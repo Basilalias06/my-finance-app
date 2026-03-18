@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1d27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+    <title>Budgets — FinTrack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Text:wght@400;500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <script src="fintrack-data.js"></script>
+<script src="fintrack-sync.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #000;
+            --surface-1: #0A0A0A;
+            --surface-2: #141414;
+            --surface-3: #1E1E1E;
+            --surface-4: #282828;
+            --surface-5: #333;
+            --primary: #80CBC4;
+            --primary-dim: rgba(128, 203, 196, 0.12);
+            --expense: #EF9A9A;
+            --income: #A5D6A7;
+            --transfer: #90CAF9;
+            --warning: #E8B06E;
+            --text-primary: #FFFBFE;
+            --text-secondary: #CAC4D0;
+            --text-tertiary: #79747E;
+            --divider: #3A3A3A;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: 'Google Sans Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 540px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 16px 8px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: transparent;
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+        }
+
+        .back-button {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .back-button:hover {
+            background: var(--surface-3);
+            color: var(--text-primary);
+        }
+
+        .back-button .material-symbols-rounded {
+            font-size: 24px;
+        }
+
+        .top-bar-title {
+            flex: 1;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-bar {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 8px;
+            background: rgba(14, 14, 14, 0.92);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            border: 1px solid var(--divider);
+            border-radius: 100px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+        }
+
+        .nav-item {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            color: var(--text-tertiary);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-item .material-symbols-rounded {
+            font-size: 22px;
+        }
+
+        .nav-item:hover {
+            color: var(--text-secondary);
+            background: var(--surface-3);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: var(--primary-dim);
+        }
+
+        .nav-item.active .material-symbols-rounded {
+            font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .page-content {
+            padding: 0 16px;
+        }
+
+        /* Month Selector */
+        .month-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .month-nav-button {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: var(--surface-3);
+            color: var(--text-secondary);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .month-nav-button:hover {
+            background: var(--surface-4);
+            color: var(--text-primary);
+        }
+
+        .month-nav-button .material-symbols-rounded {
+            font-size: 20px;
+        }
+
+        .month-label {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            min-width: 140px;
+            text-align: center;
+            padding: 8px 12px;
+            background: var(--surface-2);
+            border-radius: 12px;
+        }
+
+        /* Overall Summary Card */
+        .summary-card {
+            background: linear-gradient(135deg, var(--surface-3) 0%, var(--surface-2) 100%);
+            border: 1px solid var(--divider);
+            border-radius: 24px;
+            padding: 24px;
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .summary-left {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .summary-value.primary {
+            color: var(--primary);
+        }
+
+        .summary-value.expense {
+            color: var(--expense);
+        }
+
+        .summary-value.income {
+            color: var(--income);
+        }
+
+        .summary-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-ring-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+
+        .progress-ring {
+            width: 100%;
+            height: 100%;
+        }
+
+        .progress-ring-circle {
+            stroke: var(--surface-4);
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+        }
+
+        .progress-ring-progress {
+            stroke: var(--primary);
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease;
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 0;
+            transform: rotate(-90deg);
+            transform-origin: 60px 60px;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .progress-percentage {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .progress-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .summary-days {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* Category Budget Cards */
+        .budgets-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .budget-card {
+            background: var(--surface-2);
+            border: 1px solid var(--divider);
+            border-radius: 16px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .budget-card:hover {
+            background: var(--surface-3);
+            border-color: var(--primary);
+        }
+
+        .budget-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .budget-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface-3);
+            border-radius: 12px;
+            color: var(--primary);
+        }
+
+        .budget-icon .material-symbols-rounded {
+            font-size: 20px;
+        }
+
+        .budget-header-info {
+            flex: 1;
+        }
+
+        .budget-category {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .budget-allocated {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        .budget-status {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        .budget-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 12px;
+            font-size: 12px;
+        }
+
+        .budget-spent {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+        }
+
+        .budget-percentage {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        .budget-bar-container {
+            height: 8px;
+            background: var(--surface-4);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .budget-bar {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+            transition: background-color 0.3s, width 0.3s;
+        }
+
+        .budget-bar.warning {
+            background: var(--warning);
+        }
+
+        .budget-bar.danger {
+            background: var(--expense);
+        }
+
+        .budget-bar.danger-pulsing {
+            background: var(--expense);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .budget-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .budget-remaining {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--income);
+        }
+
+        .budget-remaining.overspent {
+            color: var(--expense);
+        }
+
+        .budget-count {
+            color: var(--text-tertiary);
+        }
+
+        /* Expandable Section */
+        .budget-expanded {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--divider);
+        }
+
+        .budget-transactions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 12px;
+        }
+
+        .transaction-label {
+            color: var(--text-secondary);
+            flex: 1;
+        }
+
+        .transaction-amount {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--expense);
+            font-weight: 500;
+        }
+
+        /* FAB Button */
+        .fab {
+            position: fixed;
+            bottom: 76px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            border-radius: 100px;
+            background: var(--primary);
+            color: var(--bg);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(128, 203, 196, 0.3);
+            transition: all 0.2s;
+            z-index: 100;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 32px rgba(128, 203, 196, 0.4);
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .fab .material-symbols-rounded {
+            font-size: 24px;
+        }
+
+        /* Bottom Sheet */
+        .sheet-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .sheet-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface-1);
+            border-top: 1px solid var(--divider);
+            border-radius: 24px 24px 0 0;
+            padding: 20px 16px 24px;
+            max-width: 540px;
+            margin: 0 auto;
+            z-index: 301;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .bottom-sheet.active {
+            transform: translateY(0);
+        }
+
+        .sheet-handle {
+            width: 36px;
+            height: 4px;
+            background: var(--surface-4);
+            border-radius: 2px;
+            margin: 0 auto 16px;
+        }
+
+        .sheet-title {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .form-input, .form-select {
+            background: var(--surface-3);
+            border: 1px solid var(--divider);
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: var(--text-primary);
+            font-family: 'Google Sans Text', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--surface-4);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .toggle-button {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--divider);
+            background: var(--surface-3);
+            color: var(--text-secondary);
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'Google Sans Text', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .toggle-button.active {
+            background: var(--primary-dim);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .numberpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .numberpad-button {
+            aspect-ratio: 1;
+            border: 1px solid var(--divider);
+            background: var(--surface-3);
+            color: var(--text-primary);
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .numberpad-button:hover {
+            background: var(--surface-4);
+        }
+
+        .numberpad-button:active {
+            background: var(--primary-dim);
+        }
+
+        .numberpad-button.delete {
+            background: var(--surface-3);
+            color: var(--expense);
+        }
+
+        .sheet-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .sheet-button {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sheet-button.primary {
+            background: var(--primary);
+            color: var(--bg);
+        }
+
+        .sheet-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(128, 203, 196, 0.3);
+        }
+
+        .sheet-button.secondary {
+            background: var(--surface-3);
+            color: var(--text-primary);
+            border: 1px solid var(--divider);
+        }
+
+        .sheet-button.secondary:hover {
+            background: var(--surface-4);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 76px;
+            left: 16px;
+            right: 16px;
+            max-width: 508px;
+            background: var(--surface-3);
+            border: 1px solid var(--divider);
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            z-index: 400;
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 4.7s;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .toast.success {
+            border-color: var(--income);
+            background: rgba(165, 214, 167, 0.08);
+            color: var(--income);
+        }
+
+        .toast.error {
+            border-color: var(--expense);
+            background: rgba(239, 154, 154, 0.08);
+            color: var(--expense);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: fixed;
+            background: var(--surface-3);
+            border: 1px solid var(--divider);
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 350;
+            min-width: 140px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .context-menu.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .context-menu-item {
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-family: 'Google Sans Text', sans-serif;
+            font-size: 13px;
+            transition: background 0.2s;
+            border-bottom: 1px solid var(--divider);
+        }
+
+        .context-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .context-menu-item:hover {
+            background: var(--surface-4);
+        }
+
+        .context-menu-item.delete {
+            color: var(--expense);
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .budgets-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .summary-card {
+                grid-template-columns: auto 1fr;
+            }
+
+            .container {
+                max-width: 1080px;
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-tertiary);
+        }
+
+        .empty-state .material-symbols-rounded {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .empty-state-description {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+    
+/* ── Light Theme ─────────────────────────── */
+.light-theme {
+  --bg:#F8F9FA; --s1:#FFFFFF; --s2:#F1F3F4; --s3:#E8EAED; --s4:#DDE1E7; --s5:#CDD0D7;
+  --ol:#DDE1E7; --olv:#E8EAED;
+  --txt:#1A1A1A; --txt2:#5F6368; --txt3:#9AA0A6;
+  --pri:#00897B; --pri-glow:rgba(0,137,123,0.08); --pri-c:rgba(0,137,123,0.10);
+  --exp:#C62828; --exp-glow:rgba(198,40,40,0.06); --exp-c:rgba(198,40,40,0.08);
+  --inc:#2E7D32; --inc-glow:rgba(46,125,50,0.06); --inc-c:rgba(46,125,50,0.08);
+  --tra:#1565C0; --warn:#E65100;
+  background-color: var(--bg) !important;
+  color: var(--txt) !important;
+}
+.light-theme body { background: var(--bg); color: var(--txt); }
+</style>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="back-button" onclick="location.href='MainMenu.html'" title="Back">
+                <span class="material-symbols-rounded">arrow_back</span>
+            </button>
+            <h1 class="top-bar-title">Budgets</h1>
+        </div>
+
+        <div class="page-content">
+            <!-- Month Selector -->
+            <div class="month-selector">
+                <button class="month-nav-button" onclick="previousMonth()" title="Previous month">
+                    <span class="material-symbols-rounded">chevron_left</span>
+                </button>
+                <div class="month-label" id="monthLabel">March 2026</div>
+                <button class="month-nav-button" onclick="nextMonth()" title="Next month">
+                    <span class="material-symbols-rounded">chevron_right</span>
+                </button>
+            </div>
+
+            <!-- Overall Summary Card -->
+            <div class="summary-card">
+                <div class="summary-left">
+                    <div class="summary-item">
+                        <div class="summary-label">Total Budget</div>
+                        <div class="summary-value primary">₹45,000</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total Spent</div>
+                        <div class="summary-value expense">₹27,599</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Remaining</div>
+                        <div class="summary-value income">₹17,401</div>
+                    </div>
+                </div>
+                <div class="summary-right">
+                    <div class="progress-ring-container">
+                        <svg class="progress-ring" viewBox="0 0 120 120">
+                            <circle class="progress-ring-circle" cx="60" cy="60" r="40"></circle>
+                            <circle class="progress-ring-progress" id="progressCircle" cx="60" cy="60" r="40"></circle>
+                        </svg>
+                        <div class="progress-text">
+                            <div class="progress-percentage" id="progressPercentage">61%</div>
+                            <div class="progress-label">Used</div>
+                        </div>
+                    </div>
+                    <div class="summary-days">
+                        <div id="daysRemaining">14 days left</div>
+                        <div style="font-size: 11px; color: var(--text-tertiary);">in month</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Budget Cards -->
+            <div id="budgetsList" class="budgets-list">
+                <!-- Budget cards will be inserted here -->
+            </div>
+
+            <!-- Empty State (hidden by default) -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <span class="material-symbols-rounded">account_balance_wallet</span>
+                <div class="empty-state-text">No budgets yet</div>
+                <div class="empty-state-description">Create your first budget to track expenses</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAB Button -->
+    <button class="fab" onclick="openAddBudgetSheet()" title="Add new budget">
+        <span class="material-symbols-rounded">add</span>
+    </button>
+
+    <!-- Bottom Sheet Overlay -->
+    <div class="sheet-overlay" id="sheetOverlay" onclick="closeBudgetSheet()"></div>
+
+    <!-- Bottom Sheet -->
+    <div class="bottom-sheet" id="budgetSheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title" id="sheetTitle">Add Budget</div>
+
+        <!-- Category Select -->
+        <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-select" id="categorySelect">
+                <option value="">Select a category</option>
+                <option value="food">Food & Dining</option>
+                <option value="transport">Transport</option>
+                <option value="entertainment">Entertainment</option>
+                <option value="housing">Housing</option>
+                <option value="bills">Bills & Utilities</option>
+                <option value="health">Health & Fitness</option>
+                <option value="shopping">Shopping</option>
+                <option value="education">Education</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <!-- Budget Amount -->
+        <div class="form-group">
+            <label class="form-label">Budget Amount (₹)</label>
+            <div style="background: var(--surface-3); border: 1px solid var(--divider); border-radius: 12px; padding: 12px 14px; font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--text-primary); min-height: 44px; display: flex; align-items: center;" id="amountDisplay">₹0</div>
+            <div class="numberpad">
+                <button class="numberpad-button" onclick="addDigit('1')">1</button>
+                <button class="numberpad-button" onclick="addDigit('2')">2</button>
+                <button class="numberpad-button" onclick="addDigit('3')">3</button>
+                <button class="numberpad-button" onclick="addDigit('4')">4</button>
+                <button class="numberpad-button" onclick="addDigit('5')">5</button>
+                <button class="numberpad-button" onclick="addDigit('6')">6</button>
+                <button class="numberpad-button" onclick="addDigit('7')">7</button>
+                <button class="numberpad-button" onclick="addDigit('8')">8</button>
+                <button class="numberpad-button" onclick="addDigit('9')">9</button>
+                <button class="numberpad-button" onclick="addDigit('0')">0</button>
+                <button class="numberpad-button delete" onclick="clearAmount()" style="grid-column: 2;">Clear</button>
+            </div>
+        </div>
+
+        <!-- Frequency Toggle -->
+        <div class="form-group">
+            <label class="form-label">Frequency</label>
+            <div class="toggle-group">
+                <button class="toggle-button active" onclick="setFrequency('monthly')">Monthly</button>
+                <button class="toggle-button" onclick="setFrequency('weekly')">Weekly</button>
+            </div>
+        </div>
+
+        <!-- Rollover Toggle -->
+        <div class="form-group">
+            <label class="form-label">Rollover</label>
+            <div class="toggle-group">
+                <button class="toggle-button active" onclick="setRollover(true)">Enabled</button>
+                <button class="toggle-button" onclick="setRollover(false)">Disabled</button>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="sheet-actions">
+            <button class="sheet-button secondary" onclick="closeBudgetSheet()">Cancel</button>
+            <button class="sheet-button primary" onclick="saveBudget()">Save Budget</button>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <button class="context-menu-item" onclick="editBudget()">Edit</button>
+        <button class="context-menu-item delete" onclick="deleteBudget()">Delete</button>
+    </div>
+
+    <script>
+        // State
+        let currentMonth = new Date(2026, 2, 17); // March 2026
+        let budgetAmount = '';
+        let frequency = 'monthly';
+        // Sync rollover from shared settings
+        let rollover = FT.getSetting('budgetRollover') !== false;
+        let editingBudgetId = null;
+        let contextMenuBudgetId = null;
+
+        // Init theme
+        FTTheme.init();
+
+        // Sample budget data
+        const budgetsData = [
+            {
+                id: 1,
+                category: 'food',
+                name: 'Food & Dining',
+                icon: 'restaurant',
+                allocated: 8000,
+                spent: 5479,
+                transactions: [
+                    { label: 'Restaurant ABC', amount: 1500 },
+                    { label: 'Grocery Store', amount: 2100 },
+                    { label: 'Coffee Shop', amount: 450 },
+                    { label: 'Delivery', amount: 1429 }
+                ]
+            },
+            {
+                id: 2,
+                category: 'transport',
+                name: 'Transport',
+                icon: 'directions_car',
+                allocated: 3000,
+                spent: 1520,
+                transactions: [
+                    { label: 'Fuel', amount: 800 },
+                    { label: 'Taxi/Auto', amount: 720 }
+                ]
+            },
+            {
+                id: 3,
+                category: 'entertainment',
+                name: 'Entertainment',
+                icon: 'movie',
+                allocated: 2000,
+                spent: 649,
+                transactions: [
+                    { label: 'Movie Tickets', amount: 400 },
+                    { label: 'Streaming', amount: 249 }
+                ]
+            },
+            {
+                id: 4,
+                category: 'housing',
+                name: 'Housing',
+                icon: 'home',
+                allocated: 18000,
+                spent: 18000,
+                transactions: [
+                    { label: 'Rent', amount: 18000 }
+                ]
+            },
+            {
+                id: 5,
+                category: 'bills',
+                name: 'Bills & Utilities',
+                icon: 'receipt_long',
+                allocated: 5000,
+                spent: 1850,
+                transactions: [
+                    { label: 'Electricity', amount: 950 },
+                    { label: 'Internet', amount: 900 }
+                ]
+            },
+            {
+                id: 6,
+                category: 'health',
+                name: 'Health & Fitness',
+                icon: 'fitness_center',
+                allocated: 3000,
+                spent: 1500,
+                transactions: [
+                    { label: 'Gym', amount: 1500 }
+                ]
+            },
+            {
+                id: 7,
+                category: 'shopping',
+                name: 'Shopping',
+                icon: 'shopping_bag',
+                allocated: 4000,
+                spent: 0,
+                transactions: []
+            },
+            {
+                id: 8,
+                category: 'education',
+                name: 'Education',
+                icon: 'school',
+                allocated: 2000,
+                spent: 450,
+                transactions: [
+                    { label: 'Course', amount: 450 }
+                ]
+            }
+        ];
+
+        let expandedBudgetId = null;
+
+        // Initialize
+        function init() {
+            updateMonthLabel();
+            renderBudgets();
+            updateProgressRing();
+            updateDaysRemaining();
+        }
+
+        // Month Navigation
+        function previousMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            updateMonthLabel();
+        }
+
+        function nextMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            updateMonthLabel();
+        }
+
+        function updateMonthLabel() {
+            const options = { month: 'long', year: 'numeric' };
+            const monthLabel = currentMonth.toLocaleDateString('en-IN', options);
+            document.getElementById('monthLabel').textContent = monthLabel;
+        }
+
+        // Calculate days remaining
+        function updateDaysRemaining() {
+            const now = new Date(2026, 2, 17);
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            const daysLeft = lastDay.getDate() - now.getDate();
+            document.getElementById('daysRemaining').textContent = `${daysLeft} days left`;
+        }
+
+        // Progress Ring
+        function updateProgressRing() {
+            const total = 45000;
+            const spent = 27599;
+            const percentage = Math.round((spent / total) * 100);
+            const circumference = 40 * 2 * Math.PI;
+            const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+            document.getElementById('progressCircle').style.strokeDashoffset = strokeDashoffset;
+            document.getElementById('progressPercentage').textContent = percentage + '%';
+        }
+
+        // Render Budget Cards
+        function renderBudgets() {
+            const container = document.getElementById('budgetsList');
+            container.innerHTML = '';
+
+            budgetsData.forEach(budget => {
+                const percentage = Math.round((budget.spent / budget.allocated) * 100);
+                const remaining = budget.allocated - budget.spent;
+                let barClass = 'primary';
+
+                if (percentage > 100) {
+                    barClass = 'danger-pulsing';
+                } else if (percentage > 90) {
+                    barClass = 'danger';
+                } else if (percentage >= 70) {
+                    barClass = 'warning';
+                }
+
+                const card = document.createElement('div');
+                card.className = 'budget-card';
+                card.onclick = () => toggleBudgetExpand(budget.id);
+                card.oncontextmenu = (e) => {
+                    e.preventDefault();
+                    showContextMenu(e, budget.id);
+                };
+
+                const isExpanded = expandedBudgetId === budget.id;
+
+                card.innerHTML = `
+                    <div class="budget-card-header">
+                        <div class="budget-icon">
+                            <span class="material-symbols-rounded">${budget.icon}</span>
+                        </div>
+                        <div class="budget-header-info">
+                            <div class="budget-category">${budget.name}</div>
+                            <div class="budget-allocated">₹${budget.allocated.toLocaleString('en-IN')}</div>
+                        </div>
+                        <div class="budget-status">₹${budget.spent.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div class="budget-details">
+                        <div class="budget-spent">${percentage}% spent</div>
+                        <div class="budget-percentage">${percentage}%</div>
+                    </div>
+                    <div class="budget-bar-container">
+                        <div class="budget-bar ${barClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+                    </div>
+                    <div class="budget-footer">
+                        <div class="budget-remaining ${remaining < 0 ? 'overspent' : ''}">
+                            ${remaining < 0 ? '₹' + Math.abs(remaining).toLocaleString('en-IN') + ' over' : '₹' + remaining.toLocaleString('en-IN') + ' left'}
+                        </div>
+                        <div class="budget-count">${budget.transactions.length} transaction${budget.transactions.length !== 1 ? 's' : ''}</div>
+                    </div>
+                    ${isExpanded ? `
+                        <div class="budget-expanded">
+                            <div class="budget-transactions">
+                                ${budget.transactions.map(t => `
+                                    <div class="transaction-item">
+                                        <div class="transaction-label">${t.label}</div>
+                                        <div class="transaction-amount">₹${t.amount.toLocaleString('en-IN')}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function toggleBudgetExpand(budgetId) {
+            expandedBudgetId = expandedBudgetId === budgetId ? null : budgetId;
+            renderBudgets();
+        }
+
+        // Context Menu
+        function showContextMenu(event, budgetId) {
+            contextMenuBudgetId = budgetId;
+            const menu = document.getElementById('contextMenu');
+            menu.style.left = event.clientX + 'px';
+            menu.style.top = event.clientY + 'px';
+            menu.classList.add('active');
+
+            document.addEventListener('click', () => {
+                menu.classList.remove('active');
+            }, { once: true });
+        }
+
+        function editBudget() {
+            if (!contextMenuBudgetId) return;
+            const budget = budgetsData.find(b => b.id === contextMenuBudgetId);
+            if (budget) {
+                editingBudgetId = budget.id;
+                document.getElementById('sheetTitle').textContent = 'Edit Budget';
+                document.getElementById('categorySelect').value = budget.category;
+                budgetAmount = budget.allocated.toString();
+                updateAmountDisplay();
+                openAddBudgetSheet();
+            }
+        }
+
+        function deleteBudget() {
+            if (!contextMenuBudgetId) return;
+            const index = budgetsData.findIndex(b => b.id === contextMenuBudgetId);
+            if (index > -1) {
+                budgetsData.splice(index, 1);
+                renderBudgets();
+                showToast('Budget deleted', 'success');
+            }
+        }
+
+        // Bottom Sheet
+        function openAddBudgetSheet() {
+            document.getElementById('sheetOverlay').classList.add('active');
+            document.getElementById('budgetSheet').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeBudgetSheet() {
+            document.getElementById('sheetOverlay').classList.remove('active');
+            document.getElementById('budgetSheet').classList.remove('active');
+            document.body.style.overflow = '';
+            resetForm();
+            editingBudgetId = null;
+            document.getElementById('sheetTitle').textContent = 'Add Budget';
+        }
+
+        function resetForm() {
+            budgetAmount = '';
+            frequency = 'monthly';
+            rollover = true;
+            document.getElementById('categorySelect').value = '';
+            updateAmountDisplay();
+            document.querySelectorAll('.toggle-button').forEach((btn, idx) => {
+                if (idx < 2) {
+                    btn.classList.toggle('active', btn.textContent.includes('Monthly'));
+                } else {
+                    btn.classList.toggle('active', idx === 3);
+                }
+            });
+        }
+
+        // Number Pad
+        function addDigit(digit) {
+            if (budgetAmount.length < 8) {
+                budgetAmount += digit;
+                updateAmountDisplay();
+            }
+        }
+
+        function clearAmount() {
+            budgetAmount = '';
+            updateAmountDisplay();
+        }
+
+        function updateAmountDisplay() {
+            const amount = budgetAmount || '0';
+            const numAmount = parseInt(amount) || 0;
+            document.getElementById('amountDisplay').textContent = '₹' + numAmount.toLocaleString('en-IN');
+        }
+
+        // Toggle Controls
+        function setFrequency(freq) {
+            frequency = freq;
+            document.querySelectorAll('.toggle-group')[0].querySelectorAll('.toggle-button').forEach(btn => {
+                btn.classList.toggle('active', (freq === 'monthly' && btn.textContent.includes('Monthly')) || (freq === 'weekly' && btn.textContent.includes('Weekly')));
+            });
+        }
+
+        function setRollover(value) {
+            rollover = value;
+            document.querySelectorAll('.toggle-group')[1].querySelectorAll('.toggle-button').forEach(btn => {
+                btn.classList.toggle('active', (value && btn.textContent.includes('Enabled')) || (!value && btn.textContent.includes('Disabled')));
+            });
+        }
+
+        // Save Budget
+        function saveBudget() {
+            const category = document.getElementById('categorySelect').value;
+            const amount = parseInt(budgetAmount) || 0;
+
+            if (!category) {
+                showToast('Please select a category', 'error');
+                return;
+            }
+
+            if (!amount || amount <= 0) {
+                showToast('Please enter a valid amount', 'error');
+                return;
+            }
+
+            if (editingBudgetId) {
+                const budget = budgetsData.find(b => b.id === editingBudgetId);
+                if (budget) {
+                    budget.allocated = amount;
+                    showToast('Budget updated', 'success');
+                }
+            } else {
+                const newBudget = {
+                    id: Math.max(...budgetsData.map(b => b.id), 0) + 1,
+                    category: category,
+                    name: document.querySelector(`option[value="${category}"]`).textContent,
+                    allocated: amount,
+                    spent: 0,
+                    transactions: [],
+                    icon: 'wallet'
+                };
+                budgetsData.push(newBudget);
+                showToast('Budget created', 'success');
+            }
+
+            closeBudgetSheet();
+            renderBudgets();
+        }
+
+        // Toast
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+    <!-- Floating Nav Bar -->
+    <nav class="nav-bar">
+      <button class="nav-item" onclick="location.href='MainMenu.html'" title="Home"><span class="material-symbols-rounded">home</span></button>
+      <button class="nav-item" onclick="location.href='AllTransactions.html'" title="Transactions"><span class="material-symbols-rounded">receipt_long</span></button>
+      <button class="nav-item" onclick="location.href='Accounts.html'" title="Accounts"><span class="material-symbols-rounded">wallet</span></button>
+      <button class="nav-item" onclick="location.href='Reports.html'" title="Reports"><span class="material-symbols-rounded">bar_chart</span></button>
+      <button class="nav-item" onclick="location.href='Settings.html'" title="Settings"><span class="material-symbols-rounded">settings</span></button>
+    </nav>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(reg => console.log("[SW] Registered:", reg.scope))
+      .catch(err => console.warn("[SW] Registration failed:", err));
+  });
+}
+</script>
+</body>
+</html>

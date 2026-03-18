@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1d27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+    <title>Calendar - FinTrack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Google+Sans+Text:wght@400;500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: #E8E8E8;
+            font-family: 'Google Sans Text', sans-serif;
+        }
+
+        body {
+            padding-bottom: 100px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid #282828;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .top-bar .back-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1E1E1E;
+            border: none;
+            border-radius: 12px;
+            color: #E8E8E8;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .top-bar .back-btn:hover {
+            background: #282828;
+        }
+
+        .top-bar .back-btn .material-symbols-rounded {
+            font-size: 24px;
+        }
+
+        .top-bar h1 {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin-top: 56px;
+            padding: 24px 16px;
+        }
+
+        /* Month Navigation */
+        .month-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .month-nav-left, .month-nav-right {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1E1E1E;
+            border: none;
+            border-radius: 12px;
+            color: #E8E8E8;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .month-nav-left:hover, .month-nav-right:hover {
+            background: #282828;
+        }
+
+        .month-nav-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .month-year {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .today-btn {
+            padding: 8px 16px;
+            background: #80CBC4;
+            border: none;
+            border-radius: 100px;
+            color: #000;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .today-btn:hover {
+            background: #6DB5AD;
+            box-shadow: 0 4px 12px rgba(128, 203, 196, 0.3);
+        }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            background: #0A0A0A;
+            border: 1px solid #282828;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .day-headers {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .day-header {
+            text-align: center;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: #79747E;
+            padding: 12px 0;
+        }
+
+        .calendar-dates {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .date-cell {
+            aspect-ratio: 1;
+            background: #141414;
+            border: 1px solid #1E1E1E;
+            border-radius: 12px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .date-cell:hover {
+            background: #1E1E1E;
+            border-color: #282828;
+        }
+
+        .date-cell.today {
+            border: 2px solid #80CBC4;
+            background: rgba(128, 203, 196, 0.08);
+        }
+
+        .date-cell.past {
+            opacity: 0.5;
+        }
+
+        .date-cell.other-month {
+            opacity: 0.3;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .date-cell.selected {
+            background: #1E1E1E;
+            border-color: #80CBC4;
+        }
+
+        .date-number {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .date-events {
+            display: flex;
+            gap: 2px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: flex-start;
+        }
+
+        .event-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .event-dot.expense {
+            background: #EF9A9A;
+        }
+
+        .event-dot.income {
+            background: #A5D6A7;
+        }
+
+        .event-dot.transfer {
+            background: #90CAF9;
+        }
+
+        .event-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            background: #282828;
+            color: #A8A8A8;
+            padding: 2px 4px;
+            border-radius: 4px;
+            line-height: 1;
+        }
+
+        /* Monthly Summary */
+        .monthly-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .summary-card {
+            background: #0A0A0A;
+            border: 1px solid #282828;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: #79747E;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .summary-amount {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .summary-income .summary-amount {
+            color: #A5D6A7;
+        }
+
+        .summary-expense .summary-amount {
+            color: #EF9A9A;
+        }
+
+        .summary-net .summary-amount {
+            color: #80CBC4;
+        }
+
+        /* Selected Day Detail */
+        .day-detail {
+            background: #0A0A0A;
+            border: 1px solid #282828;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 32px;
+            display: none;
+        }
+
+        .day-detail.active {
+            display: block;
+        }
+
+        .detail-header {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #E8E8E8;
+        }
+
+        .transactions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .transaction-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #141414;
+            border: 1px solid #1E1E1E;
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .transaction-icon.expense {
+            background: rgba(239, 154, 154, 0.12);
+            color: #EF9A9A;
+        }
+
+        .transaction-icon.income {
+            background: rgba(165, 214, 167, 0.12);
+            color: #A5D6A7;
+        }
+
+        .transaction-icon.transfer {
+            background: rgba(144, 202, 249, 0.12);
+            color: #90CAF9;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-name {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .transaction-meta {
+            font-size: 12px;
+            color: #79747E;
+        }
+
+        .transaction-amount {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .transaction-amount.expense {
+            color: #EF9A9A;
+        }
+
+        .transaction-amount.income {
+            color: #A5D6A7;
+        }
+
+        .transaction-amount.transfer {
+            color: #90CAF9;
+        }
+
+        .add-transaction-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(128, 203, 196, 0.12);
+            border: 1px solid #80CBC4;
+            border-radius: 12px;
+            color: #80CBC4;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-transaction-btn:hover {
+            background: rgba(128, 203, 196, 0.2);
+        }
+
+        /* Upcoming Bills */
+        .upcoming-bills {
+            margin-bottom: 32px;
+        }
+
+        .upcoming-title {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .bills-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bill-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #0A0A0A;
+            border: 1px solid #282828;
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .bill-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(232, 176, 110, 0.12);
+            color: #E8B06E;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .bill-info {
+            flex: 1;
+        }
+
+        .bill-name {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .bill-countdown {
+            font-size: 12px;
+            color: #79747E;
+        }
+
+        .bill-countdown.overdue {
+            color: #EF9A9A;
+        }
+
+        .bill-amount {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 600;
+            color: #E8B06E;
+            text-align: right;
+        }
+
+        .overdue-badge {
+            display: inline-block;
+            background: #EF9A9A;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 8px;
+            background: rgba(14, 14, 14, 0.92);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            border: 1px solid #3A3A3A;
+            border-radius: 100px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+        }
+
+        .nav-item {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            color: #79747E;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-item .material-symbols-rounded {
+            font-size: 22px;
+        }
+
+        .nav-item:hover {
+            color: #CAC4D0;
+            background: #242424;
+        }
+
+        .nav-item.active {
+            color: #80CBC4;
+            background: rgba(128, 203, 196, 0.12);
+        }
+
+        .nav-item.active .material-symbols-rounded {
+            font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1E1E1E;
+            color: #E8E8E8;
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: 1px solid #282828;
+            font-size: 14px;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 16px 12px;
+            }
+
+            .monthly-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .date-cell {
+                padding: 6px;
+            }
+
+            .date-number {
+                font-size: 12px;
+            }
+
+            .event-dot {
+                width: 5px;
+                height: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <button class="back-btn" onclick="goBack()">
+            <span class="material-symbols-rounded">arrow_back</span>
+        </button>
+        <h1>Calendar</h1>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Month Navigation -->
+        <div class="month-nav">
+            <button class="month-nav-left" onclick="prevMonth()">
+                <span class="material-symbols-rounded">chevron_left</span>
+            </button>
+            <div class="month-nav-center">
+                <div class="month-year" id="monthYear">March 2026</div>
+                <button class="today-btn" onclick="goToToday()">Today</button>
+            </div>
+            <button class="month-nav-right" onclick="nextMonth()">
+                <span class="material-symbols-rounded">chevron_right</span>
+            </button>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="calendar-grid">
+            <div class="day-headers">
+                <div class="day-header">Mon</div>
+                <div class="day-header">Tue</div>
+                <div class="day-header">Wed</div>
+                <div class="day-header">Thu</div>
+                <div class="day-header">Fri</div>
+                <div class="day-header">Sat</div>
+                <div class="day-header">Sun</div>
+            </div>
+            <div class="calendar-dates" id="calendarDates"></div>
+        </div>
+
+        <!-- Monthly Summary -->
+        <div class="monthly-summary">
+            <div class="summary-card summary-income">
+                <div class="summary-label">Income</div>
+                <div class="summary-amount" id="monthlyIncome">₹1,03,200</div>
+            </div>
+            <div class="summary-card summary-expense">
+                <div class="summary-label">Expenses</div>
+                <div class="summary-amount" id="monthlyExpense">₹27,599</div>
+            </div>
+            <div class="summary-card summary-net">
+                <div class="summary-label">Net</div>
+                <div class="summary-amount" id="monthlyNet">+₹75,601</div>
+            </div>
+        </div>
+
+        <!-- Selected Day Detail -->
+        <div class="day-detail" id="dayDetail">
+            <div class="detail-header" id="detailHeader"></div>
+            <div class="transactions-list" id="transactionsList"></div>
+            <button class="add-transaction-btn" onclick="addTransaction()">
+                <span style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">add</span>
+                    Add Transaction
+                </span>
+            </button>
+        </div>
+
+        <!-- Upcoming Bills -->
+        <div class="upcoming-bills">
+            <div class="upcoming-title">Upcoming Bills</div>
+            <div class="bills-list" id="billsList"></div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <button class="nav-item" onclick="navigateTo('MainMenu.html')">
+            <span class="material-symbols-rounded">home</span>
+        </button>
+        <button class="nav-item" onclick="navigateTo('AllTransactions.html')">
+            <span class="material-symbols-rounded">list</span>
+        </button>
+        <button class="nav-item active" onclick="navigateTo('Calendar.html')">
+            <span class="material-symbols-rounded">calendar_month</span>
+        </button>
+        <button class="nav-item" onclick="navigateTo('Reports.html')">
+            <span class="material-symbols-rounded">bar_chart</span>
+        </button>
+        <button class="nav-item" onclick="navigateTo('Settings.html')">
+            <span class="material-symbols-rounded">settings</span>
+        </button>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="fintrack-data.js"></script>
+<script src="fintrack-sync.js"></script>
+<script>
+        // Sample transaction data
+        const transactions = {
+            1: [{ name: 'Rent', category: 'Housing', account: 'Savings', amount: 18000, type: 'expense', icon: 'home' }],
+            3: [{ name: 'Book Purchase', category: 'Entertainment', account: 'Credit Card', amount: 450, type: 'expense', icon: 'book' }],
+            5: [{ name: 'Dining Out', category: 'Food', account: 'Debit Card', amount: 2200, type: 'expense', icon: 'restaurant' }],
+            8: [{ name: 'Gym', category: 'Health', account: 'Debit Card', amount: 1500, type: 'expense', icon: 'fitness_center' }],
+            10: [{ name: 'Dividends', category: 'Investment', account: 'Investment', amount: 3200, type: 'income', icon: 'trending_up' }],
+            12: [
+                { name: 'Electricity', category: 'Utilities', account: 'Credit Card', amount: 1850, type: 'expense', icon: 'bolt' },
+                { name: 'Coffee', category: 'Food', account: 'Debit Card', amount: 180, type: 'expense', icon: 'local_cafe' }
+            ],
+            14: [{ name: 'Savings Transfer', category: 'Transfer', account: 'Bank Transfer', amount: 10000, type: 'transfer', icon: 'arrow_forward' }],
+            15: [
+                { name: 'Uber', category: 'Transport', account: 'Debit Card', amount: 320, type: 'expense', icon: 'directions_car' },
+                { name: 'Freelance', category: 'Income', account: 'Bank', amount: 15000, type: 'income', icon: 'work' }
+            ],
+            16: [{ name: 'Netflix', category: 'Entertainment', account: 'Credit Card', amount: 649, type: 'expense', icon: 'theaters' }],
+            17: [
+                { name: 'Grocery', category: 'Food', account: 'Debit Card', amount: 2450, type: 'expense', icon: 'shopping_cart' },
+                { name: 'Salary', category: 'Income', account: 'Bank', amount: 85000, type: 'income', icon: 'account_balance' }
+            ]
+        };
+
+        // Upcoming bills data
+        const upcomingBills = [
+            { name: 'Internet Bill', amount: 999, daysUntil: 5, overdue: false },
+            { name: 'Water Bill', amount: 450, daysUntil: 8, overdue: false },
+            { name: 'Insurance', amount: 5000, daysUntil: 12, overdue: false },
+            { name: 'Phone Bill', amount: 599, daysUntil: 15, overdue: false },
+            { name: 'Property Tax', amount: 8500, daysUntil: 25, overdue: false }
+        ];
+
+        let currentDate = new Date(2026, 2, 17); // March 17, 2026
+        const today = new Date(2026, 2, 17);
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            // Update month-year display
+            document.getElementById('monthYear').textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+            const calendarDates = document.getElementById('calendarDates');
+            calendarDates.innerHTML = '';
+
+            // Previous month's days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const day = daysInPrevMonth - i;
+                const cell = createDateCell(day, true, month - 1);
+                cell.classList.add('other-month');
+                calendarDates.appendChild(cell);
+            }
+
+            // Current month's days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = createDateCell(day, false, month);
+                const cellDate = new Date(year, month, day);
+
+                // Check if today
+                if (cellDate.toDateString() === today.toDateString()) {
+                    cell.classList.add('today');
+                }
+
+                // Check if past
+                if (cellDate < today) {
+                    cell.classList.add('past');
+                }
+
+                // Add click listener
+                cell.addEventListener('click', () => selectDay(day));
+
+                calendarDates.appendChild(cell);
+            }
+
+            // Next month's days
+            const totalCells = calendarDates.children.length;
+            const remainingCells = 42 - totalCells;
+            for (let day = 1; day <= remainingCells; day++) {
+                const cell = createDateCell(day, true, month + 1);
+                cell.classList.add('other-month');
+                calendarDates.appendChild(cell);
+            }
+
+            // Render monthly summary
+            renderMonthlySummary(month);
+
+            // Render upcoming bills
+            renderUpcomingBills();
+        }
+
+        function createDateCell(day, isOtherMonth, month) {
+            const cell = document.createElement('div');
+            cell.className = 'date-cell';
+
+            const dateNumber = document.createElement('div');
+            dateNumber.className = 'date-number';
+            dateNumber.textContent = day;
+            cell.appendChild(dateNumber);
+
+            const eventsContainer = document.createElement('div');
+            eventsContainer.className = 'date-events';
+
+            // Get transactions for this day (if current month)
+            if (!isOtherMonth && transactions[day]) {
+                const transactionList = transactions[day];
+                const types = {};
+
+                transactionList.forEach(t => {
+                    types[t.type] = (types[t.type] || 0) + 1;
+                });
+
+                // Add event dots
+                if (types.expense > 0) {
+                    const dot = document.createElement('div');
+                    dot.className = 'event-dot expense';
+                    eventsContainer.appendChild(dot);
+                }
+                if (types.income > 0) {
+                    const dot = document.createElement('div');
+                    dot.className = 'event-dot income';
+                    eventsContainer.appendChild(dot);
+                }
+                if (types.transfer > 0) {
+                    const dot = document.createElement('div');
+                    dot.className = 'event-dot transfer';
+                    eventsContainer.appendChild(dot);
+                }
+
+                // Show count if multiple events
+                const totalEvents = transactionList.length;
+                if (totalEvents > 1) {
+                    const count = document.createElement('div');
+                    count.className = 'event-count';
+                    count.textContent = totalEvents;
+                    eventsContainer.appendChild(count);
+                }
+            }
+
+            if (eventsContainer.children.length > 0) {
+                cell.appendChild(eventsContainer);
+            }
+
+            return cell;
+        }
+
+        function selectDay(day) {
+            // Remove previous selection
+            document.querySelectorAll('.date-cell.selected').forEach(cell => {
+                cell.classList.remove('selected');
+            });
+
+            // Add selection to new day
+            const cells = document.querySelectorAll('.date-cell');
+            let dayIndex = 0;
+            for (let i = 0; i < cells.length; i++) {
+                if (cells[i].textContent.startsWith(day.toString()) && !cells[i].classList.contains('other-month')) {
+                    cells[i].classList.add('selected');
+                    break;
+                }
+            }
+
+            // Show day detail
+            showDayDetail(day);
+        }
+
+        function showDayDetail(day) {
+            const detailDiv = document.getElementById('dayDetail');
+            const transactionsList = document.getElementById('transactionsList');
+            const detailHeader = document.getElementById('detailHeader');
+
+            // Format date
+            const selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            const dateStr = selectedDate.toLocaleDateString('en-US', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                weekday: 'long'
+            });
+            detailHeader.textContent = dateStr;
+
+            // Get transactions for this day
+            const dayTransactions = transactions[day] || [];
+
+            transactionsList.innerHTML = '';
+            if (dayTransactions.length === 0) {
+                transactionsList.innerHTML = '<p style="text-align: center; color: #79747E; padding: 20px 0;">No transactions on this day</p>';
+            } else {
+                dayTransactions.forEach(transaction => {
+                    const card = document.createElement('div');
+                    card.className = 'transaction-card';
+
+                    const icon = document.createElement('div');
+                    icon.className = `transaction-icon ${transaction.type}`;
+                    icon.innerHTML = `<span class="material-symbols-rounded">${transaction.icon}</span>`;
+                    card.appendChild(icon);
+
+                    const details = document.createElement('div');
+                    details.className = 'transaction-details';
+                    details.innerHTML = `
+                        <div class="transaction-name">${transaction.name}</div>
+                        <div class="transaction-meta">${transaction.category} • ${transaction.account}</div>
+                    `;
+                    card.appendChild(details);
+
+                    const amount = document.createElement('div');
+                    amount.className = `transaction-amount ${transaction.type}`;
+                    const sign = transaction.type === 'income' ? '+' : transaction.type === 'transfer' ? '' : '-';
+                    amount.textContent = `${sign}${formatCurrency(transaction.amount)}`;
+                    card.appendChild(amount);
+
+                    transactionsList.appendChild(card);
+                });
+            }
+
+            detailDiv.classList.add('active');
+        }
+
+        function renderMonthlySummary(month) {
+            let totalIncome = 0;
+            let totalExpense = 0;
+
+            // Calculate totals from transactions
+            Object.values(transactions).forEach(dayTransactions => {
+                dayTransactions.forEach(transaction => {
+                    if (transaction.type === 'income') {
+                        totalIncome += transaction.amount;
+                    } else if (transaction.type === 'expense') {
+                        totalExpense += transaction.amount;
+                    }
+                });
+            });
+
+            const net = totalIncome - totalExpense;
+
+            document.getElementById('monthlyIncome').textContent = formatCurrency(totalIncome);
+            document.getElementById('monthlyExpense').textContent = formatCurrency(totalExpense);
+            document.getElementById('monthlyNet').textContent = (net >= 0 ? '+' : '') + formatCurrency(net);
+        }
+
+        function renderUpcomingBills() {
+            const billsList = document.getElementById('billsList');
+            billsList.innerHTML = '';
+
+            upcomingBills.forEach(bill => {
+                const card = document.createElement('div');
+                card.className = 'bill-card';
+
+                const icon = document.createElement('div');
+                icon.className = 'bill-icon';
+                icon.innerHTML = '<span class="material-symbols-rounded">receipt_long</span>';
+                card.appendChild(icon);
+
+                const info = document.createElement('div');
+                info.className = 'bill-info';
+
+                const name = document.createElement('div');
+                name.className = 'bill-name';
+                name.textContent = bill.name;
+                info.appendChild(name);
+
+                const countdown = document.createElement('div');
+                countdown.className = `bill-countdown ${bill.overdue ? 'overdue' : ''}`;
+                countdown.textContent = bill.overdue ? 'Overdue' : `Due in ${bill.daysUntil} days`;
+                info.appendChild(countdown);
+
+                card.appendChild(info);
+
+                const amount = document.createElement('div');
+                amount.className = 'bill-amount';
+                amount.textContent = formatCurrency(bill.amount);
+
+                if (bill.overdue) {
+                    const badge = document.createElement('span');
+                    badge.className = 'overdue-badge';
+                    badge.textContent = 'OVERDUE';
+                    amount.appendChild(badge);
+                }
+
+                card.appendChild(amount);
+
+                billsList.appendChild(card);
+            });
+        }
+
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function goToToday() {
+            currentDate = new Date(today);
+            renderCalendar();
+            selectDay(today.getDate());
+        }
+
+        function goBack() {
+            window.location.href = 'MainMenu.html';
+        }
+
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        function addTransaction() {
+            showToast('Add transaction feature coming soon');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize
+        FTTheme.init();
+        renderCalendar();
+        selectDay(today.getDate());
+    </script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(reg => console.log("[SW] Registered:", reg.scope))
+      .catch(err => console.warn("[SW] Registration failed:", err));
+  });
+}
+</script>
+</body>
+</html>

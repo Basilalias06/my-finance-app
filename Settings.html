@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1d27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Settings — FinTrack</title>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Text:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <script src="fintrack-data.js"></script>
+<script src="fintrack-sync.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #000000;
+      --surface-0: #0A0A0A;
+      --surface-1: #141414;
+      --surface-2: #1E1E1E;
+      --surface-3: #282828;
+      --surface-4: #333333;
+      --primary: #80CBC4;
+      --expense: #EF9A9A;
+      --income: #A5D6A7;
+      --transfer: #90CAF9;
+      --text-primary: #FFFBFE;
+      --text-secondary: #CAC4D0;
+      --text-tertiary: #79747E;
+      --divider: #3A3A3A;
+      --radius-small: 12px;
+      --radius-medium: 16px;
+      --radius-large: 24px;
+      --radius-full: 100px;
+    }
+
+    :root.light-theme {
+      --bg: #F5F5F5;
+      --surface-0: #FFFFFF;
+      --surface-1: #F0F0F0;
+      --surface-2: #E8E8E8;
+      --surface-3: #E0E0E0;
+      --surface-4: #D8D8D8;
+      --text-primary: #1A1A1A;
+      --text-secondary: #444444;
+      --text-tertiary: #888888;
+      --divider: #DDDDDD;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: 'Google Sans Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.5;
+    }
+
+    body {
+      overflow-x: hidden;
+      padding-bottom: 100px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        max-width: 768px;
+        padding: 0 24px;
+      }
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 16px 8px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: transparent;
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    }
+
+    .top-bar .back-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      border-radius: var(--radius-medium);
+      transition: all 0.2s;
+    }
+
+    .top-bar .back-btn:hover {
+      background: var(--surface-2);
+      color: var(--primary);
+    }
+
+    .top-bar h1 {
+      font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 28px;
+      font-weight: 500;
+      flex: 1;
+    }
+
+    /* Content */
+    .content {
+      padding: 16px;
+    }
+
+    @media (min-width: 768px) {
+      .content {
+        padding: 24px;
+      }
+    }
+
+    /* Sections */
+    .settings-section {
+      margin-bottom: 24px;
+      background: var(--surface-1);
+      border-radius: var(--radius-large);
+      border: 1px solid var(--divider);
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    .section-header .material-symbols-rounded {
+      font-size: 24px;
+      color: var(--primary);
+    }
+
+    .section-header h2 {
+      font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .section-content {
+      padding: 0;
+    }
+
+    /* Setting Rows */
+    .setting-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--divider);
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+
+    .setting-row:last-child {
+      border-bottom: none;
+    }
+
+    .setting-row:hover {
+      background: var(--surface-2);
+    }
+
+    .setting-row.profile {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px 16px;
+    }
+
+    .profile-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .profile-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--transfer));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .profile-info h3 {
+      font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .profile-info p {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      margin: 0;
+    }
+
+    .edit-profile-btn {
+      align-self: flex-start;
+      background: transparent;
+      border: 1px solid var(--divider);
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      border-radius: var(--radius-medium);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Google Sans Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .edit-profile-btn:hover {
+      background: var(--surface-2);
+      color: var(--text-primary);
+    }
+
+    .setting-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--text-tertiary);
+    }
+
+    .setting-icon .material-symbols-rounded {
+      font-size: 24px;
+    }
+
+    .setting-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .setting-label {
+      font-family: 'Google Sans Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+
+    .setting-description {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin: 0;
+    }
+
+    .setting-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* Toggle Switch */
+    .toggle {
+      width: 48px;
+      height: 28px;
+      background: var(--surface-3);
+      border: none;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      padding: 2px;
+    }
+
+    .toggle.on {
+      background: var(--primary);
+    }
+
+    .toggle::after {
+      content: '';
+      width: 24px;
+      height: 24px;
+      background: var(--surface-0);
+      border-radius: 50%;
+      position: absolute;
+      left: 2px;
+      transition: left 0.3s;
+    }
+
+    .toggle.on::after {
+      left: 22px;
+    }
+
+    /* Time Picker */
+    .time-picker {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--surface-2);
+      padding: 6px 12px;
+      border-radius: var(--radius-medium);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* Dropdown */
+    .dropdown {
+      background: var(--surface-2);
+      border: 1px solid var(--divider);
+      color: var(--text-secondary);
+      padding: 8px 12px;
+      border-radius: var(--radius-medium);
+      cursor: pointer;
+      font-family: 'Google Sans Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      appearance: none;
+      padding-right: 28px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2379747E' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 6px center;
+    }
+
+    .dropdown:hover {
+      background-color: var(--surface-3);
+    }
+
+    .dropdown:focus {
+      outline: none;
+      border-color: var(--primary);
+      background-color: var(--surface-3);
+    }
+
+    /* Segmented Control */
+    .segmented-control {
+      display: flex;
+      gap: 4px;
+      background: var(--surface-2);
+      padding: 4px;
+      border-radius: var(--radius-medium);
+    }
+
+    .segment-btn {
+      flex: 1;
+      padding: 8px 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      border-radius: var(--radius-small);
+      cursor: pointer;
+      font-family: 'Google Sans Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .segment-btn.active {
+      background: var(--surface-1);
+      color: var(--primary);
+    }
+
+    .segment-btn:hover:not(.active) {
+      color: var(--text-secondary);
+    }
+
+    /* Color Palette */
+    .color-palette {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .color-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .color-circle.active {
+      border-color: var(--text-primary);
+    }
+
+    .color-circle.active::after {
+      content: '✓';
+      color: var(--bg);
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .color-circle.teal {
+      background: #80CBC4;
+    }
+
+    .color-circle.blue {
+      background: #90CAF9;
+    }
+
+    .color-circle.purple {
+      background: #CE93D8;
+    }
+
+    .color-circle.orange {
+      background: #FFCC80;
+    }
+
+    .color-circle.pink {
+      background: #F48FB1;
+    }
+
+    .color-circle.green {
+      background: #A5D6A7;
+    }
+
+    .color-circle:hover {
+      transform: scale(1.1);
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 10px 16px;
+      border-radius: var(--radius-medium);
+      border: none;
+      cursor: pointer;
+      font-family: 'Google Sans Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--bg);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--surface-2);
+      color: var(--text-secondary);
+      border: 1px solid var(--divider);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-3);
+      color: var(--text-primary);
+    }
+
+    .btn-danger {
+      background: var(--expense);
+      color: var(--bg);
+    }
+
+    .btn-danger:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Chevron */
+    .chevron {
+      color: var(--text-tertiary);
+      transition: all 0.2s;
+    }
+
+    .setting-row:hover .chevron {
+      color: var(--primary);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--surface-2);
+      border: 1px solid var(--divider);
+      color: var(--text-primary);
+      padding: 12px 16px;
+      border-radius: var(--radius-medium);
+      font-size: 13px;
+      z-index: 300;
+      transition: transform 0.3s ease;
+      max-width: calc(100% - 32px);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Modal/Confirmation Dialog */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: flex-end;
+      z-index: 400;
+      animation: fadeIn 0.2s;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: var(--surface-1);
+      border: 1px solid var(--divider);
+      border-radius: var(--radius-large) var(--radius-large) 0 0;
+      padding: 24px 16px;
+      width: 100%;
+      animation: slideUp 0.3s;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-title {
+      font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .modal-description {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      flex-direction: column-reverse;
+    }
+
+    .modal-actions .btn {
+      width: 100%;
+    }
+
+    /* Export/Import Actions */
+    .action-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .action-group .btn {
+      flex: 1;
+      min-width: 100px;
+    }
+
+    /* Disabled State */
+    .setting-row.disabled,
+    .toggle:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .setting-row.disabled:hover {
+      background: var(--surface-1);
+    }
+
+    /* Nav Bar */
+    .nav-bar {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 8px;
+      background: rgba(14, 14, 14, 0.92);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border: 1px solid var(--divider);
+      border-radius: var(--radius-full);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+    }
+
+    :root.light-theme .nav-bar {
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Quick Links Section */
+    .quick-link-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--divider);
+      transition: background 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .quick-link-row:last-child {
+      border-bottom: none;
+    }
+
+    .quick-link-row:hover {
+      background: var(--surface-2);
+    }
+
+    .quick-link-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--primary);
+    }
+
+    .quick-link-label {
+      flex: 1;
+      font-family: 'Google Sans Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .nav-item {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      border-radius: var(--radius-medium);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .nav-item .material-symbols-rounded {
+      font-size: 22px;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+      color: var(--text-secondary);
+      background: var(--surface-2);
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+      background: rgba(128, 203, 196, 0.12);
+    }
+
+    .nav-item.active .material-symbols-rounded {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <button class="back-btn" onclick="location.href='MainMenu.html'" title="Back">
+      <span class="material-symbols-rounded">arrow_back</span>
+    </button>
+    <h1>Settings</h1>
+  </div>
+
+  <div class="container">
+    <div class="content">
+      <!-- Profile Section -->
+      <div class="settings-section">
+        <div class="section-content">
+          <div class="setting-row profile">
+            <div class="profile-top">
+              <div class="profile-avatar">DA</div>
+              <div class="profile-info">
+                <h3>Darko</h3>
+                <p>educationforbasil@gmail.com</p>
+              </div>
+            </div>
+            <button class="edit-profile-btn" onclick="showToast('Profile editing coming soon')">Edit Profile</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- General Settings -->
+      <div class="settings-section">
+        <div class="section-header">
+          <span class="material-symbols-rounded">tune</span>
+          <h2>General</h2>
+        </div>
+        <div class="section-content">
+          <!-- Currency -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">currency_rupee</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Currency</div>
+              <p class="setting-description" id="currency-description">Indian Rupee (INR)</p>
+            </div>
+            <div class="setting-control">
+              <select class="dropdown" id="currency-select" onchange="changeCurrency(this)">
+                <option value="₹ INR" data-symbol="₹" selected>₹ INR</option>
+                <option value="$ USD" data-symbol="$">$ USD</option>
+                <option value="€ EUR" data-symbol="€">€ EUR</option>
+                <option value="£ GBP" data-symbol="£">£ GBP</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Language -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">language</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Language</div>
+              <p class="setting-description">English</p>
+            </div>
+            <div class="setting-control">
+              <select class="dropdown" onchange="showToast('Language changed')">
+                <option selected>English</option>
+                <option>Hindi</option>
+                <option>Spanish</option>
+                <option>French</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Date Format -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">calendar_today</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Date Format</div>
+              <p class="setting-description">DD/MM/YYYY</p>
+            </div>
+            <div class="setting-control">
+              <select class="dropdown" onchange="showToast('Date format changed')">
+                <option selected>DD/MM/YYYY</option>
+                <option>MM/DD/YYYY</option>
+                <option>YYYY-MM-DD</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Start of Week -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">calendar_month</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Start of Week</div>
+              <p class="setting-description">Monday</p>
+            </div>
+            <div class="setting-control">
+              <select class="dropdown" onchange="showToast('Week start changed')">
+                <option>Sunday</option>
+                <option selected>Monday</option>
+                <option>Saturday</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Financial Year Start -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">event_note</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Financial Year Start</div>
+              <p class="setting-description">April</p>
+            </div>
+            <div class="setting-control">
+              <select class="dropdown" onchange="showToast('Financial year start changed')">
+                <option selected>April</option>
+                <option>January</option>
+                <option>July</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appearance -->
+      <div class="settings-section">
+        <div class="section-header">
+          <span class="material-symbols-rounded">palette</span>
+          <h2>Appearance</h2>
+        </div>
+        <div class="section-content">
+          <!-- Theme -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">dark_mode</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Theme</div>
+              <p class="setting-description">Choose your preferred theme</p>
+            </div>
+            <div class="setting-control">
+              <div class="segmented-control">
+                <button class="segment-btn active" onclick="switchTheme('dark', event)">Dark</button>
+                <button class="segment-btn" onclick="switchTheme('light', event)">Light</button>
+                <button class="segment-btn" onclick="switchTheme('system', event)">System</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accent Color -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">color_lens</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Accent Color</div>
+              <p class="setting-description">Select your accent color</p>
+            </div>
+          </div>
+
+          <!-- Color Palette -->
+          <div class="setting-row" style="flex-direction: column; align-items: flex-start; padding: 16px; border-bottom: none;">
+            <div class="color-palette">
+              <div class="color-circle teal active" onclick="selectColor(this, 'teal', '#80CBC4')" title="Teal"></div>
+              <div class="color-circle blue" onclick="selectColor(this, 'blue', '#82B5E8')" title="Blue"></div>
+              <div class="color-circle purple" onclick="selectColor(this, 'purple', '#CE93D8')" title="Purple"></div>
+              <div class="color-circle orange" onclick="selectColor(this, 'orange', '#E8B06E')" title="Orange"></div>
+              <div class="color-circle pink" onclick="selectColor(this, 'pink', '#E87EA8')" title="Pink"></div>
+              <div class="color-circle green" onclick="selectColor(this, 'green', '#96CC98')" title="Green"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="settings-section">
+        <div class="section-header">
+          <span class="material-symbols-rounded">notifications</span>
+          <h2>Notifications</h2>
+        </div>
+        <div class="section-content">
+          <!-- Daily Reminder -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">schedule</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Daily Reminder</div>
+              <p class="setting-description">Get a reminder every day</p>
+            </div>
+            <div class="setting-control">
+              <button class="toggle on" onclick="toggleNotification(this, 'reminder')" data-state="on"></button>
+            </div>
+          </div>
+
+          <!-- Daily Reminder Time -->
+          <div class="setting-row" style="padding: 12px 16px;">
+            <div class="setting-icon" style="visibility: hidden;"></div>
+            <div class="setting-content">
+              <p class="setting-description" style="font-size: 12px; color: var(--text-tertiary);">Reminder time</p>
+            </div>
+            <div class="setting-control">
+              <div class="time-picker">
+                09:00 AM
+              </div>
+            </div>
+          </div>
+
+          <!-- Budget Alerts -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">notification_important</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Budget Alerts</div>
+              <p class="setting-description">Alert when you exceed budget</p>
+            </div>
+            <div class="setting-control">
+              <button class="toggle on" onclick="toggleNotification(this, 'budget')" data-state="on"></button>
+            </div>
+          </div>
+
+          <!-- Budget Rollover -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">rotate_right</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Budget Rollover</div>
+              <p class="setting-description">Carry unused budget to next month</p>
+            </div>
+            <div class="setting-control">
+              <button class="toggle" id="budget-rollover-toggle" onclick="toggleBudgetRollover()" data-state="off"></button>
+            </div>
+          </div>
+
+          <!-- Bill Reminders -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">receipt</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Bill Reminders</div>
+              <p class="setting-description">Remind me about upcoming bills</p>
+            </div>
+            <div class="setting-control">
+              <button class="toggle on" onclick="toggleNotification(this, 'bills')" data-state="on"></button>
+            </div>
+          </div>
+
+          <!-- Weekly Summary -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">summarize</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Weekly Summary</div>
+              <p class="setting-description">Get a weekly summary of transactions</p>
+            </div>
+            <div class="setting-control">
+              <button class="toggle" onclick="toggleNotification(this, 'summary')" data-state="off"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data & Privacy -->
+      <div class="settings-section">
+        <div class="section-header">
+          <span class="material-symbols-rounded">storage</span>
+          <h2>Data & Privacy</h2>
+        </div>
+        <div class="section-content">
+          <!-- Export Data -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">download</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Export Data</div>
+              <p class="setting-description">Download your data in CSV or JSON</p>
+            </div>
+            <div class="setting-control">
+              <div class="action-group">
+                <button class="btn btn-secondary" onclick="exportData('csv')" style="min-width: 60px;">CSV</button>
+                <button class="btn btn-secondary" onclick="exportData('json')" style="min-width: 60px;">JSON</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Import Data -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">upload</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Import Data</div>
+              <p class="setting-description">Import data from a file</p>
+            </div>
+            <div class="setting-control">
+              <button class="btn btn-secondary" onclick="importData()" style="min-width: 80px;">Import</button>
+            </div>
+          </div>
+
+          <!-- Cloud Backup -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">cloud_sync</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Backup to Cloud</div>
+              <p class="setting-description">Automatically backup your data</p>
+            </div>
+            <div class="setting-control">
+              <button class="toggle" onclick="toggleCloudBackup(this)" data-state="off"></button>
+            </div>
+          </div>
+
+          <!-- Clear All Data -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">delete_sweep</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Clear All Data</div>
+              <p class="setting-description">Permanently delete all data (cannot be undone)</p>
+            </div>
+            <div class="setting-control">
+              <button class="btn btn-danger" onclick="showClearDataConfirmation()" style="min-width: 100px;">Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security -->
+      <div class="settings-section">
+        <div class="section-header">
+          <span class="material-symbols-rounded">security</span>
+          <h2>Security</h2>
+        </div>
+        <div class="section-content">
+          <!-- App Lock -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">lock</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">App Lock</div>
+              <p class="setting-description">Require password to open the app</p>
+            </div>
+            <div class="setting-control">
+              <button class="toggle" onclick="toggleAppLock(this)" data-state="off"></button>
+            </div>
+          </div>
+
+          <!-- Biometric Login -->
+          <div class="setting-row disabled" id="biometric-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">fingerprint</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Biometric Login</div>
+              <p class="setting-description">Use fingerprint or face recognition</p>
+            </div>
+            <div class="setting-control">
+              <button class="toggle" disabled data-state="off"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="settings-section">
+        <div class="section-header">
+          <span class="material-symbols-rounded">link</span>
+          <h2>Quick Links</h2>
+        </div>
+        <div class="section-content">
+          <a class="quick-link-row" href="Budgets.html">
+            <div class="quick-link-icon">
+              <span class="material-symbols-rounded">account_balance_wallet</span>
+            </div>
+            <div class="quick-link-label">Budgets</div>
+            <span class="material-symbols-rounded chevron">chevron_right</span>
+          </a>
+          <a class="quick-link-row" href="Recurring.html">
+            <div class="quick-link-icon">
+              <span class="material-symbols-rounded">repeat</span>
+            </div>
+            <div class="quick-link-label">Recurring</div>
+            <span class="material-symbols-rounded chevron">chevron_right</span>
+          </a>
+          <a class="quick-link-row" href="Goals.html">
+            <div class="quick-link-icon">
+              <span class="material-symbols-rounded">flag</span>
+            </div>
+            <div class="quick-link-label">Goals</div>
+            <span class="material-symbols-rounded chevron">chevron_right</span>
+          </a>
+          <a class="quick-link-row" href="Calendar.html">
+            <div class="quick-link-icon">
+              <span class="material-symbols-rounded">calendar_today</span>
+            </div>
+            <div class="quick-link-label">Calendar</div>
+            <span class="material-symbols-rounded chevron">chevron_right</span>
+          </a>
+          <a class="quick-link-row" href="DebtTracker.html">
+            <div class="quick-link-icon">
+              <span class="material-symbols-rounded">trending_down</span>
+            </div>
+            <div class="quick-link-label">Debt Tracker</div>
+            <span class="material-symbols-rounded chevron">chevron_right</span>
+          </a>
+          <a class="quick-link-row" href="SplitExpense.html">
+            <div class="quick-link-icon">
+              <span class="material-symbols-rounded">group</span>
+            </div>
+            <div class="quick-link-label">Split Expenses</div>
+            <span class="material-symbols-rounded chevron">chevron_right</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div class="settings-section">
+        <div class="section-header">
+          <span class="material-symbols-rounded">info</span>
+          <h2>About</h2>
+        </div>
+        <div class="section-content">
+          <!-- Version -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">info</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">App Version</div>
+              <p class="setting-description">v1.0.0</p>
+            </div>
+          </div>
+
+          <!-- Developer -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">build</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Developer</div>
+              <p class="setting-description">FinTrack Team</p>
+            </div>
+          </div>
+
+          <!-- Terms of Service -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">description</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Terms of Service</div>
+              <p class="setting-description">Read our terms and conditions</p>
+            </div>
+            <div class="setting-control">
+              <span class="material-symbols-rounded chevron">chevron_right</span>
+            </div>
+          </div>
+
+          <!-- Privacy Policy -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">privacy_tip</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Privacy Policy</div>
+              <p class="setting-description">Learn how we handle your data</p>
+            </div>
+            <div class="setting-control">
+              <span class="material-symbols-rounded chevron">chevron_right</span>
+            </div>
+          </div>
+
+          <!-- Rate this App -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">star</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Rate this App</div>
+              <p class="setting-description">Share your feedback on app stores</p>
+            </div>
+            <div class="setting-control">
+              <span class="material-symbols-rounded chevron">chevron_right</span>
+            </div>
+          </div>
+
+          <!-- Send Feedback -->
+          <div class="setting-row">
+            <div class="setting-icon">
+              <span class="material-symbols-rounded">feedback</span>
+            </div>
+            <div class="setting-content">
+              <div class="setting-label">Send Feedback</div>
+              <p class="setting-description">Help us improve your experience</p>
+            </div>
+            <div class="setting-control">
+              <span class="material-symbols-rounded chevron">chevron_right</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="nav-bar">
+    <button class="nav-item" onclick="location.href='MainMenu.html'" title="Home">
+      <span class="material-symbols-rounded">home</span>
+    </button>
+    <button class="nav-item" onclick="location.href='AllTransactions.html'" title="Transactions">
+      <span class="material-symbols-rounded">receipt_long</span>
+    </button>
+    <button class="nav-item" onclick="location.href='Accounts.html'" title="Accounts">
+      <span class="material-symbols-rounded">wallet</span>
+    </button>
+    <button class="nav-item" onclick="location.href='Reports.html'" title="Reports">
+      <span class="material-symbols-rounded">bar_chart</span>
+    </button>
+    <button class="nav-item active" title="Settings">
+      <span class="material-symbols-rounded">settings</span>
+    </button>
+  </nav>
+
+  <!-- Toast Container -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-title">Clear All Data?</div>
+      <div class="modal-description">
+        This will permanently delete all your transactions, accounts, and settings. This action cannot be undone.
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-danger" onclick="confirmClearData()">Clear All Data</button>
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize theme and preferences on page load
+    window.addEventListener('DOMContentLoaded', function() {
+      loadThemePreference();
+      loadCurrencyPreference();
+      loadAccentColorPreference();
+    });
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    function loadThemePreference() {
+      const savedTheme = localStorage.getItem('fintrack-theme') || 'dark';
+      const systemPrefers = window.matchMedia('(prefers-color-scheme: light)').matches;
+
+      let themeToApply = savedTheme;
+      if (savedTheme === 'system') {
+        themeToApply = systemPrefers ? 'light' : 'dark';
+      }
+
+      applyTheme(themeToApply);
+      updateThemeButtons(savedTheme);
+    }
+
+    function applyTheme(theme) {
+      const html = document.documentElement;
+      if (theme === 'light') {
+        html.classList.add('light-theme');
+      } else {
+        html.classList.remove('light-theme');
+      }
+    }
+
+    function updateThemeButtons(theme) {
+      const buttons = document.querySelectorAll('.segment-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      if (theme === 'dark') {
+        buttons[0].classList.add('active');
+      } else if (theme === 'light') {
+        buttons[1].classList.add('active');
+      } else if (theme === 'system') {
+        buttons[2].classList.add('active');
+      }
+    }
+
+    function switchTheme(theme, event) {
+      event.preventDefault();
+      const buttons = document.querySelectorAll('.segment-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      localStorage.setItem('fintrack-theme', theme);
+
+      if (theme === 'dark') {
+        applyTheme('dark');
+        showToast('Theme changed to Dark');
+      } else if (theme === 'light') {
+        applyTheme('light');
+        showToast('Theme changed to Light');
+      } else if (theme === 'system') {
+        const systemPrefers = window.matchMedia('(prefers-color-scheme: light)').matches;
+        applyTheme(systemPrefers ? 'light' : 'dark');
+        showToast('Theme set to System');
+      }
+    }
+
+    function changeCurrency(select) {
+      const currencyValue = select.value;
+      const currencySymbol = select.options[select.selectedIndex].getAttribute('data-symbol');
+
+      localStorage.setItem('fintrack-currency', currencyValue);
+      localStorage.setItem('fintrack-currency-symbol', currencySymbol);
+
+      document.getElementById('currency-description').textContent = currencyValue.split(' ')[1] + ' (' + currencyValue.split(' ')[0] + ')';
+      showToast('Currency updated to ' + currencyValue);
+    }
+
+    function loadCurrencyPreference() {
+      const savedCurrency = localStorage.getItem('fintrack-currency');
+      if (savedCurrency) {
+        const select = document.getElementById('currency-select');
+        select.value = savedCurrency;
+        const currencySymbol = localStorage.getItem('fintrack-currency-symbol');
+        document.getElementById('currency-description').textContent = savedCurrency.split(' ')[1] + ' (' + currencySymbol + ')';
+      }
+    }
+
+    function selectColor(element, color, colorValue) {
+      document.querySelectorAll('.color-circle').forEach(el => {
+        el.classList.remove('active');
+      });
+      element.classList.add('active');
+
+      document.documentElement.style.setProperty('--primary', colorValue);
+      localStorage.setItem('fintrack-accent-color', color);
+      localStorage.setItem('fintrack-accent-value', colorValue);
+
+      showToast('Accent color changed to ' + capitalizeFirst(color));
+    }
+
+    function loadAccentColorPreference() {
+      const savedColor = localStorage.getItem('fintrack-accent-color');
+      const savedValue = localStorage.getItem('fintrack-accent-value');
+
+      if (savedColor && savedValue) {
+        const colorElement = document.querySelector('.color-circle.' + savedColor);
+        if (colorElement) {
+          selectColor(colorElement, savedColor, savedValue);
+        }
+      }
+    }
+
+    function toggleNotification(button, type) {
+      const isOn = button.getAttribute('data-state') === 'on';
+      if (isOn) {
+        button.classList.remove('on');
+        button.setAttribute('data-state', 'off');
+        showToast(capitalizeFirst(type) + ' notification disabled');
+      } else {
+        button.classList.add('on');
+        button.setAttribute('data-state', 'on');
+        showToast(capitalizeFirst(type) + ' notification enabled');
+      }
+    }
+
+    function toggleCloudBackup(button) {
+      const isOn = button.getAttribute('data-state') === 'on';
+      if (isOn) {
+        button.classList.remove('on');
+        button.setAttribute('data-state', 'off');
+        showToast('Cloud backup disabled');
+      } else {
+        button.classList.add('on');
+        button.setAttribute('data-state', 'on');
+        showToast('Cloud backup enabled. Starting backup...');
+      }
+    }
+
+    function toggleAppLock(button) {
+      const isOn = button.getAttribute('data-state') === 'on';
+      const biometricRow = document.getElementById('biometric-row');
+      const biometricToggle = biometricRow.querySelector('.toggle');
+
+      if (isOn) {
+        button.classList.remove('on');
+        button.setAttribute('data-state', 'off');
+        biometricRow.classList.add('disabled');
+        biometricToggle.disabled = true;
+        showToast('App lock disabled');
+      } else {
+        button.classList.add('on');
+        button.setAttribute('data-state', 'on');
+        biometricRow.classList.remove('disabled');
+        biometricToggle.disabled = false;
+        showToast('App lock enabled');
+      }
+    }
+
+    function generateSampleData() {
+      const transactions = [
+        { date: '2026-03-17', name: 'Coffee', type: 'Expense', amount: 150, category: 'Food & Dining', account: 'Credit Card', status: 'Completed' },
+        { date: '2026-03-16', name: 'Salary', type: 'Income', amount: 50000, category: 'Salary', account: 'Savings', status: 'Completed' },
+        { date: '2026-03-15', name: 'Grocery', type: 'Expense', amount: 2500, category: 'Groceries', account: 'Debit Card', status: 'Completed' },
+        { date: '2026-03-14', name: 'Gas', type: 'Transfer', amount: 300, category: 'Transport', account: 'Wallet', status: 'Completed' },
+        { date: '2026-03-13', name: 'Restaurant', type: 'Expense', amount: 800, category: 'Food & Dining', account: 'Credit Card', status: 'Completed' },
+        { date: '2026-03-12', name: 'Gym', type: 'Expense', amount: 500, category: 'Health', account: 'Debit Card', status: 'Completed' },
+        { date: '2026-03-11', name: 'Online Transfer', type: 'Income', amount: 5000, category: 'Other Income', account: 'Savings', status: 'Completed' },
+        { date: '2026-03-10', name: 'Movie', type: 'Expense', amount: 400, category: 'Entertainment', account: 'Wallet', status: 'Completed' }
+      ];
+      return transactions;
+    }
+
+    function exportData(format) {
+      if (format === 'csv') {
+        const csv = FT.exportCSV();
+        downloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), 'fintrack-export.csv');
+      } else if (format === 'json') {
+        const json = FT.exportJSON();
+        downloadFile(new Blob([json], { type: 'application/json;charset=utf-8;' }), 'fintrack-export.json');
+      }
+      showToast('Exported successfully ✓');
+    }
+
+    function downloadFile(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url; link.download = filename;
+      document.body.appendChild(link); link.click();
+      document.body.removeChild(link); URL.revokeObjectURL(url);
+    }
+
+    function importData() {
+      const input = document.createElement('input');
+      input.type = 'file'; input.accept = '.json';
+      input.onchange = e => {
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const ok = FT.importJSON(ev.target.result);
+          showToast(ok ? 'Data imported successfully ✓' : 'Import failed — invalid file format');
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    function showClearDataConfirmation() {
+      document.getElementById('modal-overlay').classList.add('show');
+    }
+
+    function closeModal(event) {
+      if (event) event.preventDefault();
+      document.getElementById('modal-overlay').classList.remove('show');
+    }
+
+    function confirmClearData() {
+      FT.clearAll();
+      showToast('All data has been cleared');
+      closeModal();
+      setTimeout(() => location.href = 'Onboarding.html', 800);
+    }
+
+    // ── Budget Rollover ───────────────────────
+    function toggleBudgetRollover(){
+      const current = FT.getSetting('budgetRollover');
+      FT.setSetting('budgetRollover', !current);
+      showToast('Budget rollover ' + (!current ? 'enabled' : 'disabled'));
+    }
+
+    // ── Theme overrides to also persist in FT ─
+    const _origSwitchTheme = switchTheme;
+    function switchTheme(theme, event) {
+      _origSwitchTheme(theme, event);
+      FT.setSetting('theme', theme);
+    }
+
+    // ── Init ─────────────────────────────────
+    (function ftSettingsInit(){
+      FTTheme.init();
+      // Sync budget rollover toggle state if element exists
+      const rolloverEl = document.getElementById('budget-rollover-toggle');
+      if(rolloverEl) rolloverEl.classList.toggle('on', FT.getSetting('budgetRollover'));
+    })();
+
+    function capitalizeFirst(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+  </script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(reg => console.log("[SW] Registered:", reg.scope))
+      .catch(err => console.warn("[SW] Registration failed:", err));
+  });
+}
+</script>
+</body>
+</html>

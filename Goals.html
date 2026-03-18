@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1d27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+    <title>Savings Goals — FinTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <script src="fintrack-data.js"></script>
+<script src="fintrack-sync.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: 'Google Sans Text', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: #E3E3E3;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            padding-bottom: 100px;
+        }
+
+        /* TOP BAR */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 300;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 0 16px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid #1E1E1E;
+        }
+
+        .top-bar-back {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1E1E1E;
+            border: none;
+            border-radius: 12px;
+            color: #E3E3E3;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .top-bar-back:hover {
+            background: #282828;
+        }
+
+        .top-bar-back .material-symbols-rounded {
+            font-size: 22px;
+        }
+
+        .top-bar-title {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 20px;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        /* MAIN CONTENT */
+        .container {
+            padding: 72px 16px 0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* OVERVIEW CARD */
+        .overview-card {
+            background: linear-gradient(135deg, #141414 0%, #0A0A0A 100%);
+            border: 1px solid #1E1E1E;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .overview-progress-ring {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            flex-shrink: 0;
+        }
+
+        .overview-progress-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .overview-progress-ring circle {
+            stroke-linecap: round;
+        }
+
+        .overview-progress-ring .bg-circle {
+            stroke: #1E1E1E;
+            fill: none;
+        }
+
+        .overview-progress-ring .progress-circle {
+            stroke: #80CBC4;
+            fill: none;
+            transition: stroke-dashoffset 0.3s ease;
+        }
+
+        .overview-progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .overview-progress-text .percentage {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 600;
+            color: #80CBC4;
+        }
+
+        .overview-progress-text .label {
+            font-size: 11px;
+            color: #79747E;
+            margin-top: 4px;
+        }
+
+        .overview-info {
+            flex: 1;
+        }
+
+        .overview-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .overview-info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .overview-info-label {
+            font-size: 13px;
+            color: #79747E;
+        }
+
+        .overview-info-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 600;
+            color: #E3E3E3;
+        }
+
+        /* GOALS SECTION */
+        .goals-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #79747E;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding: 0 8px;
+        }
+
+        /* GOAL CARD */
+        .goal-card {
+            background: linear-gradient(135deg, #141414 0%, #0A0A0A 100%);
+            border: 1px solid #1E1E1E;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .goal-card:hover {
+            border-color: #282828;
+            background: linear-gradient(135deg, #1E1E1E 0%, #141414 100%);
+        }
+
+        .goal-card:active {
+            transform: scale(0.98);
+        }
+
+        .goal-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .goal-card-title-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .goal-card-icon {
+            font-size: 32px;
+        }
+
+        .goal-card-title {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            color: #E3E3E3;
+        }
+
+        .goal-card-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .goal-card-badge.on-track {
+            background: rgba(165, 214, 167, 0.15);
+            color: #A5D6A7;
+        }
+
+        .goal-card-badge.tight {
+            background: rgba(232, 176, 110, 0.15);
+            color: #E8B06E;
+        }
+
+        .goal-card-amounts {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .goal-card-amount {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .goal-card-amount-label {
+            color: #79747E;
+            font-size: 12px;
+        }
+
+        .goal-card-amount-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: #E3E3E3;
+        }
+
+        .goal-progress-container {
+            margin-bottom: 16px;
+        }
+
+        .goal-progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #1E1E1E;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .goal-progress-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .goal-card[data-accent="#80CBC4"] .goal-progress-fill {
+            background: linear-gradient(90deg, #80CBC4 0%, #4DB8A8 100%);
+        }
+
+        .goal-card[data-accent="#90CAF9"] .goal-progress-fill {
+            background: linear-gradient(90deg, #90CAF9 0%, #64B5F6 100%);
+        }
+
+        .goal-card[data-accent="#CE93D8"] .goal-progress-fill {
+            background: linear-gradient(90deg, #CE93D8 0%, #BA68C8 100%);
+        }
+
+        .goal-card[data-accent="#E8B06E"] .goal-progress-fill {
+            background: linear-gradient(90deg, #E8B06E 0%, #F5A962 100%);
+        }
+
+        .goal-progress-milestones {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 4px;
+            font-size: 10px;
+            color: #79747E;
+        }
+
+        .goal-milestone-marker {
+            width: 1px;
+            height: 4px;
+            background: #282828;
+        }
+
+        .goal-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #1E1E1E;
+        }
+
+        .goal-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .goal-detail-label {
+            color: #79747E;
+            font-size: 12px;
+        }
+
+        .goal-detail-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            color: #E3E3E3;
+        }
+
+        .goal-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .goal-add-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 12px;
+            background: #1E1E1E;
+            color: #E3E3E3;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Google Sans', sans-serif;
+        }
+
+        .goal-add-btn:hover {
+            background: #282828;
+        }
+
+        /* COMPLETED SECTION */
+        .completed-section {
+            margin-bottom: 32px;
+        }
+
+        .completed-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border: none;
+            background: transparent;
+            color: #79747E;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Google Sans', sans-serif;
+            width: 100%;
+        }
+
+        .completed-toggle .material-symbols-rounded {
+            font-size: 20px;
+            transition: transform 0.2s;
+        }
+
+        .completed-toggle.collapsed .material-symbols-rounded {
+            transform: rotate(-90deg);
+        }
+
+        .completed-content {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .completed-content.collapsed {
+            max-height: 0;
+        }
+
+        .completed-goal-card {
+            background: linear-gradient(135deg, #141414 0%, #0A0A0A 100%);
+            border: 1px solid #1E1E1E;
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .completed-goal-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .completed-goal-icon {
+            font-size: 32px;
+        }
+
+        .completed-goal-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .completed-goal-name {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #E3E3E3;
+        }
+
+        .completed-goal-amount {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #79747E;
+        }
+
+        .completed-goal-check {
+            color: #A5D6A7;
+            font-size: 24px;
+        }
+
+        /* FLOATING NAV BAR */
+        .nav-bar {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 8px;
+            background: rgba(14, 14, 14, 0.92);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            border: 1px solid #3A3A3A;
+            border-radius: 100px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+        }
+
+        .nav-item {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            color: #79747E;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-item .material-symbols-rounded {
+            font-size: 22px;
+        }
+
+        .nav-item:hover {
+            color: #CAC4D0;
+            background: #242424;
+        }
+
+        /* FAB */
+        .fab {
+            position: fixed;
+            bottom: 76px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            border-radius: 100px;
+            background: linear-gradient(135deg, #80CBC4 0%, #4DB8A8 100%);
+            border: none;
+            color: #000;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(128, 203, 196, 0.4);
+            transition: all 0.2s;
+            z-index: 150;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 24px rgba(128, 203, 196, 0.6);
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .fab .material-symbols-rounded {
+            font-size: 28px;
+        }
+
+        /* BOTTOM SHEET */
+        .bottom-sheet-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 400;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .bottom-sheet-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0A0A0A;
+            border-top: 1px solid #1E1E1E;
+            border-radius: 24px 24px 0 0;
+            z-index: 500;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .bottom-sheet.active {
+            transform: translateY(0);
+        }
+
+        .bottom-sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: #282828;
+            border-radius: 2px;
+            margin: 12px auto;
+        }
+
+        .bottom-sheet-content {
+            padding: 16px;
+            padding-bottom: 32px;
+        }
+
+        .bottom-sheet-title {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+            color: #E3E3E3;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            color: #79747E;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #1E1E1E;
+            border: 1px solid #282828;
+            border-radius: 12px;
+            color: #E3E3E3;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #80CBC4;
+            background: #242424;
+        }
+
+        .form-input::placeholder {
+            color: #79747E;
+        }
+
+        .emoji-picker {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .emoji-option {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 2px solid #282828;
+            border-radius: 12px;
+            background: #1E1E1E;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            transition: all 0.2s;
+        }
+
+        .emoji-option:hover {
+            border-color: #3A3A3A;
+        }
+
+        .emoji-option.selected {
+            border-color: #80CBC4;
+            background: rgba(128, 203, 196, 0.12);
+        }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .color-option {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-option.selected {
+            border-color: #E3E3E3;
+            transform: scale(0.9);
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .form-button {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Google Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .form-button.primary {
+            background: linear-gradient(135deg, #80CBC4 0%, #4DB8A8 100%);
+            color: #000;
+        }
+
+        .form-button.primary:hover {
+            box-shadow: 0 4px 12px rgba(128, 203, 196, 0.3);
+        }
+
+        .form-button.secondary {
+            background: #1E1E1E;
+            color: #E3E3E3;
+        }
+
+        .form-button.secondary:hover {
+            background: #282828;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1E1E1E;
+            color: #E3E3E3;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            border: 1px solid #282828;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 600;
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .toast.success {
+            background: rgba(165, 214, 167, 0.15);
+            border-color: #A5D6A7;
+            color: #A5D6A7;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 480px) {
+            .container {
+                padding: 72px 12px 0;
+            }
+
+            .overview-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .overview-info-row {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .goal-details {
+                flex-wrap: wrap;
+            }
+
+            .goal-detail-item {
+                flex: 1;
+                min-width: 50%;
+            }
+        }
+    
+/* ── Light Theme ─────────────────────────── */
+.light-theme {
+  --bg:#F8F9FA; --s1:#FFFFFF; --s2:#F1F3F4; --s3:#E8EAED; --s4:#DDE1E7; --s5:#CDD0D7;
+  --ol:#DDE1E7; --olv:#E8EAED;
+  --txt:#1A1A1A; --txt2:#5F6368; --txt3:#9AA0A6;
+  --pri:#00897B; --pri-glow:rgba(0,137,123,0.08); --pri-c:rgba(0,137,123,0.10);
+  --exp:#C62828; --exp-glow:rgba(198,40,40,0.06); --exp-c:rgba(198,40,40,0.08);
+  --inc:#2E7D32; --inc-glow:rgba(46,125,50,0.06); --inc-c:rgba(46,125,50,0.08);
+  --tra:#1565C0; --warn:#E65100;
+  background-color: var(--bg) !important;
+  color: var(--txt) !important;
+}
+.light-theme body { background: var(--bg); color: var(--txt); }
+</style>
+</head>
+<body>
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <button class="top-bar-back" onclick="goToMainMenu()">
+            <span class="material-symbols-rounded">arrow_back</span>
+        </button>
+        <div class="top-bar-title">Goals</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <!-- OVERVIEW CARD -->
+        <div class="overview-card">
+            <div class="overview-progress-ring">
+                <svg viewBox="0 0 100 100">
+                    <circle class="bg-circle" cx="50" cy="50" r="45" stroke-width="8"></circle>
+                    <circle class="progress-circle" cx="50" cy="50" r="45" stroke-width="8" id="overviewCircle"></circle>
+                </svg>
+                <div class="overview-progress-text">
+                    <div class="percentage">38%</div>
+                    <div class="label">Progress</div>
+                </div>
+            </div>
+            <div class="overview-info">
+                <div class="overview-info-row">
+                    <span class="overview-info-label">Total Saved</span>
+                    <span class="overview-info-value">₹2,85,000</span>
+                </div>
+                <div class="overview-info-row">
+                    <span class="overview-info-label">Total Target</span>
+                    <span class="overview-info-value">₹7,50,000</span>
+                </div>
+                <div class="overview-info-row">
+                    <span class="overview-info-label">Active Goals</span>
+                    <span class="overview-info-value">4</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTIVE GOALS -->
+        <div class="goals-section">
+            <div class="section-title">Active Goals</div>
+
+            <!-- Emergency Fund -->
+            <div class="goal-card" data-accent="#80CBC4" data-goal-id="1">
+                <div class="goal-card-header">
+                    <div class="goal-card-title-section">
+                        <div class="goal-card-icon">🛡️</div>
+                        <div>
+                            <div class="goal-card-title">Emergency Fund</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="goal-card-amounts">
+                    <div class="goal-card-amount">
+                        <span class="goal-card-amount-label">Saved</span>
+                        <span class="goal-card-amount-value">₹2,00,000</span>
+                    </div>
+                    <div class="goal-card-amount" style="text-align: right;">
+                        <span class="goal-card-amount-label">Target</span>
+                        <span class="goal-card-amount-value">₹5,00,000</span>
+                    </div>
+                </div>
+                <div class="goal-progress-container">
+                    <div class="goal-progress-bar">
+                        <div class="goal-progress-fill" style="width: 40%"></div>
+                    </div>
+                    <div class="goal-progress-milestones">
+                        <span>0%</span>
+                        <span>25%</span>
+                        <span>50%</span>
+                        <span>75%</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+                <div class="goal-details">
+                    <div class="goal-detail-item">
+                        <span class="goal-detail-label">Monthly</span>
+                        <span class="goal-detail-value">₹15,000</span>
+                    </div>
+                    <div class="goal-detail-item">
+                        <span class="goal-detail-label">Completion</span>
+                        <span class="goal-detail-value">Dec 2027</span>
+                    </div>
+                </div>
+                <div class="goal-actions">
+                    <button class="goal-add-btn" onclick="openAddMoneySheet('1', 'Emergency Fund', 2000000, 5000000)">
+                        <span class="material-symbols-rounded" style="font-size: 18px; display: inline; margin-right: 4px;">add</span>Add Money
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vacation Fund -->
+            <div class="goal-card" data-accent="#90CAF9" data-goal-id="2">
+                <div class="goal-card-header">
+                    <div class="goal-card-title-section">
+                        <div class="goal-card-icon">✈️</div>
+                        <div>
+                            <div class="goal-card-title">Vacation Fund</div>
+                        </div>
+                    </div>
+                    <div class="goal-card-badge on-track">
+                        <span class="material-symbols-rounded" style="font-size: 14px;">check_circle</span>
+                        On Track
+                    </div>
+                </div>
+                <div class="goal-card-amounts">
+                    <div class="goal-card-amount">
+                        <span class="goal-card-amount-label">Saved</span>
+                        <span class="goal-card-amount-value">₹45,000</span>
+                    </div>
+                    <div class="goal-card-amount" style="text-align: right;">
+                        <span class="goal-card-amount-label">Target</span>
+                        <span class="goal-card-amount-value">₹1,00,000</span>
+                    </div>
+                </div>
+                <div class="goal-progress-container">
+                    <div class="goal-progress-bar">
+                        <div class="goal-progress-fill" style="width: 45%"></div>
+                    </div>
+                    <div class="goal-progress-milestones">
+                        <span>0%</span>
+                        <span>25%</span>
+                        <span>50%</span>
+                        <span>75%</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+                <div class="goal-details">
+                    <div class="goal-detail-item">
+                        <span class="goal-detail-label">Monthly</span>
+                        <span class="goal-detail-value">₹8,000</span>
+                    </div>
+                    <div class="goal-detail-item">
+                        <span class="goal-detail-label">Deadline</span>
+                        <span class="goal-detail-value">Dec 2026</span>
+                    </div>
+                </div>
+                <div class="goal-actions">
+                    <button class="goal-add-btn" onclick="openAddMoneySheet('2', 'Vacation Fund', 45000, 100000)">
+                        <span class="material-symbols-rounded" style="font-size: 18px; display: inline; margin-right: 4px;">add</span>Add Money
+                    </button>
+                </div>
+            </div>
+
+            <!-- New Laptop -->
+            <div class="goal-card" data-accent="#CE93D8" data-goal-id="3">
+                <div class="goal-card-header">
+                    <div class="goal-card-title-section">
+                        <div class="goal-card-icon">💻</div>
+                        <div>
+                            <div class="goal-card-title">New Laptop</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="goal-card-amounts">
+                    <div class="goal-card-amount">
+                        <span class="goal-card-amount-label">Saved</span>
+                        <span class="goal-card-amount-value">₹30,000</span>
+                    </div>
+                    <div class="goal-card-amount" style="text-align: right;">
+                        <span class="goal-card-amount-label">Target</span>
+                        <span class="goal-card-amount-value">₹80,000</span>
+                    </div>
+                </div>
+                <div class="goal-progress-container">
+                    <div class="goal-progress-bar">
+                        <div class="goal-progress-fill" style="width: 37.5%"></div>
+                    </div>
+                    <div class="goal-progress-milestones">
+                        <span>0%</span>
+                        <span>25%</span>
+                        <span>50%</span>
+                        <span>75%</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+                <div class="goal-details">
+                    <div class="goal-detail-item">
+                        <span class="goal-detail-label">Monthly</span>
+                        <span class="goal-detail-value">₹5,000</span>
+                    </div>
+                    <div class="goal-detail-item">
+                        <span class="goal-detail-label">Completion</span>
+                        <span class="goal-detail-value">Jan 2027</span>
+                    </div>
+                </div>
+                <div class="goal-actions">
+                    <button class="goal-add-btn" onclick="openAddMoneySheet('3', 'New Laptop', 30000, 80000)">
+                        <span class="material-symbols-rounded" style="font-size: 18px; display: inline; margin-right: 4px;">add</span>Add Money
+                    </button>
+                </div>
+            </div>
+
+            <!-- Wedding Gift -->
+            <div class="goal-card" data-accent="#E8B06E" data-goal-id="4">
+                <div class="goal-card-header">
+                    <div class="goal-card-title-section">
+                        <div class="goal-card-icon">🎁</div>
+                        <div>
+                            <div class="goal-card-title">Wedding Gift</div>
+                        </div>
+                    </div>
+                    <div class="goal-card-badge tight">
+                        <span class="material-symbols-rounded" style="font-size: 14px;">schedule</span>
+                        Tight
+                    </div>
+                </div>
+                <div class="goal-card-amounts">
+                    <div class="goal-card-amount">
+                        <span class="goal-card-amount-label">Saved</span>
+                        <span class="goal-card-amount-value">₹10,000</span>
+                    </div>
+                    <div class="goal-card-amount" style="text-align: right;">
+                        <span class="goal-card-amount-label">Target</span>
+                        <span class="goal-card-amount-value">₹70,000</span>
+                    </div>
+                </div>
+                <div class="goal-progress-container">
+                    <div class="goal-progress-bar">
+                        <div class="goal-progress-fill" style="width: 14%"></div>
+                    </div>
+                    <div class="goal-progress-milestones">
+                        <span>0%</span>
+                        <span>25%</span>
+                        <span>50%</span>
+                        <span>75%</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+                <div class="goal-details">
+                    <div class="goal-detail-item">
+                        <span class="goal-detail-label">Monthly</span>
+                        <span class="goal-detail-value">₹10,000</span>
+                    </div>
+                    <div class="goal-detail-item">
+                        <span class="goal-detail-label">Deadline</span>
+                        <span class="goal-detail-value">Oct 2026</span>
+                    </div>
+                </div>
+                <div class="goal-actions">
+                    <button class="goal-add-btn" onclick="openAddMoneySheet('4', 'Wedding Gift', 10000, 70000)">
+                        <span class="material-symbols-rounded" style="font-size: 18px; display: inline; margin-right: 4px;">add</span>Add Money
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMPLETED GOALS -->
+        <div class="completed-section">
+            <button class="completed-toggle" onclick="toggleCompleted(this)">
+                <span class="material-symbols-rounded">expand_more</span>
+                <span style="flex: 1; text-align: left;">Completed Goals (1)</span>
+            </button>
+            <div class="completed-content">
+                <div class="completed-goal-card">
+                    <div class="completed-goal-info">
+                        <div class="completed-goal-icon">📱</div>
+                        <div class="completed-goal-text">
+                            <div class="completed-goal-name">Phone Upgrade</div>
+                            <div class="completed-goal-amount">₹25,000</div>
+                        </div>
+                    </div>
+                    <div class="completed-goal-check">✓</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING NAV BAR -->
+    <div class="nav-bar">
+        <a href="MainMenu.html" class="nav-item" title="Home">
+            <span class="material-symbols-rounded">home</span>
+        </a>
+        <a href="AllTransactions.html" class="nav-item" title="Transactions">
+            <span class="material-symbols-rounded">receipt_long</span>
+        </a>
+        <a href="Accounts.html" class="nav-item" title="Accounts">
+            <span class="material-symbols-rounded">wallet</span>
+        </a>
+        <a href="Reports.html" class="nav-item" title="Reports">
+            <span class="material-symbols-rounded">bar_chart</span>
+        </a>
+        <a href="Settings.html" class="nav-item" title="Settings">
+            <span class="material-symbols-rounded">settings</span>
+        </a>
+    </div>
+
+    <!-- FAB -->
+    <button class="fab" onclick="openAddGoalSheet()">
+        <span class="material-symbols-rounded">add</span>
+    </button>
+
+    <!-- BOTTOM SHEET OVERLAY -->
+    <div class="bottom-sheet-overlay" id="bottomSheetOverlay" onclick="closeBottomSheet(event)"></div>
+
+    <!-- ADD GOAL BOTTOM SHEET -->
+    <div class="bottom-sheet" id="addGoalSheet">
+        <div class="bottom-sheet-handle"></div>
+        <div class="bottom-sheet-content">
+            <div class="bottom-sheet-title">Create New Goal</div>
+
+            <div class="form-group">
+                <label class="form-label">Goal Name</label>
+                <input class="form-input" type="text" id="goalName" placeholder="e.g., Home Down Payment">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Target Amount (₹)</label>
+                <input class="form-input" type="number" id="goalTarget" placeholder="0">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Monthly Contribution (₹)</label>
+                <input class="form-input" type="number" id="goalMonthly" placeholder="0">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Target Date (Optional)</label>
+                <input class="form-input" type="date" id="goalDate">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Goal Icon</label>
+                <div class="emoji-picker" id="emojiPicker">
+                    <button class="emoji-option" onclick="selectEmoji(this, '🏠')">🏠</button>
+                    <button class="emoji-option" onclick="selectEmoji(this, '🚗')">🚗</button>
+                    <button class="emoji-option" onclick="selectEmoji(this, '✈️')">✈️</button>
+                    <button class="emoji-option" onclick="selectEmoji(this, '📚')">📚</button>
+                    <button class="emoji-option" onclick="selectEmoji(this, '💻')">💻</button>
+                    <button class="emoji-option" onclick="selectEmoji(this, '👰')">👰</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Color Theme</label>
+                <div class="color-picker">
+                    <div class="color-option selected" style="background: #80CBC4;" onclick="selectColor(this, '#80CBC4')"></div>
+                    <div class="color-option" style="background: #90CAF9;" onclick="selectColor(this, '#90CAF9')"></div>
+                    <div class="color-option" style="background: #CE93D8;" onclick="selectColor(this, '#CE93D8')"></div>
+                    <div class="color-option" style="background: #E8B06E;" onclick="selectColor(this, '#E8B06E')"></div>
+                    <div class="color-option" style="background: #A5D6A7;" onclick="selectColor(this, '#A5D6A7')"></div>
+                    <div class="color-option" style="background: #EF9A9A;" onclick="selectColor(this, '#EF9A9A')"></div>
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <button class="form-button secondary" onclick="closeBottomSheet()">Cancel</button>
+                <button class="form-button primary" onclick="saveGoal()">Save Goal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD MONEY BOTTOM SHEET -->
+    <div class="bottom-sheet" id="addMoneySheet">
+        <div class="bottom-sheet-handle"></div>
+        <div class="bottom-sheet-content">
+            <div class="bottom-sheet-title">Add Money to <span id="moneyGoalName"></span></div>
+
+            <div style="background: #141414; border: 1px solid #1E1E1E; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px;">
+                <div style="font-size: 12px; color: #79747E; margin-bottom: 4px;">Current Progress</div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; color: #E3E3E3;" id="moneyProgress">₹0 / ₹0</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Amount to Add (₹)</label>
+                <input class="form-input" type="number" id="addMoneyAmount" placeholder="0">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">From Account</label>
+                <select class="form-input" id="addMoneyAccount">
+                    <option value="checking">Checking Account</option>
+                    <option value="savings">Savings Account</option>
+                    <option value="cash">Cash</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Note (Optional)</label>
+                <input class="form-input" type="text" id="addMoneyNote" placeholder="e.g., Monthly contribution">
+            </div>
+
+            <div class="form-buttons">
+                <button class="form-button secondary" onclick="closeBottomSheet()">Cancel</button>
+                <button class="form-button primary" onclick="addMoney()">Add Money</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let currentSheet = null;
+        let selectedEmoji = '🏠';
+        let selectedColor = '#80CBC4';
+        let currentGoalData = null;
+
+        // Initialize progress circle
+        function initProgressRing() {
+            const circle = document.getElementById('overviewCircle');
+            const circumference = 2 * Math.PI * 45;
+            circle.style.strokeDasharray = circumference;
+            circle.style.strokeDashoffset = circumference * (1 - 0.38);
+        }
+
+        // Bottom sheet functions
+        function openAddGoalSheet() {
+            currentSheet = document.getElementById('addGoalSheet');
+            resetGoalForm();
+            showBottomSheet();
+        }
+
+        function openAddMoneySheet(goalId, goalName, saved, target) {
+            currentGoalData = { goalId, saved, target };
+            document.getElementById('moneyGoalName').textContent = goalName;
+            document.getElementById('moneyProgress').textContent = `₹${new Intl.NumberFormat('en-IN').format(saved)} / ₹${new Intl.NumberFormat('en-IN').format(target)}`;
+            currentSheet = document.getElementById('addMoneySheet');
+            showBottomSheet();
+        }
+
+        function showBottomSheet() {
+            document.getElementById('bottomSheetOverlay').classList.add('active');
+            currentSheet.classList.add('active');
+        }
+
+        function closeBottomSheet(event) {
+            if (event && event.target !== document.getElementById('bottomSheetOverlay')) {
+                return;
+            }
+            if (currentSheet) {
+                currentSheet.classList.remove('active');
+            }
+            document.getElementById('bottomSheetOverlay').classList.remove('active');
+            currentSheet = null;
+        }
+
+        function resetGoalForm() {
+            document.getElementById('goalName').value = '';
+            document.getElementById('goalTarget').value = '';
+            document.getElementById('goalMonthly').value = '';
+            document.getElementById('goalDate').value = '';
+            selectedEmoji = '🏠';
+            selectedColor = '#80CBC4';
+            document.querySelectorAll('.emoji-option').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('.emoji-option')[0].classList.add('selected');
+            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('.color-option')[0].classList.add('selected');
+        }
+
+        function selectEmoji(el, emoji) {
+            document.querySelectorAll('.emoji-option').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedEmoji = emoji;
+        }
+
+        function selectColor(el, color) {
+            document.querySelectorAll('.color-option').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedColor = color;
+        }
+
+        function saveGoal() {
+            const name = document.getElementById('goalName').value.trim();
+            const target = document.getElementById('goalTarget').value;
+            const monthly = document.getElementById('goalMonthly').value;
+
+            if (!name || !target || !monthly) {
+                showToast('Please fill in all required fields', false);
+                return;
+            }
+
+            showToast(`Goal "${name}" created successfully!`, true);
+            closeBottomSheet();
+        }
+
+        function addMoney() {
+            const amount = parseFloat(document.getElementById('addMoneyAmount').value);
+
+            if (!amount || amount <= 0) {
+                showToast('Please enter a valid amount', false);
+                return;
+            }
+
+            // Check milestone notifications
+            if(currentGoalData) {
+                const prevSaved = currentGoalData.saved;
+                const newSaved  = prevSaved + amount;
+                const fakGoal = {
+                    id: currentGoalData.goalId,
+                    name: document.getElementById('addMoneyGoalName').textContent,
+                    target: currentGoalData.target,
+                    saved: newSaved,
+                    milestones: [25,50,75,100]
+                };
+                FTGoalMilestones.check(fakGoal, prevSaved);
+                // Check for notifications and toast them
+                const unread = FT.getUnreadCount();
+                if(unread > 0){
+                    const notifs = FT.getNotifications().filter(n=>!n.read);
+                    notifs.forEach(n=>{
+                        setTimeout(()=>ftToast('🎉 '+n.body,'success',4000), 500);
+                    });
+                    FT.markAllRead();
+                }
+            }
+
+            showToast(`₹${new Intl.NumberFormat('en-IN').format(amount)} added successfully!`, true);
+            closeBottomSheet();
+        }
+
+        function toggleCompleted(button) {
+            button.classList.toggle('collapsed');
+            const content = button.nextElementSibling;
+            content.classList.toggle('collapsed');
+        }
+
+        function showToast(message, isSuccess) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            if (isSuccess) {
+                toast.classList.add('success');
+            } else {
+                toast.classList.remove('success');
+            }
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function goToMainMenu() {
+            window.location.href = 'MainMenu.html';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            FTTheme.init();
+            initProgressRing();
+        });
+
+        // Close on overlay click
+        document.getElementById('bottomSheetOverlay').addEventListener('click', closeBottomSheet);
+    </script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(reg => console.log("[SW] Registered:", reg.scope))
+      .catch(err => console.warn("[SW] Registration failed:", err));
+  });
+}
+</script>
+</body>
+</html>

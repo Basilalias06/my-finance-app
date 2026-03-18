@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1d27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Accounts — FinTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <script src="fintrack-data.js"></script>
+<script src="fintrack-sync.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #000000;
+      --surface-0: #0A0A0A;
+      --surface-1: #141414;
+      --surface-2: #1E1E1E;
+      --surface-3: #282828;
+      --surface-4: #333333;
+      --primary: #80CBC4;
+      --expense: #EF9A9A;
+      --income: #A5D6A7;
+      --transfer: #90CAF9;
+      --text-primary: #FFFBFE;
+      --text-secondary: #CAC4D0;
+      --text-tertiary: #79747E;
+      --divider: #3A3A3A;
+    }
+
+    html, body {
+      background-color: var(--bg);
+      color: var(--text-primary);
+      font-family: 'Google Sans Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      height: 100%;
+    }
+
+    body {
+      padding-bottom: 100px;
+      overflow-x: hidden;
+    }
+
+    .material-symbols-rounded {
+      font-family: 'Material Symbols Rounded';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      display: inline-block;
+      line-height: 1;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 16px 8px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: transparent;
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    }
+
+    .back-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+      border-radius: 16px;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      background-color: var(--surface-2);
+    }
+
+    .top-bar h1 {
+      font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 0 16px 16px;
+    }
+
+    /* Net Worth Card */
+    .net-worth-card {
+      background: linear-gradient(135deg, rgba(128, 203, 196, 0.08) 0%, rgba(128, 203, 196, 0.02) 100%);
+      border: 1px solid rgba(128, 203, 196, 0.2);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .net-worth-card .label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .net-worth-card .amount {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+      word-break: break-word;
+    }
+
+    .net-worth-card .change {
+      font-size: 12px;
+      color: var(--income);
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
+    /* Accounts Section */
+    .section-title {
+      font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 28px 0 16px;
+      padding: 0 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .accounts-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .account-card {
+      background-color: var(--surface-1);
+      border: 1px solid var(--divider);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .account-card:hover {
+      background-color: var(--surface-2);
+      border-color: rgba(128, 203, 196, 0.3);
+    }
+
+    .account-icon {
+      font-size: 32px;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--surface-2);
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .account-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .account-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .account-name {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+
+    .account-type {
+      font-size: 11px;
+      background-color: var(--surface-2);
+      color: var(--text-tertiary);
+      padding: 4px 10px;
+      border-radius: 100px;
+      text-transform: uppercase;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .account-balance {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .account-change {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      margin-top: 4px;
+      color: var(--income);
+    }
+
+    .account-change.negative {
+      color: var(--expense);
+    }
+
+    .change-icon {
+      font-size: 16px;
+    }
+
+    /* Credit Cards Section */
+    .credit-card {
+      background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-1) 100%);
+      border: 1px solid var(--divider);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .credit-card:hover {
+      border-color: rgba(128, 203, 196, 0.3);
+      background: linear-gradient(135deg, var(--surface-3) 0%, var(--surface-2) 100%);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-name {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+
+    .card-billing {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      background-color: var(--surface-3);
+      padding: 4px 8px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .card-usage {
+      margin-bottom: 12px;
+    }
+
+    .card-usage-text {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .card-used {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .card-limit {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    .card-available {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background-color: var(--surface-3);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: var(--income);
+      transition: all 0.3s;
+      border-radius: 3px;
+    }
+
+    .progress-fill.warning {
+      background-color: #FFB74D;
+    }
+
+    .progress-fill.danger {
+      background-color: var(--expense);
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 8px;
+      background: rgba(14, 14, 14, 0.92);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border: 1px solid #3A3A3A;
+      border-radius: 100px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+    }
+
+    .nav-item {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: #79747E;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .nav-item .material-symbols-rounded {
+      font-size: 22px;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+      color: #CAC4D0;
+      background: #242424;
+    }
+
+    .nav-item.active {
+      color: #80CBC4;
+      background: rgba(128, 203, 196, 0.12);
+    }
+
+    .nav-item.active .material-symbols-rounded {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+    }
+
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 76px;
+      right: 16px;
+      width: 56px;
+      height: 56px;
+      border-radius: 100px;
+      background-color: var(--primary);
+      color: #000000;
+      border: none;
+      box-shadow: 0 4px 12px rgba(128, 203, 196, 0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: all 0.2s;
+      font-size: 28px;
+    }
+
+    .fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 20px rgba(128, 203, 196, 0.4);
+    }
+
+    .fab:active {
+      transform: scale(0.95);
+    }
+
+    /* Toast */
+    .toast{
+      position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
+      z-index:300;padding:12px 24px;
+      background:rgba(30,30,30,0.95);color:#E6E1E5;
+      border:1px solid #3A3A3A;border-radius:12px;
+      font-family:'Google Sans Text',sans-serif;font-size:13px;font-weight:500;
+      box-shadow:0 8px 32px rgba(0,0,0,0.6);
+      opacity:0;pointer-events:none;
+      transition:all .3s cubic-bezier(.2,0,0,1);
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+
+    /* Overlay for modals */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    /* Bottom Sheet */
+    .bottom-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--surface-0);
+      border-top: 1px solid var(--divider);
+      border-radius: 24px 24px 0 0;
+      max-height: 90vh;
+      overflow-y: auto;
+      z-index: 250;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+      padding: 0;
+    }
+
+    .bottom-sheet.active {
+      transform: translateY(0);
+    }
+
+    .bottom-sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid var(--divider);
+      position: sticky;
+      top: 0;
+      background-color: var(--surface-0);
+    }
+
+    .bottom-sheet-title {
+      font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .bottom-sheet-close {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 12px;
+      transition: all 0.2s;
+      font-size: 20px;
+    }
+
+    .bottom-sheet-close:hover {
+      background-color: var(--surface-2);
+      color: var(--text-primary);
+    }
+
+    .bottom-sheet-content {
+      padding: 24px 16px;
+      padding-bottom: 100px;
+    }
+
+    .bottom-sheet-section {
+      margin-bottom: 24px;
+    }
+
+    .bottom-sheet-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .account-detail-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    .account-detail-icon {
+      font-size: 48px;
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--surface-2);
+      border-radius: 12px;
+    }
+
+    .account-detail-info h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .account-detail-info p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .account-detail-balance {
+      background-color: var(--surface-1);
+      border: 1px solid var(--divider);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .account-detail-balance-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .account-detail-amount {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .account-detail-change {
+      font-size: 12px;
+      color: var(--income);
+    }
+
+    .account-detail-change.negative {
+      color: var(--expense);
+    }
+
+    .recent-transactions {
+      margin-bottom: 24px;
+    }
+
+    .transaction-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--surface-2);
+    }
+
+    .transaction-item:last-child {
+      border-bottom: none;
+    }
+
+    .transaction-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--surface-2);
+      border-radius: 10px;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .transaction-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .transaction-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .transaction-date {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    .transaction-amount {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--income);
+    }
+
+    .transaction-amount.expense {
+      color: var(--expense);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    .button-group.row {
+      flex-direction: row;
+    }
+
+    .button-group.col {
+      flex-direction: column;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Google Sans Text', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #000000;
+    }
+
+    .btn-primary:hover {
+      background-color: #6CBAA0;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background-color: var(--surface-2);
+      color: var(--text-primary);
+      border: 1px solid var(--divider);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--surface-3);
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-danger {
+      background-color: var(--expense);
+      color: #000000;
+    }
+
+    .btn-danger:hover {
+      background-color: #E87878;
+    }
+
+    .btn-danger:active {
+      transform: scale(0.98);
+    }
+
+    /* Form Inputs */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .form-input, .form-select {
+      background-color: var(--surface-2);
+      border: 1px solid var(--divider);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: var(--text-primary);
+      font-family: 'Google Sans Text', sans-serif;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background-color: var(--surface-3);
+    }
+
+    .form-input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .icon-picker {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .icon-option {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--surface-2);
+      border: 2px solid var(--divider);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 24px;
+      transition: all 0.2s;
+    }
+
+    .icon-option:hover {
+      border-color: var(--primary);
+      transform: scale(1.05);
+    }
+
+    .icon-option.selected {
+      background-color: rgba(128, 203, 196, 0.2);
+      border-color: var(--primary);
+    }
+
+    .color-picker {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .color-option {
+      width: 48px;
+      height: 48px;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .color-option:hover {
+      transform: scale(1.05);
+    }
+
+    .color-option.selected {
+      border-color: #FFF;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Delete Confirmation Dialog */
+    .confirmation-dialog {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      background-color: var(--surface-1);
+      border: 1px solid var(--divider);
+      border-radius: 20px;
+      padding: 32px 24px;
+      max-width: 320px;
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+      text-align: center;
+    }
+
+    .confirmation-dialog.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .confirmation-title {
+      font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .confirmation-message {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    /* Credit Card Details */
+    .card-detail-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    .card-detail-name h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .card-detail-name p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .card-details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card-detail-item {
+      background-color: var(--surface-2);
+      border: 1px solid var(--divider);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .card-detail-item-label {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 8px;
+    }
+
+    .card-detail-item-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .card-payment-history {
+      margin-bottom: 24px;
+    }
+
+    .payment-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--surface-2);
+    }
+
+    .payment-item:last-child {
+      border-bottom: none;
+    }
+
+    .payment-date {
+      font-size: 14px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .payment-amount {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--income);
+    }
+
+    /* Responsive Design */
+    @media (min-width: 768px) {
+      .container {
+        max-width: 720px;
+      }
+
+      .accounts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .account-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .account-header {
+        width: 100%;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .container {
+        max-width: 960px;
+      }
+
+      .accounts-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+  
+/* ── Light Theme ─────────────────────────── */
+.light-theme {
+  --bg:#F8F9FA; --s1:#FFFFFF; --s2:#F1F3F4; --s3:#E8EAED; --s4:#DDE1E7; --s5:#CDD0D7;
+  --ol:#DDE1E7; --olv:#E8EAED;
+  --txt:#1A1A1A; --txt2:#5F6368; --txt3:#9AA0A6;
+  --pri:#00897B; --pri-glow:rgba(0,137,123,0.08); --pri-c:rgba(0,137,123,0.10);
+  --exp:#C62828; --exp-glow:rgba(198,40,40,0.06); --exp-c:rgba(198,40,40,0.08);
+  --inc:#2E7D32; --inc-glow:rgba(46,125,50,0.06); --inc-c:rgba(46,125,50,0.08);
+  --tra:#1565C0; --warn:#E65100;
+  background-color: var(--bg) !important;
+  color: var(--txt) !important;
+}
+.light-theme body { background: var(--bg); color: var(--txt); }
+</style>
+</head>
+<body>
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <button class="back-btn" onclick="location.href='MainMenu.html'" title="Back">
+      <span class="material-symbols-rounded">arrow_back</span>
+    </button>
+    <h1>Accounts</h1>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Net Worth Card -->
+    <div class="net-worth-card">
+      <div class="label">Total Net Worth</div>
+      <div class="amount">₹2,03,950</div>
+      <div class="change">↑ 12.5% this month</div>
+    </div>
+
+    <!-- Bank Accounts Section -->
+    <h2 class="section-title">Bank Accounts</h2>
+    <div class="accounts-grid">
+      <div class="account-card" onclick="openAccountDetail({id: 'acc1', icon: '💵', name: 'Cash', type: 'Cash', balance: 12450, change: -5.2, transactions: [{desc: 'Withdrawal', date: 'Today', amt: -500}, {desc: 'Payment', date: 'Yesterday', amt: -1200}, {desc: 'Deposit', date: '2 days ago', amt: 1500}, {desc: 'Withdrawal', date: '3 days ago', amt: -800}, {desc: 'Payment', date: '4 days ago', amt: -300}]})">
+        <div class="account-icon">💵</div>
+        <div class="account-info">
+          <div class="account-header">
+            <div class="account-name">Cash</div>
+            <span class="account-type">Cash</span>
+          </div>
+          <div class="account-balance">₹12,450</div>
+          <div class="account-change negative">
+            <span class="change-icon">↓</span>
+            <span>5.2%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="account-card" onclick="openAccountDetail({id: 'acc2', icon: '🏦', name: 'SBI Savings', type: 'Savings', balance: 145000, change: 8.3, transactions: [{desc: 'Salary Deposit', date: 'Today', amt: 50000}, {desc: 'EMI Payment', date: 'Yesterday', amt: -5000}, {desc: 'Transfer Out', date: '2 days ago', amt: -10000}, {desc: 'Interest Credit', date: '3 days ago', amt: 200}, {desc: 'Bill Payment', date: '4 days ago', amt: -2500}]})">
+        <div class="account-icon">🏦</div>
+        <div class="account-info">
+          <div class="account-header">
+            <div class="account-name">SBI Savings</div>
+            <span class="account-type">Savings</span>
+          </div>
+          <div class="account-balance">₹1,45,000</div>
+          <div class="account-change">
+            <span class="change-icon">↑</span>
+            <span>8.3%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="account-card" onclick="openAccountDetail({id: 'acc3', icon: '🏧', name: 'HDFC Checking', type: 'Checking', balance: 38500, change: 2.1, transactions: [{desc: 'Freelance Income', date: 'Today', amt: 15000}, {desc: 'Utility Bill', date: 'Yesterday', amt: -2500}, {desc: 'Online Shopping', date: '2 days ago', amt: -3200}, {desc: 'Transfer In', date: '3 days ago', amt: 5000}, {desc: 'Subscription', date: '4 days ago', amt: -499}]})">
+        <div class="account-icon">🏧</div>
+        <div class="account-info">
+          <div class="account-header">
+            <div class="account-name">HDFC Checking</div>
+            <span class="account-type">Checking</span>
+          </div>
+          <div class="account-balance">₹38,500</div>
+          <div class="account-change">
+            <span class="change-icon">↑</span>
+            <span>2.1%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="account-card" onclick="openAccountDetail({id: 'acc4', icon: '📱', name: 'UPI (GPay)', type: 'UPI', balance: 5200, change: -3.5, transactions: [{desc: 'Money Sent', date: 'Today', amt: -500}, {desc: 'Money Received', date: 'Yesterday', amt: 1000}, {desc: 'Bill Payment', date: '2 days ago', amt: -300}, {desc: 'Money Sent', date: '3 days ago', amt: -200}, {desc: 'Money Received', date: '4 days ago', amt: 800}]})">
+        <div class="account-icon">📱</div>
+        <div class="account-info">
+          <div class="account-header">
+            <div class="account-name">UPI (GPay)</div>
+            <span class="account-type">UPI</span>
+          </div>
+          <div class="account-balance">₹5,200</div>
+          <div class="account-change negative">
+            <span class="change-icon">↓</span>
+            <span>3.5%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="account-card" onclick="openAccountDetail({id: 'acc5', icon: '👝', name: 'Paytm Wallet', type: 'Wallet', balance: 2800, change: -1.8, transactions: [{desc: 'Cashback', date: 'Today', amt: 100}, {desc: 'Mobile Recharge', date: 'Yesterday', amt: -499}, {desc: 'Movie Tickets', date: '2 days ago', amt: -550}, {desc: 'Food Order', date: '3 days ago', amt: -299}, {desc: 'Cashback', date: '4 days ago', amt: 50}]})">
+        <div class="account-icon">👝</div>
+        <div class="account-info">
+          <div class="account-header">
+            <div class="account-name">Paytm Wallet</div>
+            <span class="account-type">Wallet</span>
+          </div>
+          <div class="account-balance">₹2,800</div>
+          <div class="account-change negative">
+            <span class="change-icon">↓</span>
+            <span>1.8%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Credit Cards Section -->
+    <h2 class="section-title">Credit Cards</h2>
+    <div class="credit-cards-list">
+      <div class="credit-card" onclick="openCardDetail({id: 'card1', name: 'Axis Credit Card', billing: '17th', used: 10663, limit: 190000, available: 179337, percent: 5.6, payments: [{date: 'Mar 17, 2026', amt: 8500}, {date: 'Feb 17, 2026', amt: 12300}, {date: 'Jan 17, 2026', amt: 9800}]})">
+        <div class="card-header">
+          <div class="card-name">Axis Credit Card</div>
+          <div class="card-billing">Billing 17th</div>
+        </div>
+        <div class="card-usage">
+          <div class="card-usage-text">
+            <div>
+              <div class="card-used">₹10,663 / ₹1,90,000</div>
+              <div class="card-available">Available: ₹1,79,337</div>
+            </div>
+            <div class="card-limit">5.6%</div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 5.6%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="credit-card" onclick="openCardDetail({id: 'card2', name: 'ICICI Credit Card', billing: '17th', used: 5399, limit: 160000, available: 154601, percent: 3.4, payments: [{date: 'Mar 17, 2026', amt: 7200}, {date: 'Feb 17, 2026', amt: 6500}, {date: 'Jan 17, 2026', amt: 5900}]})">
+        <div class="card-header">
+          <div class="card-name">ICICI Credit Card</div>
+          <div class="card-billing">Billing 17th</div>
+        </div>
+        <div class="card-usage">
+          <div class="card-usage-text">
+            <div>
+              <div class="card-used">₹5,399 / ₹1,60,000</div>
+              <div class="card-available">Available: ₹1,54,601</div>
+            </div>
+            <div class="card-limit">3.4%</div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 3.4%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="credit-card" onclick="openCardDetail({id: 'card3', name: 'HDFC Credit Card', billing: '17th', used: 0, limit: 116000, available: 116000, percent: 0, payments: [{date: 'Mar 17, 2026', amt: 0}, {date: 'Feb 17, 2026', amt: 3200}, {date: 'Jan 17, 2026', amt: 0}]})">
+        <div class="card-header">
+          <div class="card-name">HDFC Credit Card</div>
+          <div class="card-billing">Billing 17th</div>
+        </div>
+        <div class="card-usage">
+          <div class="card-usage-text">
+            <div>
+              <div class="card-used">₹0 / ₹1,16,000</div>
+              <div class="card-available">Available: ₹1,16,000</div>
+            </div>
+            <div class="card-limit">0%</div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="credit-card" onclick="openCardDetail({id: 'card4', name: 'Federal Credit Card', billing: '17th', used: 0, limit: 70000, available: 70000, percent: 0, payments: [{date: 'Mar 17, 2026', amt: 0}, {date: 'Feb 17, 2026', amt: 0}, {date: 'Jan 17, 2026', amt: 0}]})">
+        <div class="card-header">
+          <div class="card-name">Federal Credit Card</div>
+          <div class="card-billing">Billing 17th</div>
+        </div>
+        <div class="card-usage">
+          <div class="card-usage-text">
+            <div>
+              <div class="card-used">₹0 / ₹70,000</div>
+              <div class="card-available">Available: ₹70,000</div>
+            </div>
+            <div class="card-limit">0%</div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="credit-card" onclick="openCardDetail({id: 'card5', name: 'SBI Credit Card', billing: '17th', used: 0, limit: 80000, available: 80000, percent: 0, payments: [{date: 'Mar 17, 2026', amt: 5000}, {date: 'Feb 17, 2026', amt: 0}, {date: 'Jan 17, 2026', amt: 4500}]})">
+        <div class="card-header">
+          <div class="card-name">SBI Credit Card</div>
+          <div class="card-billing">Billing 17th</div>
+        </div>
+        <div class="card-usage">
+          <div class="card-usage-text">
+            <div>
+              <div class="card-used">₹0 / ₹80,000</div>
+              <div class="card-available">Available: ₹80,000</div>
+            </div>
+            <div class="card-limit">0%</div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Action Button -->
+  <div class="toast" id="toast"></div>
+  <button class="fab" title="Add Account" onclick="openAddAccountForm()">
+    <span class="material-symbols-rounded">add</span>
+  </button>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay" onclick="if(event.target===this)closeAllModals()"></div>
+
+  <!-- Account Detail Bottom Sheet -->
+  <div class="bottom-sheet" id="accountDetailSheet">
+    <div class="bottom-sheet-header">
+      <h2 class="bottom-sheet-title">Account Details</h2>
+      <button class="bottom-sheet-close" onclick="closeAllModals()">✕</button>
+    </div>
+    <div class="bottom-sheet-content" id="accountDetailContent"></div>
+  </div>
+
+  <!-- Edit Account Bottom Sheet -->
+  <div class="bottom-sheet" id="editAccountSheet">
+    <div class="bottom-sheet-header">
+      <h2 class="bottom-sheet-title">Edit Account</h2>
+      <button class="bottom-sheet-close" onclick="closeAllModals()">✕</button>
+    </div>
+    <div class="bottom-sheet-content">
+      <div class="form-group">
+        <label class="bottom-sheet-label">Account Name</label>
+        <input type="text" class="form-input" id="editAccName" placeholder="Account name">
+      </div>
+
+      <div class="form-group">
+        <label class="bottom-sheet-label">Account Type</label>
+        <select class="form-select" id="editAccType">
+          <option>Savings</option>
+          <option>Checking</option>
+          <option>Cash</option>
+          <option>UPI</option>
+          <option>Wallet</option>
+          <option>Credit Card</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="bottom-sheet-label">Current Balance</label>
+        <input type="number" class="form-input" id="editAccBalance" placeholder="0.00">
+      </div>
+
+      <div class="form-group">
+        <label class="bottom-sheet-label">Icon</label>
+        <div class="icon-picker" id="editAccIconPicker"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="bottom-sheet-label">Color Accent</label>
+        <div class="color-picker" id="editAccColorPicker"></div>
+      </div>
+
+      <div class="button-group col">
+        <button class="btn btn-primary" onclick="saveEditAccount()">Save Changes</button>
+        <button class="btn btn-secondary" onclick="closeAllModals()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Account Bottom Sheet -->
+  <div class="bottom-sheet" id="addAccountSheet">
+    <div class="bottom-sheet-header">
+      <h2 class="bottom-sheet-title">Add Account</h2>
+      <button class="bottom-sheet-close" onclick="closeAllModals()">✕</button>
+    </div>
+    <div class="bottom-sheet-content">
+      <div class="form-group">
+        <label class="bottom-sheet-label">Account Name</label>
+        <input type="text" class="form-input" id="addAccName" placeholder="e.g., My Savings">
+      </div>
+
+      <div class="form-group">
+        <label class="bottom-sheet-label">Account Type</label>
+        <select class="form-select" id="addAccType">
+          <option>Savings</option>
+          <option>Checking</option>
+          <option>Cash</option>
+          <option>UPI</option>
+          <option>Wallet</option>
+          <option>Credit Card</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="bottom-sheet-label">Initial Balance</label>
+        <input type="number" class="form-input" id="addAccBalance" placeholder="0.00">
+      </div>
+
+      <div class="form-group">
+        <label class="bottom-sheet-label">Icon</label>
+        <div class="icon-picker" id="addAccIconPicker"></div>
+      </div>
+
+      <div class="button-group col">
+        <button class="btn btn-primary" onclick="saveNewAccount()">Create Account</button>
+        <button class="btn btn-secondary" onclick="closeAllModals()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Dialog -->
+  <div class="confirmation-dialog" id="deleteConfirmDialog">
+    <h2 class="confirmation-title" id="deleteConfirmTitle">Delete Account?</h2>
+    <p class="confirmation-message">This action cannot be undone. Your transactions will remain in history.</p>
+    <div class="button-group col">
+      <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+      <button class="btn btn-secondary" onclick="closeAllModals()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Credit Card Detail Bottom Sheet -->
+  <div class="bottom-sheet" id="cardDetailSheet">
+    <div class="bottom-sheet-header">
+      <h2 class="bottom-sheet-title">Card Details</h2>
+      <button class="bottom-sheet-close" onclick="closeAllModals()">✕</button>
+    </div>
+    <div class="bottom-sheet-content" id="cardDetailContent"></div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="nav-bar">
+    <button class="nav-item" onclick="location.href='MainMenu.html'" title="Home">
+      <span class="material-symbols-rounded">home</span>
+    </button>
+    <button class="nav-item" onclick="location.href='AllTransactions.html'" title="Transactions">
+      <span class="material-symbols-rounded">receipt_long</span>
+    </button>
+    <button class="nav-item active" title="Accounts">
+      <span class="material-symbols-rounded">wallet</span>
+    </button>
+    <button class="nav-item" onclick="location.href='Reports.html'" title="Reports">
+      <span class="material-symbols-rounded">bar_chart</span>
+    </button>
+    <button class="nav-item" onclick="location.href='Settings.html'" title="Settings">
+      <span class="material-symbols-rounded">settings</span>
+    </button>
+  </nav>
+
+  <script>
+    // Initialize theme from shared data layer
+    FTTheme.init();
+
+    // Take net worth snapshot on page load
+    FT.pushNWSnapshot();
+
+    // State management
+    let currentEditingAccount = null;
+    let currentDeleteTarget = null;
+    const icons = ['💵', '🏦', '🏧', '📱', '👝', '💳', '🏠', '🎓', '🚗', '🎮', '📚', '🍔'];
+    const colors = ['#80CBC4', '#A5D6A7', '#FFB74D', '#EF9A9A', '#90CAF9', '#CE93D8'];
+
+    // Add subtle interaction feedback to cards
+    document.querySelectorAll('.account-card, .credit-card').forEach(card => {
+      card.addEventListener('mousedown', function() {
+        this.style.transform = 'scale(0.98)';
+      });
+      card.addEventListener('mouseup', function() {
+        this.style.transform = 'scale(1)';
+      });
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+      });
+    });
+
+    // Toast notification
+    function showToast(msg){
+      const t=document.getElementById('toast');
+      t.textContent=msg;t.classList.add('show');
+      clearTimeout(t._tid);
+      t._tid=setTimeout(()=>t.classList.remove('show'),2500);
+    }
+
+    // Format currency values
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(value);
+    }
+
+    // Close all modals
+    function closeAllModals() {
+      document.getElementById('overlay').classList.remove('active');
+      document.getElementById('accountDetailSheet').classList.remove('active');
+      document.getElementById('editAccountSheet').classList.remove('active');
+      document.getElementById('addAccountSheet').classList.remove('active');
+      document.getElementById('deleteConfirmDialog').classList.remove('active');
+      document.getElementById('cardDetailSheet').classList.remove('active');
+      currentEditingAccount = null;
+      currentDeleteTarget = null;
+    }
+
+    // Open account detail sheet
+    function openAccountDetail(account) {
+      currentEditingAccount = account;
+      const content = document.getElementById('accountDetailContent');
+
+      const changeColor = account.change >= 0 ? 'color: var(--income)' : 'color: var(--expense)';
+      const changeArrow = account.change >= 0 ? '↑' : '↓';
+
+      let transactionsHtml = '';
+      if (account.transactions && account.transactions.length > 0) {
+        transactionsHtml = `
+          <div class="recent-transactions">
+            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">Recent Transactions</h3>
+            ${account.transactions.map(t => `
+              <div class="transaction-item">
+                <div class="transaction-icon">${t.amt > 0 ? '↓' : '↑'}</div>
+                <div class="transaction-details">
+                  <div class="transaction-name">${t.desc}</div>
+                  <div class="transaction-date">${t.date}</div>
+                </div>
+                <div class="transaction-amount ${t.amt > 0 ? '' : 'expense'}">${t.amt > 0 ? '+' : ''}${formatCurrency(t.amt)}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      content.innerHTML = `
+        <div class="account-detail-header">
+          <div class="account-detail-icon">${account.icon}</div>
+          <div class="account-detail-info">
+            <h3>${account.name}</h3>
+            <p>${account.type}</p>
+          </div>
+        </div>
+
+        <div class="account-detail-balance">
+          <div class="account-detail-balance-label">Current Balance</div>
+          <div class="account-detail-amount">${formatCurrency(account.balance)}</div>
+          <div class="account-detail-change ${account.change < 0 ? 'negative' : ''}">
+            ${changeArrow} ${Math.abs(account.change)}% this month
+          </div>
+        </div>
+
+        ${transactionsHtml}
+
+        <div class="button-group col">
+          <button class="btn btn-primary" onclick="openEditAccount(${JSON.stringify(account).replace(/"/g, '&quot;')})">
+            <span class="material-symbols-rounded" style="font-size: 20px;">edit</span>
+            Edit
+          </button>
+          <button class="btn btn-danger" onclick="showDeleteConfirm('${account.name}', '${account.id}', 'account')">
+            <span class="material-symbols-rounded" style="font-size: 20px;">delete</span>
+            Delete
+          </button>
+        </div>
+      `;
+
+      document.getElementById('overlay').classList.add('active');
+      document.getElementById('accountDetailSheet').classList.add('active');
+    }
+
+    // Open edit account sheet
+    function openEditAccount(account) {
+      currentEditingAccount = account;
+      document.getElementById('editAccName').value = account.name;
+      document.getElementById('editAccType').value = account.type;
+      document.getElementById('editAccBalance').value = account.balance;
+
+      renderIconPicker('editAccIconPicker', account.icon);
+      renderColorPicker('editAccColorPicker');
+
+      document.getElementById('accountDetailSheet').classList.remove('active');
+      document.getElementById('editAccountSheet').classList.add('active');
+    }
+
+    // Open add account form
+    function openAddAccountForm() {
+      document.getElementById('addAccName').value = '';
+      document.getElementById('addAccType').value = 'Savings';
+      document.getElementById('addAccBalance').value = '';
+
+      renderIconPicker('addAccIconPicker', '💵');
+      renderColorPicker('addAccColorPicker');
+
+      currentEditingAccount = null;
+      document.getElementById('overlay').classList.add('active');
+      document.getElementById('addAccountSheet').classList.add('active');
+    }
+
+    // Render icon picker
+    function renderIconPicker(containerId, selected = null) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = icons.map(icon => `
+        <div class="icon-option ${icon === selected ? 'selected' : ''}" onclick="selectIcon('${containerId}', '${icon}')">
+          ${icon}
+        </div>
+      `).join('');
+    }
+
+    // Render color picker
+    function renderColorPicker(containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = colors.map(color => `
+        <div class="color-option" style="background-color: ${color};" onclick="selectColor('${containerId}', '${color}')"></div>
+      `).join('');
+    }
+
+    // Select icon
+    function selectIcon(containerId, icon) {
+      document.querySelectorAll(`#${containerId} .icon-option`).forEach(el => {
+        el.classList.remove('selected');
+      });
+      event.target.closest('.icon-option').classList.add('selected');
+    }
+
+    // Select color
+    function selectColor(containerId, color) {
+      document.querySelectorAll(`#${containerId} .color-option`).forEach(el => {
+        el.style.borderColor = 'transparent';
+      });
+      event.target.classList.add('selected');
+    }
+
+    // Save edited account
+    function saveEditAccount() {
+      const name = document.getElementById('editAccName').value.trim();
+      const type = document.getElementById('editAccType').value;
+      const balance = parseFloat(document.getElementById('editAccBalance').value) || 0;
+      const icon = document.querySelector('#editAccIconPicker .icon-option.selected');
+
+      if (!name) {
+        showToast('Please enter account name');
+        return;
+      }
+
+      showToast('Account updated');
+      closeAllModals();
+    }
+
+    // Save new account
+    function saveNewAccount() {
+      const name = document.getElementById('addAccName').value.trim();
+      const type = document.getElementById('addAccType').value;
+      const balance = parseFloat(document.getElementById('addAccBalance').value) || 0;
+      const icon = document.querySelector('#addAccIconPicker .icon-option.selected');
+
+      if (!name) {
+        showToast('Please enter account name');
+        return;
+      }
+
+      showToast('Account created');
+      closeAllModals();
+    }
+
+    // Show delete confirmation
+    function showDeleteConfirm(itemName, itemId, type) {
+      currentDeleteTarget = { name: itemName, id: itemId, type: type };
+      document.getElementById('deleteConfirmTitle').textContent = `Delete ${itemName}?`;
+      document.getElementById('overlay').classList.add('active');
+      document.getElementById('deleteConfirmDialog').classList.add('active');
+    }
+
+    // Confirm delete
+    function confirmDelete() {
+      if (currentDeleteTarget) {
+        showToast(`${currentDeleteTarget.name} deleted`);
+        closeAllModals();
+      }
+    }
+
+    // Open card detail sheet
+    function openCardDetail(card) {
+      const content = document.getElementById('cardDetailContent');
+      const paymentHistory = (card.payments || []).map(p => `
+        <div class="payment-item">
+          <div class="payment-date">${p.date}</div>
+          <div class="payment-amount">${p.amt > 0 ? '+' : ''}${formatCurrency(p.amt)}</div>
+        </div>
+      `).join('');
+
+      content.innerHTML = `
+        <div class="card-detail-header">
+          <div class="card-detail-name">
+            <h3>${card.name}</h3>
+            <p>Billing Date: ${card.billing}</p>
+          </div>
+        </div>
+
+        <div class="card-details-grid">
+          <div class="card-detail-item">
+            <div class="card-detail-item-label">Used</div>
+            <div class="card-detail-item-value">${formatCurrency(card.used)}</div>
+          </div>
+          <div class="card-detail-item">
+            <div class="card-detail-item-label">Limit</div>
+            <div class="card-detail-item-value">${formatCurrency(card.limit)}</div>
+          </div>
+          <div class="card-detail-item">
+            <div class="card-detail-item-label">Available</div>
+            <div class="card-detail-item-value">${formatCurrency(card.available)}</div>
+          </div>
+          <div class="card-detail-item">
+            <div class="card-detail-item-label">Utilization</div>
+            <div class="card-detail-item-value">${card.percent}%</div>
+          </div>
+        </div>
+
+        <div class="card-usage" style="margin-bottom: 24px;">
+          <div class="progress-bar" style="height: 8px;">
+            <div class="progress-fill" style="width: ${card.percent}%; background-color: ${card.percent > 75 ? '#EF9A9A' : card.percent > 50 ? '#FFB74D' : '#A5D6A7'}"></div>
+          </div>
+        </div>
+
+        <div class="card-payment-history">
+          <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">Payment History</h3>
+          ${paymentHistory}
+        </div>
+
+        <div class="button-group col">
+          <button class="btn btn-primary" onclick="showToast('Make Payment feature coming soon')">
+            <span class="material-symbols-rounded" style="font-size: 20px;">payments</span>
+            Make Payment
+          </button>
+          <button class="btn btn-secondary" onclick="showToast('Edit Card feature coming soon')">
+            <span class="material-symbols-rounded" style="font-size: 20px;">edit</span>
+            Edit
+          </button>
+          <button class="btn btn-danger" onclick="showDeleteConfirm('${card.name}', '${card.id}', 'card')">
+            <span class="material-symbols-rounded" style="font-size: 20px;">delete</span>
+            Delete
+          </button>
+        </div>
+      `;
+
+      document.getElementById('overlay').classList.add('active');
+      document.getElementById('cardDetailSheet').classList.add('active');
+    }
+
+    // Close modals when pressing Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeAllModals();
+      }
+    });
+  </script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(reg => console.log("[SW] Registered:", reg.scope))
+      .catch(err => console.warn("[SW] Registration failed:", err));
+  });
+}
+</script>
+</body>
+</html>

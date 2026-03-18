@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1d27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Reports & Analytics — FinTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Google+Sans+Text:wght@400;500&family=Google+Sans:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="fintrack-data.js"></script>
+<script src="fintrack-sync.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      background-color: #000;
+      color: #CAC4D0;
+      font-family: 'Google Sans Text', sans-serif;
+      padding-bottom: 100px;
+      overflow-x: hidden;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 16px 8px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: transparent;
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    }
+
+    .top-bar-back {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: #CAC4D0;
+      cursor: pointer;
+      border-radius: 16px;
+      transition: all 0.2s;
+    }
+
+    .top-bar-back:hover {
+      background: #242424;
+      color: #80CBC4;
+    }
+
+    .top-bar-back .material-symbols-rounded {
+      font-size: 22px;
+    }
+
+    .top-bar h1 {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      flex: 1;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        max-width: 100%;
+        padding: 0 24px;
+      }
+    }
+
+    /* Period Selector */
+    .period-selector {
+      display: flex;
+      gap: 8px;
+      padding: 16px 0;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+    }
+
+    .period-selector::-webkit-scrollbar {
+      display: none;
+    }
+
+    .period-btn {
+      padding: 8px 16px;
+      background: #1E1E1E;
+      border: 1px solid #333;
+      color: #79747E;
+      border-radius: 100px;
+      cursor: pointer;
+      font-family: 'Google Sans Text', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .period-btn:hover {
+      background: #242424;
+      color: #CAC4D0;
+    }
+
+    .period-btn.active {
+      background: #80CBC4;
+      color: #000;
+      border-color: #80CBC4;
+    }
+
+    /* Card Styles */
+    .card {
+      background: #0A0A0A;
+      border: 1px solid #1E1E1E;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(20px) saturate(1.2);
+      -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    }
+
+    .card-title {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #CAC4D0;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: #79747E;
+      margin-bottom: 12px;
+    }
+
+    /* Chart Container */
+    .chart-container {
+      position: relative;
+      height: 280px;
+      margin-bottom: 16px;
+    }
+
+    .chart-container canvas {
+      max-height: 280px;
+    }
+
+    /* Summary Table */
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+
+    .summary-table th {
+      background: #141414;
+      padding: 10px;
+      text-align: left;
+      color: #79747E;
+      border-bottom: 1px solid #1E1E1E;
+      font-weight: 500;
+      font-family: 'Google Sans Text', sans-serif;
+    }
+
+    .summary-table td {
+      padding: 10px;
+      border-bottom: 1px solid #1E1E1E;
+      color: #CAC4D0;
+    }
+
+    .summary-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .summary-table .amount {
+      font-family: 'JetBrains Mono', monospace;
+      text-align: right;
+      color: #80CBC4;
+      font-weight: 500;
+    }
+
+    .summary-table .income {
+      color: #A5D6A7;
+    }
+
+    .summary-table .expense {
+      color: #EF9A9A;
+    }
+
+    /* Sub Period Buttons */
+    .sub-period {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .sub-period-btn {
+      padding: 6px 12px;
+      background: #1E1E1E;
+      border: 1px solid #333;
+      color: #79747E;
+      border-radius: 100px;
+      cursor: pointer;
+      font-family: 'Google Sans Text', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .sub-period-btn:hover {
+      background: #242424;
+      color: #CAC4D0;
+    }
+
+    .sub-period-btn.active {
+      background: #80CBC4;
+      color: #000;
+      border-color: #80CBC4;
+    }
+
+    /* Balance Sheet */
+    .balance-sheet {
+      background: #0A0A0A;
+      border: 1px solid #1E1E1E;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .bs-section {
+      margin-bottom: 20px;
+    }
+
+    .bs-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .bs-section-title {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #79747E;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .bs-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #1E1E1E;
+      font-size: 13px;
+    }
+
+    .bs-item:last-child {
+      border-bottom: none;
+    }
+
+    .bs-item-label {
+      color: #CAC4D0;
+    }
+
+    .bs-item-amount {
+      font-family: 'JetBrains Mono', monospace;
+      color: #80CBC4;
+      font-weight: 500;
+    }
+
+    .bs-total {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-top: 2px solid #333;
+      border-bottom: 2px solid #333;
+      margin: 12px 0;
+      font-weight: 600;
+    }
+
+    .bs-total-label {
+      color: #CAC4D0;
+      font-size: 13px;
+    }
+
+    .bs-total-amount {
+      font-family: 'JetBrains Mono', monospace;
+      color: #80CBC4;
+      font-size: 13px;
+    }
+
+    .bs-net-worth {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      font-weight: 600;
+      color: #A5D6A7;
+    }
+
+    .bs-net-worth-amount {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Comparison Card */
+    .comparison-card {
+      background: #0A0A0A;
+      border: 1px solid #1E1E1E;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .comparison-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #1E1E1E;
+    }
+
+    .comparison-row:last-child {
+      border-bottom: none;
+    }
+
+    .comparison-label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .comparison-label-title {
+      font-size: 13px;
+      color: #CAC4D0;
+      font-weight: 500;
+    }
+
+    .comparison-label-subtitle {
+      font-size: 11px;
+      color: #79747E;
+    }
+
+    .comparison-value {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .comparison-amount {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: #80CBC4;
+    }
+
+    .comparison-change {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .comparison-change.positive {
+      color: #A5D6A7;
+    }
+
+    .comparison-change.negative {
+      color: #EF9A9A;
+    }
+
+    /* Legend */
+    .legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .legend-label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .legend-label-name {
+      color: #CAC4D0;
+      font-weight: 500;
+    }
+
+    .legend-label-value {
+      color: #79747E;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Donut Chart Legend */
+    .donut-legend {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .donut-legend-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #1E1E1E;
+      font-size: 12px;
+    }
+
+    .donut-legend-item:last-child {
+      border-bottom: none;
+    }
+
+    .donut-legend-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .donut-legend-color {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .donut-legend-label {
+      color: #CAC4D0;
+      font-weight: 500;
+    }
+
+    .donut-legend-right {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .donut-legend-percent {
+      color: #79747E;
+      font-size: 11px;
+      min-width: 30px;
+      text-align: right;
+    }
+
+    .donut-legend-amount {
+      color: #80CBC4;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      min-width: 60px;
+      text-align: right;
+    }
+
+    /* Daily Average */
+    .daily-average {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: #141414;
+      border-radius: 12px;
+      margin-top: 12px;
+    }
+
+    .daily-average-label {
+      color: #79747E;
+      font-size: 12px;
+    }
+
+    .daily-average-value {
+      font-family: 'JetBrains Mono', monospace;
+      color: #80CBC4;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    /* Grid Layout for Desktop */
+    @media (min-width: 768px) {
+      .reports-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .grid-full {
+        grid-column: 1 / -1;
+      }
+
+      .card {
+        margin-bottom: 0;
+      }
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 8px;
+      background: rgba(14, 14, 14, 0.92);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border: 1px solid #3A3A3A;
+      border-radius: 100px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+    }
+
+    .nav-item {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: #79747E;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .nav-item .material-symbols-rounded {
+      font-size: 22px;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+      color: #CAC4D0;
+      background: #242424;
+    }
+
+    .nav-item.active {
+      color: #80CBC4;
+      background: rgba(128, 203, 196, 0.12);
+    }
+
+    .nav-item.active .material-symbols-rounded {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+    }
+
+    /* Insights Card Styles */
+    .insights-card {
+      background: #0A0A0A;
+      border: 1px solid #1E1E1E;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .insights-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .insight-item {
+      background: rgba(128, 203, 196, 0.08);
+      border: 1px solid rgba(128, 203, 196, 0.15);
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .insight-item:hover {
+      background: rgba(128, 203, 196, 0.12);
+      border-color: rgba(128, 203, 196, 0.25);
+    }
+
+    .insight-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .insight-text {
+      font-size: 13px;
+      color: #CAC4D0;
+      flex: 1;
+    }
+
+    /* Cash Flow Forecast Styles */
+    .forecast-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .forecast-chart-container {
+      position: relative;
+      height: 280px;
+      margin-bottom: 16px;
+    }
+
+    .forecast-chart-container canvas {
+      max-height: 280px;
+    }
+
+    .forecast-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .forecast-stat {
+      background: #141414;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .forecast-stat-label {
+      font-size: 12px;
+      color: #79747E;
+      margin-bottom: 6px;
+    }
+
+    .forecast-stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: #80CBC4;
+    }
+
+    .forecast-warning {
+      background: rgba(239, 154, 154, 0.15);
+      border: 1px solid rgba(239, 154, 154, 0.25);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: #EF9A9A;
+    }
+
+    .forecast-warning-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    /* Month-over-Month Card Styles */
+    .mom-card {
+      background: #0A0A0A;
+      border: 1px solid #1E1E1E;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .mom-category {
+      margin-bottom: 16px;
+    }
+
+    .mom-category:last-child {
+      margin-bottom: 0;
+    }
+
+    .mom-category-name {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .mom-category-label {
+      color: #CAC4D0;
+      font-weight: 500;
+    }
+
+    .mom-category-change {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .mom-category-change.positive {
+      color: #A5D6A7;
+    }
+
+    .mom-category-change.negative {
+      color: #EF9A9A;
+    }
+
+    .mom-bars {
+      display: flex;
+      gap: 8px;
+      height: 24px;
+      align-items: flex-end;
+    }
+
+    .mom-bar {
+      flex: 1;
+      border-radius: 4px;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .mom-bar-current {
+      background: #80CBC4;
+    }
+
+    .mom-bar-previous {
+      background: #79747E;
+      opacity: 0.5;
+    }
+
+    .mom-bar-value {
+      position: absolute;
+      bottom: -22px;
+      font-size: 11px;
+      color: #79747E;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+    }
+
+    .mom-legend {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 24px;
+      font-size: 12px;
+    }
+
+    .mom-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mom-legend-color {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .mom-legend-label {
+      color: #CAC4D0;
+    }
+
+    /* Export Button */
+    .export-section {
+      padding: 0 0 20px 0;
+    }
+
+    .export-button {
+      width: 100%;
+      padding: 12px 16px;
+      background: transparent;
+      border: 2px solid #80CBC4;
+      border-radius: 12px;
+      color: #80CBC4;
+      font-family: 'Google Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .export-button:hover {
+      background: rgba(128, 203, 196, 0.1);
+    }
+
+    .export-button:active {
+      background: rgba(128, 203, 196, 0.2);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #242424;
+      color: #CAC4D0;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      font-size: 13px;
+      z-index: 150;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+  
+/* ── Light Theme ─────────────────────────── */
+.light-theme {
+  --bg:#F8F9FA; --s1:#FFFFFF; --s2:#F1F3F4; --s3:#E8EAED; --s4:#DDE1E7; --s5:#CDD0D7;
+  --ol:#DDE1E7; --olv:#E8EAED;
+  --txt:#1A1A1A; --txt2:#5F6368; --txt3:#9AA0A6;
+  --pri:#00897B; --pri-glow:rgba(0,137,123,0.08); --pri-c:rgba(0,137,123,0.10);
+  --exp:#C62828; --exp-glow:rgba(198,40,40,0.06); --exp-c:rgba(198,40,40,0.08);
+  --inc:#2E7D32; --inc-glow:rgba(46,125,50,0.06); --inc-c:rgba(46,125,50,0.08);
+  --tra:#1565C0; --warn:#E65100;
+  background-color: var(--bg) !important;
+  color: var(--txt) !important;
+}
+.light-theme body { background: var(--bg); color: var(--txt); }
+</style>
+</head>
+<body>
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <button class="top-bar-back" onclick="location.href='MainMenu.html'">
+      <span class="material-symbols-rounded">arrow_back</span>
+    </button>
+    <h1>Reports</h1>
+    <button onclick="exportPDF()" title="Export as PDF" style="margin-left:auto;display:flex;align-items:center;gap:6px;padding:8px 14px;background:rgba(128,203,196,0.12);border:1px solid rgba(128,203,196,0.25);color:#80CBC4;border-radius:100px;cursor:pointer;font-size:12px;font-weight:600;font-family:'Google Sans Text',sans-serif;transition:all .2s" onmouseover="this.style.background='rgba(128,203,196,0.2)'" onmouseout="this.style.background='rgba(128,203,196,0.12)'">
+      <span class="material-symbols-rounded" style="font-size:16px">picture_as_pdf</span>Export PDF
+    </button>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Period Selector -->
+    <div class="period-selector">
+      <button class="period-btn" onclick="setPeriod('week')">Week</button>
+      <button class="period-btn active" onclick="setPeriod('month')">Month</button>
+      <button class="period-btn" onclick="setPeriod('quarter')">Quarter</button>
+      <button class="period-btn" onclick="setPeriod('year')">Year</button>
+      <button class="period-btn" onclick="setPeriod('all')">All Time</button>
+      <button class="period-btn" onclick="toggleCustomRange()">Custom</button>
+    </div>
+    <!-- Custom Date Range Picker -->
+    <div id="custom-range-row" style="display:none;align-items:center;gap:10px;padding:0 16px 12px;flex-wrap:wrap">
+      <label style="font-size:12px;color:#888">From:</label>
+      <input type="date" id="custom-from" style="background:#1A1A1A;border:1px solid #333;color:#eee;padding:6px 10px;border-radius:10px;font-size:13px" onchange="applyCustomRange()">
+      <label style="font-size:12px;color:#888">To:</label>
+      <input type="date" id="custom-to" style="background:#1A1A1A;border:1px solid #333;color:#eee;padding:6px 10px;border-radius:10px;font-size:13px" onchange="applyCustomRange()">
+    </div>
+
+    <!-- Income vs Expense Chart -->
+    <div class="card">
+      <div class="card-title">Income vs Expense</div>
+      <div class="chart-container">
+        <canvas id="incomeExpenseChart"></canvas>
+      </div>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th style="text-align:right;">Income</th>
+            <th style="text-align:right;">Expense</th>
+            <th style="text-align:right;">Net</th>
+          </tr>
+        </thead>
+        <tbody id="incomeExpenseSummary">
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Spending by Category Donut Chart -->
+    <div class="card">
+      <div class="card-title">Spending by Category</div>
+      <div class="chart-container">
+        <canvas id="categoryChart"></canvas>
+      </div>
+      <div class="donut-legend" id="categoryLegend"></div>
+    </div>
+
+    <!-- Net Worth Trend Chart -->
+    <div class="card">
+      <div class="card-title">Net Worth Trend</div>
+      <div class="card-subtitle">12-Month View</div>
+      <div class="chart-container">
+        <canvas id="netWorthChart"></canvas>
+      </div>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th style="text-align:right;">Assets</th>
+            <th style="text-align:right;">Liabilities</th>
+            <th style="text-align:right;">Net Worth</th>
+          </tr>
+        </thead>
+        <tbody id="netWorthSummary">
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Daily Spending Chart -->
+    <div class="card">
+      <div class="card-title">Daily Spending</div>
+      <div class="sub-period">
+        <button class="sub-period-btn" onclick="setDailyPeriod('7')">7D</button>
+        <button class="sub-period-btn active" onclick="setDailyPeriod('14')">14D</button>
+        <button class="sub-period-btn" onclick="setDailyPeriod('30')">30D</button>
+      </div>
+      <div class="chart-container">
+        <canvas id="dailyChart"></canvas>
+      </div>
+      <div class="daily-average">
+        <div class="daily-average-label">Average Daily Spend</div>
+        <div class="daily-average-value" id="avgDaily">₹0</div>
+      </div>
+    </div>
+
+    <!-- Balance Sheet -->
+    <div class="balance-sheet">
+      <div class="card-title">Balance Sheet Summary</div>
+
+      <div class="bs-section">
+        <div class="bs-section-title">Assets</div>
+        <div class="bs-item">
+          <span class="bs-item-label">Cash</span>
+          <span class="bs-item-amount">₹15,000</span>
+        </div>
+        <div class="bs-item">
+          <span class="bs-item-label">Bank Accounts</span>
+          <span class="bs-item-amount">₹245,000</span>
+        </div>
+        <div class="bs-item">
+          <span class="bs-item-label">Investments</span>
+          <span class="bs-item-amount">₹380,000</span>
+        </div>
+        <div class="bs-total">
+          <span class="bs-total-label">Total Assets</span>
+          <span class="bs-total-amount">₹640,000</span>
+        </div>
+      </div>
+
+      <div class="bs-section">
+        <div class="bs-section-title">Liabilities</div>
+        <div class="bs-item">
+          <span class="bs-item-label">Credit Cards</span>
+          <span class="bs-item-amount">₹25,000</span>
+        </div>
+        <div class="bs-item">
+          <span class="bs-item-label">Loans</span>
+          <span class="bs-item-amount">₹150,000</span>
+        </div>
+        <div class="bs-total">
+          <span class="bs-total-label">Total Liabilities</span>
+          <span class="bs-total-amount">₹175,000</span>
+        </div>
+      </div>
+
+      <div class="bs-section">
+        <div class="bs-net-worth">
+          <span class="bs-net-worth">Net Worth</span>
+          <span class="bs-net-worth-amount">₹465,000</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Comparison -->
+    <div class="comparison-card">
+      <div class="card-title">Monthly Comparison</div>
+      <div class="card-subtitle">Current Month vs Last Month</div>
+
+      <div class="comparison-row">
+        <div class="comparison-label">
+          <span class="comparison-label-title">Income</span>
+          <span class="comparison-label-subtitle">March 2026</span>
+        </div>
+        <div class="comparison-value">
+          <span class="comparison-amount">₹128,200</span>
+          <span class="comparison-change positive">↑ +8.3%</span>
+        </div>
+      </div>
+
+      <div class="comparison-row">
+        <div class="comparison-label">
+          <span class="comparison-label-title">Expense</span>
+          <span class="comparison-label-subtitle">March 2026</span>
+        </div>
+        <div class="comparison-value">
+          <span class="comparison-amount">₹39,799</span>
+          <span class="comparison-change positive">↓ -12.5%</span>
+        </div>
+      </div>
+
+      <div class="comparison-row">
+        <div class="comparison-label">
+          <span class="comparison-label-title">Savings Rate</span>
+          <span class="comparison-label-subtitle">Current Month</span>
+        </div>
+        <div class="comparison-value">
+          <span class="comparison-amount" style="color:#A5D6A7;">68.9%</span>
+          <span class="comparison-change positive">↑ +5.2%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spending Insights Card -->
+    <div class="insights-card">
+      <div class="card-title">Insights</div>
+      <div class="insights-list" id="insightsList">
+        <div class="insight-item">
+          <div class="insight-icon">📊</div>
+          <div class="insight-text">Your Food & Dining spending is 23% higher than last month</div>
+        </div>
+        <div class="insight-item">
+          <div class="insight-icon">💡</div>
+          <div class="insight-text">You saved ₹8,500 more this month compared to February</div>
+        </div>
+        <div class="insight-item">
+          <div class="insight-icon">🔄</div>
+          <div class="insight-text">3 recurring payments totaling ₹20,149 are due this week</div>
+        </div>
+        <div class="insight-item">
+          <div class="insight-icon">📈</div>
+          <div class="insight-text">Your net worth has grown 12% in the last 3 months</div>
+        </div>
+        <div class="insight-item">
+          <div class="insight-icon">⚠️</div>
+          <div class="insight-text">Credit card utilization on Axis is at 5.6% — keep it up!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cash Flow Forecast Card -->
+    <div class="card">
+      <div class="card-title">Cash Flow Forecast</div>
+      <div class="forecast-controls">
+        <button class="sub-period-btn active" onclick="setForecastPeriod(30, event)">30D</button>
+        <button class="sub-period-btn" onclick="setForecastPeriod(60, event)">60D</button>
+        <button class="sub-period-btn" onclick="setForecastPeriod(90, event)">90D</button>
+      </div>
+      <div class="forecast-chart-container">
+        <canvas id="forecastChart"></canvas>
+      </div>
+      <div class="forecast-stats">
+        <div class="forecast-stat">
+          <div class="forecast-stat-label">Projected Low Point</div>
+          <div class="forecast-stat-value" id="projectedLow">₹52,400</div>
+        </div>
+        <div class="forecast-stat">
+          <div class="forecast-stat-label">Date</div>
+          <div class="forecast-stat-value" id="projectedDate">Mar 25</div>
+        </div>
+      </div>
+      <div class="forecast-warning" id="forecastWarning" style="display: none;">
+        <div class="forecast-warning-icon">⚠️</div>
+        <div>Balance projected to fall below zero on Apr 3</div>
+      </div>
+    </div>
+
+    <!-- Month-over-Month Card -->
+    <div class="mom-card">
+      <div class="card-title">Month-over-Month</div>
+      <div id="momContent">
+        <div class="mom-category">
+          <div class="mom-category-name">
+            <span class="mom-category-label">Food & Dining</span>
+            <span class="mom-category-change negative">↑ +23%</span>
+          </div>
+          <div class="mom-bars">
+            <div class="mom-bar mom-bar-current" style="height: 85%;">
+              <div class="mom-bar-value">₹6,850</div>
+            </div>
+            <div class="mom-bar mom-bar-previous" style="height: 65%;">
+              <div class="mom-bar-value">₹5,570</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mom-category">
+          <div class="mom-category-name">
+            <span class="mom-category-label">Housing</span>
+            <span class="mom-category-change negative">→ 0%</span>
+          </div>
+          <div class="mom-bars">
+            <div class="mom-bar mom-bar-current" style="height: 100%;">
+              <div class="mom-bar-value">₹18,000</div>
+            </div>
+            <div class="mom-bar mom-bar-previous" style="height: 100%;">
+              <div class="mom-bar-value">₹18,000</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mom-category">
+          <div class="mom-category-name">
+            <span class="mom-category-label">Transport</span>
+            <span class="mom-category-change positive">↓ -18%</span>
+          </div>
+          <div class="mom-bars">
+            <div class="mom-bar mom-bar-current" style="height: 55%;">
+              <div class="mom-bar-value">₹1,520</div>
+            </div>
+            <div class="mom-bar mom-bar-previous" style="height: 67%;">
+              <div class="mom-bar-value">₹1,860</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mom-category">
+          <div class="mom-category-name">
+            <span class="mom-category-label">Entertainment</span>
+            <span class="mom-category-change positive">↓ -35%</span>
+          </div>
+          <div class="mom-bars">
+            <div class="mom-bar mom-bar-current" style="height: 40%;">
+              <div class="mom-bar-value">₹649</div>
+            </div>
+            <div class="mom-bar mom-bar-previous" style="height: 62%;">
+              <div class="mom-bar-value">₹999</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mom-category">
+          <div class="mom-category-name">
+            <span class="mom-category-label">Bills</span>
+            <span class="mom-category-change negative">↑ +5%</span>
+          </div>
+          <div class="mom-bars">
+            <div class="mom-bar mom-bar-current" style="height: 62%;">
+              <div class="mom-bar-value">₹1,850</div>
+            </div>
+            <div class="mom-bar mom-bar-previous" style="height: 59%;">
+              <div class="mom-bar-value">₹1,760</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mom-legend">
+          <div class="mom-legend-item">
+            <div class="mom-legend-color mom-bar-current"></div>
+            <span class="mom-legend-label">This Month</span>
+          </div>
+          <div class="mom-legend-item">
+            <div class="mom-legend-color mom-bar-previous"></div>
+            <span class="mom-legend-label">Last Month</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Export Section -->
+    <div class="export-section">
+      <button class="export-button" onclick="exportReport()">Export as PDF</button>
+    </div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="nav-bar">
+    <button class="nav-item" onclick="location.href='MainMenu.html'" title="Home"><span class="material-symbols-rounded">home</span></button>
+    <button class="nav-item" onclick="location.href='AllTransactions.html'" title="Transactions"><span class="material-symbols-rounded">receipt_long</span></button>
+    <button class="nav-item" onclick="location.href='Accounts.html'" title="Accounts"><span class="material-symbols-rounded">wallet</span></button>
+    <button class="nav-item active" title="Reports"><span class="material-symbols-rounded">bar_chart</span></button>
+    <button class="nav-item" onclick="location.href='Settings.html'" title="Settings"><span class="material-symbols-rounded">settings</span></button>
+  </nav>
+
+  <script>
+    // Load transaction data from localStorage via shared data layer
+    FTTheme.init();
+    let TX = FT.getTX();
+
+    // Custom date range state
+    let customDateFrom = '', customDateTo = '';
+    let activePeriodMode = 'preset'; // 'preset' or 'custom'
+
+    // Chart instances
+    let incomeExpenseChart, categoryChart, netWorthChart, dailyChart, forecastChart;
+    let currentPeriod = 'month';
+    let currentDailyPeriod = '14';
+    let currentForecastPeriod = 30;
+
+    // Format currency for display
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+
+    // Initialize charts
+    function initCharts() {
+      initIncomeExpenseChart();
+      initCategoryChart();
+      initNetWorthChart();
+      initDailyChart();
+      initForecastChart();
+      updateIncomeExpenseSummary();
+      updateNetWorthSummary();
+    }
+
+    // Income vs Expense Chart
+    function initIncomeExpenseChart() {
+      const ctx = document.getElementById('incomeExpenseChart').getContext('2d');
+
+      // Calculate monthly data for last 3 months
+      const today = new Date('2026-03-17');
+      const months = [];
+      const income = [];
+      const expense = [];
+
+      for (let i = 2; i >= 0; i--) {
+        const date = new Date(today);
+        date.setMonth(date.getMonth() - i);
+        const monthYear = date.toLocaleString('en-IN', { month: 'short', year: 'numeric' });
+        months.push(monthYear);
+
+        // Calculate totals for this month
+        let monthIncome = 0;
+        let monthExpense = 0;
+        TX.forEach(tx => {
+          const txDate = new Date(tx.d);
+          if (txDate.getMonth() === date.getMonth() && txDate.getFullYear() === date.getFullYear()) {
+            if (tx.ty === 'income') monthIncome += tx.a;
+            else if (tx.ty === 'expense') monthExpense += tx.a;
+          }
+        });
+        income.push(monthIncome);
+        expense.push(monthExpense);
+      }
+
+      incomeExpenseChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: months,
+          datasets: [
+            {
+              label: 'Income',
+              data: income,
+              backgroundColor: '#A5D6A7',
+              borderRadius: 8,
+              borderSkipped: false
+            },
+            {
+              label: 'Expense',
+              data: expense,
+              backgroundColor: '#EF9A9A',
+              borderRadius: 8,
+              borderSkipped: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                color: '#CAC4D0',
+                font: { family: "'Google Sans Text', sans-serif", size: 12 },
+                padding: 12,
+                usePointStyle: true
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#79747E', font: { family: "'JetBrains Mono', monospace" } },
+              grid: { color: '#1E1E1E', drawBorder: false }
+            },
+            x: {
+              ticks: { color: '#79747E', font: { family: "'Google Sans Text', sans-serif" } },
+              grid: { display: false, drawBorder: false }
+            }
+          }
+        }
+      });
+    }
+
+    function updateIncomeExpenseSummary() {
+      const today = new Date('2026-03-17');
+      const tbody = document.getElementById('incomeExpenseSummary');
+      tbody.innerHTML = '';
+
+      for (let i = 2; i >= 0; i--) {
+        const date = new Date(today);
+        date.setMonth(date.getMonth() - i);
+        const monthYear = date.toLocaleString('en-IN', { month: 'short', year: '2-digit' });
+
+        let monthIncome = 0;
+        let monthExpense = 0;
+        TX.forEach(tx => {
+          const txDate = new Date(tx.d);
+          if (txDate.getMonth() === date.getMonth() && txDate.getFullYear() === date.getFullYear()) {
+            if (tx.ty === 'income') monthIncome += tx.a;
+            else if (tx.ty === 'expense') monthExpense += tx.a;
+          }
+        });
+
+        const net = monthIncome - monthExpense;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${monthYear}</td>
+          <td class="amount income">${formatCurrency(monthIncome)}</td>
+          <td class="amount expense">${formatCurrency(monthExpense)}</td>
+          <td class="amount">${formatCurrency(net)}</td>
+        `;
+        tbody.appendChild(row);
+      }
+    }
+
+    // Category Chart
+    function initCategoryChart() {
+      const ctx = document.getElementById('categoryChart').getContext('2d');
+
+      const categories = {
+        'Food & Dining': { expenses: 0, color: '#EF9A9A' },
+        'Housing': { expenses: 0, color: '#90CAF9' },
+        'Transport': { expenses: 0, color: '#CE93D8' },
+        'Entertainment': { expenses: 0, color: '#F0D96A' },
+        'Bills': { expenses: 0, color: '#FFAB91' },
+        'Health': { expenses: 0, color: '#81C784' },
+        'Education': { expenses: 0, color: '#A1887F' },
+        'Shopping': { expenses: 0, color: '#FFB3BA' },
+        'Insurance': { expenses: 0, color: '#FFD1DC' }
+      };
+
+      TX.forEach(tx => {
+        if (tx.ty === 'expense' && categories[tx.cat]) {
+          categories[tx.cat].expenses += tx.a;
+        }
+      });
+
+      const labels = Object.keys(categories);
+      const data = labels.map(cat => categories[cat].expenses);
+      const colors = labels.map(cat => categories[cat].color);
+      const total = data.reduce((a, b) => a + b, 0);
+
+      categoryChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: colors,
+            borderColor: '#0A0A0A',
+            borderWidth: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1E1E1E',
+              titleColor: '#CAC4D0',
+              bodyColor: '#CAC4D0',
+              padding: 8,
+              callbacks: {
+                label: function(context) {
+                  const amount = formatCurrency(context.parsed);
+                  const percent = ((context.parsed / total) * 100).toFixed(1);
+                  return `${amount} (${percent}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Update legend
+      const legend = document.getElementById('categoryLegend');
+      legend.innerHTML = '';
+      labels.forEach((label, idx) => {
+        const amount = data[idx];
+        const percent = ((amount / total) * 100).toFixed(1);
+        const item = document.createElement('div');
+        item.className = 'donut-legend-item';
+        item.style.cursor = 'pointer';
+        item.title = 'Tap to drill down';
+        item.innerHTML = `
+          <div class="donut-legend-left">
+            <div class="donut-legend-color" style="background-color: ${colors[idx]}"></div>
+            <span class="donut-legend-label">${label}</span>
+          </div>
+          <div class="donut-legend-right">
+            <span class="donut-legend-percent">${percent}%</span>
+            <span class="donut-legend-amount">${formatCurrency(amount)}</span>
+            <span style="font-size:14px;color:#888;margin-left:4px" class="material-symbols-rounded">chevron_right</span>
+          </div>
+        `;
+        item.onclick = () => openCategoryDrillDown(label);
+        legend.appendChild(item);
+      });
+    }
+
+    // Net Worth Trend Chart
+    function initNetWorthChart() {
+      const ctx = document.getElementById('netWorthChart').getContext('2d');
+
+      const today = new Date('2026-03-17');
+      const months = [];
+      const assets = [];
+      const liabilities = [];
+      const netWorth = [];
+
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date(today);
+        date.setMonth(date.getMonth() - i);
+        const monthLabel = date.toLocaleString('en-IN', { month: 'short' });
+        months.push(monthLabel);
+
+        const baseAssets = 620000 - (i * 5000);
+        const baseLiabilities = 175000 - (i * 2000);
+        assets.push(baseAssets);
+        liabilities.push(baseLiabilities);
+        netWorth.push(baseAssets - baseLiabilities);
+      }
+
+      netWorthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [
+            {
+              label: 'Assets',
+              data: assets,
+              borderColor: '#A5D6A7',
+              backgroundColor: 'rgba(165, 214, 167, 0.1)',
+              tension: 0.4,
+              fill: true,
+              pointRadius: 4,
+              pointBackgroundColor: '#A5D6A7',
+              pointBorderColor: '#0A0A0A',
+              pointBorderWidth: 2
+            },
+            {
+              label: 'Liabilities',
+              data: liabilities,
+              borderColor: '#EF9A9A',
+              backgroundColor: 'rgba(239, 154, 154, 0.1)',
+              tension: 0.4,
+              fill: true,
+              pointRadius: 4,
+              pointBackgroundColor: '#EF9A9A',
+              pointBorderColor: '#0A0A0A',
+              pointBorderWidth: 2
+            },
+            {
+              label: 'Net Worth',
+              data: netWorth,
+              borderColor: '#80CBC4',
+              backgroundColor: 'rgba(128, 203, 196, 0.1)',
+              tension: 0.4,
+              fill: true,
+              pointRadius: 4,
+              pointBackgroundColor: '#80CBC4',
+              pointBorderColor: '#0A0A0A',
+              pointBorderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                color: '#CAC4D0',
+                font: { family: "'Google Sans Text', sans-serif", size: 12 },
+                padding: 12,
+                usePointStyle: true
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#79747E', font: { family: "'JetBrains Mono', monospace" } },
+              grid: { color: '#1E1E1E', drawBorder: false }
+            },
+            x: {
+              ticks: { color: '#79747E', font: { family: "'Google Sans Text', sans-serif" } },
+              grid: { display: false, drawBorder: false }
+            }
+          }
+        }
+      });
+    }
+
+    function updateNetWorthSummary() {
+      const today = new Date('2026-03-17');
+      const tbody = document.getElementById('netWorthSummary');
+      tbody.innerHTML = '';
+
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date(today);
+        date.setMonth(date.getMonth() - i);
+        const monthYear = date.toLocaleString('en-IN', { month: 'short', year: '2-digit' });
+
+        const baseAssets = 620000 - (i * 5000);
+        const baseLiabilities = 175000 - (i * 2000);
+        const netWorthVal = baseAssets - baseLiabilities;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${monthYear}</td>
+          <td class="amount income">${formatCurrency(baseAssets)}</td>
+          <td class="amount expense">${formatCurrency(baseLiabilities)}</td>
+          <td class="amount">${formatCurrency(netWorthVal)}</td>
+        `;
+        tbody.appendChild(row);
+      }
+    }
+
+    // Daily Spending Chart
+    function initDailyChart() {
+      const ctx = document.getElementById('dailyChart').getContext('2d');
+      updateDailyChart();
+    }
+
+    function updateDailyChart() {
+      const ctx = document.getElementById('dailyChart').getContext('2d');
+      const days = parseInt(currentDailyPeriod);
+      const today = new Date('2026-03-17');
+      const labels = [];
+      const dailyIncome = [];
+      const dailyExpense = [];
+
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dayLabel = date.toLocaleString('en-IN', { month: 'short', day: 'numeric' });
+        labels.push(dayLabel);
+
+        let income = 0;
+        let expense = 0;
+        TX.forEach(tx => {
+          const txDate = new Date(tx.d);
+          if (txDate.toDateString() === date.toDateString()) {
+            if (tx.ty === 'income') income += tx.a;
+            else if (tx.ty === 'expense') expense += tx.a;
+          }
+        });
+        dailyIncome.push(income);
+        dailyExpense.push(expense);
+      }
+
+      const totalExpense = dailyExpense.reduce((a, b) => a + b, 0);
+      const avgDaily = Math.round(totalExpense / days);
+      document.getElementById('avgDaily').textContent = formatCurrency(avgDaily);
+
+      if (dailyChart) {
+        dailyChart.data.labels = labels;
+        dailyChart.data.datasets[0].data = dailyIncome;
+        dailyChart.data.datasets[1].data = dailyExpense;
+        dailyChart.update();
+      } else {
+        dailyChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Income',
+                data: dailyIncome,
+                backgroundColor: '#A5D6A7',
+                borderRadius: 6,
+                borderSkipped: false
+              },
+              {
+                label: 'Expense',
+                data: dailyExpense,
+                backgroundColor: '#EF9A9A',
+                borderRadius: 6,
+                borderSkipped: false
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                  color: '#CAC4D0',
+                  font: { family: "'Google Sans Text', sans-serif", size: 12 },
+                  padding: 12,
+                  usePointStyle: true
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { color: '#79747E', font: { family: "'JetBrains Mono', monospace" } },
+                grid: { color: '#1E1E1E', drawBorder: false }
+              },
+              x: {
+                ticks: { color: '#79747E', font: { family: "'Google Sans Text', sans-serif", size: 11 } },
+                grid: { display: false, drawBorder: false }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Period selector handlers
+    function setPeriod(period) {
+      activePeriodMode = 'preset';
+      currentPeriod = period;
+      document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('custom-range-row').style.display = 'none';
+      TX = FT.getTX(); // reload from localStorage
+      initCharts();
+    }
+
+    function toggleCustomRange() {
+      const row = document.getElementById('custom-range-row');
+      const isShown = row.style.display !== 'none';
+      row.style.display = isShown ? 'none' : 'flex';
+      if(!isShown){
+        document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        activePeriodMode = 'custom';
+      }
+    }
+
+    function applyCustomRange() {
+      customDateFrom = document.getElementById('custom-from').value;
+      customDateTo   = document.getElementById('custom-to').value;
+      if(!customDateFrom || !customDateTo) return;
+      activePeriodMode = 'custom';
+      TX = FT.getTX().filter(t => {
+        const d = t.d.slice(0,10);
+        return d >= customDateFrom && d <= customDateTo;
+      });
+      initCharts();
+      ftToast('Showing ' + TX.length + ' transactions for custom range','info');
+    }
+
+    // Category drill-down overlay
+    let drillCategory = null;
+    function openCategoryDrillDown(cat) {
+      drillCategory = cat;
+      const allTx = FT.getTX();
+      const catTx = allTx.filter(t => t.cat === cat && t.ty === 'expense');
+      if(!catTx.length){ ftToast('No transactions for '+cat,'info'); return; }
+      const total = catTx.reduce((s,t)=>s+t.a,0);
+      let html = '<div style="position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center" id="drill-sheet" onclick="if(event.target===this)this.remove()">'
+        +'<div style="width:100%;max-width:540px;background:#1A1A1A;border-radius:24px 24px 0 0;padding:20px 16px 32px;max-height:75vh;overflow-y:auto" onclick="event.stopPropagation()">'
+        +'<div style="width:36px;height:4px;background:#333;border-radius:2px;margin:0 auto 16px"></div>'
+        +'<div style="font-size:16px;font-weight:700;color:#eee;margin-bottom:4px;font-family:\'Google Sans\',sans-serif">'+cat+'</div>'
+        +'<div style="font-size:13px;color:#888;margin-bottom:16px">Total: ₹'+total.toLocaleString('en-IN')+'</div>';
+      catTx.forEach(t=>{
+        html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#242424;border-radius:10px;margin-bottom:7px">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#eee">${t.n}</div>
+            <div style="font-size:11px;color:#666;margin-top:1px">${new Date(t.d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})} · ${t.acc}</div>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:#EF9A9A;font-family:'JetBrains Mono',monospace">-₹${t.a.toLocaleString('en-IN')}</div>
+        </div>`;
+      });
+      html += '</div></div>';
+      document.body.insertAdjacentHTML('beforeend', html);
+    }
+
+    // PDF Export (print-based)
+    function exportPDF() {
+      window.print();
+    }
+
+    function setDailyPeriod(days) {
+      currentDailyPeriod = days;
+      document.querySelectorAll('.sub-period-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      updateDailyChart();
+    }
+
+    // Cash Flow Forecast Chart
+    function initForecastChart() {
+      updateForecastChart();
+    }
+
+    function updateForecastChart() {
+      const ctx = document.getElementById('forecastChart').getContext('2d');
+      const today = new Date('2026-03-17');
+      const days = currentForecastPeriod;
+      const labels = [];
+      const balanceData = [];
+
+      let currentBalance = 75000; // Starting balance
+      let projectedLow = currentBalance;
+      let projectedLowDate = '';
+
+      for (let i = 0; i <= days; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() + i);
+        const dateLabel = date.toLocaleString('en-IN', { month: 'short', day: 'numeric' });
+        labels.push(dateLabel);
+
+        // Apply recurring income/expenses
+        if (date.getDate() === 15) {
+          currentBalance += 85000; // Salary
+        }
+        if (date.getDate() === 1 && i > 0) {
+          currentBalance -= 18000; // Rent
+        }
+
+        // Random small expenses
+        if (Math.random() > 0.7) {
+          currentBalance -= Math.floor(Math.random() * 2000) + 500;
+        }
+
+        balanceData.push(Math.max(0, currentBalance));
+
+        if (currentBalance < projectedLow) {
+          projectedLow = currentBalance;
+          projectedLowDate = dateLabel;
+        }
+      }
+
+      // Update stats
+      document.getElementById('projectedLow').textContent = formatCurrency(Math.max(0, projectedLow));
+      document.getElementById('projectedDate').textContent = projectedLowDate;
+
+      // Show warning if balance goes negative
+      const warningDiv = document.getElementById('forecastWarning');
+      if (projectedLow < 0) {
+        warningDiv.style.display = 'flex';
+      } else {
+        warningDiv.style.display = 'none';
+      }
+
+      if (forecastChart) {
+        forecastChart.data.labels = labels;
+        forecastChart.data.datasets[0].data = balanceData;
+        forecastChart.update();
+      } else {
+        forecastChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Projected Balance',
+              data: balanceData,
+              borderColor: '#80CBC4',
+              backgroundColor: 'rgba(128, 203, 196, 0.1)',
+              tension: 0.4,
+              fill: true,
+              pointRadius: 3,
+              pointBackgroundColor: '#80CBC4',
+              pointBorderColor: '#0A0A0A',
+              pointBorderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                  color: '#CAC4D0',
+                  font: { family: "'Google Sans Text', sans-serif", size: 12 },
+                  padding: 12,
+                  usePointStyle: true
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { color: '#79747E', font: { family: "'JetBrains Mono', monospace" } },
+                grid: { color: '#1E1E1E', drawBorder: false }
+              },
+              x: {
+                ticks: { color: '#79747E', font: { family: "'Google Sans Text', sans-serif", size: 11 } },
+                grid: { display: false, drawBorder: false }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function setForecastPeriod(days, e) {
+      currentForecastPeriod = days;
+      document.querySelectorAll('.forecast-controls .sub-period-btn').forEach(btn => btn.classList.remove('active'));
+      e.target.classList.add('active');
+      updateForecastChart();
+    }
+
+    // Export Report
+    function exportReport() {
+      // Show toast notification
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = 'Report exported successfully!';
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+
+      // In a real app, this would generate a PDF
+      console.log('Exporting report as PDF...');
+    }
+
+    // Initialize on page load
+    window.addEventListener('load', initCharts);
+  </script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(reg => console.log("[SW] Registered:", reg.scope))
+      .catch(err => console.warn("[SW] Registration failed:", err));
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1d27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Welcome to FinTrack</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Google+Sans+Text:wght@400;500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<script src="fintrack-data.js"></script>
+<script src="fintrack-sync.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#000;--s1:#0A0A0A;--s2:#141414;--s3:#1E1E1E;--s4:#282828;
+  --ol:#333;--olv:#222;
+  --txt:#EAEAEA;--txt2:#B8B8B8;--txt3:#6E6E6E;
+  --pri:#7ECEC6;--exp:#E88E8E;--inc:#96CC98;--warn:#E8B06E;
+  --r-sm:12px;--r-md:16px;--r-lg:20px;--r-xl:24px;--r-full:100px;
+}
+body{
+  font-family:'Google Sans Text','Google Sans',system-ui,sans-serif;
+  background:var(--bg);color:var(--txt);min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  -webkit-font-smoothing:antialiased;padding:20px;
+  background:radial-gradient(ellipse at 50% 0%,rgba(126,206,198,0.06) 0%,transparent 60%);
+}
+.ob-wrap{width:100%;max-width:420px}
+
+/* ── Slide container ── */
+.slide{display:none;flex-direction:column;align-items:center;text-align:center;animation:fadeUp .4s ease}
+.slide.active{display:flex}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Slide 1: Welcome ── */
+.ob-logo{
+  width:80px;height:80px;border-radius:var(--r-xl);
+  background:linear-gradient(135deg,var(--pri),#5FB8AE);
+  display:flex;align-items:center;justify-content:center;
+  font-size:40px;margin-bottom:24px;
+  box-shadow:0 12px 40px rgba(126,206,198,0.3);
+}
+.ob-title{
+  font-family:'Google Sans',sans-serif;font-size:28px;font-weight:700;
+  letter-spacing:-0.8px;margin-bottom:10px;
+  background:linear-gradient(135deg,var(--pri),#A8E6CF);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.ob-sub{font-size:15px;color:var(--txt2);line-height:1.6;max-width:320px}
+
+/* ── Feature pills ── */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:24px 0 0;width:100%}
+.feat-item{
+  padding:14px;border-radius:var(--r-md);
+  background:var(--s2);border:1px solid var(--olv);text-align:left;
+}
+.feat-ico{font-size:22px;margin-bottom:6px}
+.feat-l{font-size:12px;font-weight:600;color:var(--txt);margin-bottom:2px}
+.feat-d{font-size:11px;color:var(--txt3);line-height:1.4}
+
+/* ── Slide 2: Name ── */
+.ob-name-field{width:100%;margin:20px 0}
+.ob-input{
+  width:100%;padding:16px 18px;border-radius:var(--r-md);
+  background:var(--s2);border:1.5px solid var(--olv);
+  color:var(--txt);font-size:16px;font-family:'Google Sans Text',sans-serif;
+  outline:none;transition:border-color .2s;
+}
+.ob-input:focus{border-color:var(--pri)}
+.ob-input::placeholder{color:var(--txt3)}
+
+/* ── Slide 3: Theme ── */
+.theme-row{display:flex;gap:10px;margin:20px 0;width:100%}
+.theme-card{
+  flex:1;padding:18px 12px;border-radius:var(--r-lg);
+  background:var(--s2);border:2px solid var(--olv);
+  cursor:pointer;transition:all .2s;text-align:center;
+}
+.theme-card:hover{border-color:var(--ol)}
+.theme-card.selected{border-color:var(--pri);background:rgba(126,206,198,0.06)}
+.theme-ico{font-size:28px;margin-bottom:8px}
+.theme-l{font-size:13px;font-weight:600;color:var(--txt)}
+.theme-d{font-size:11px;color:var(--txt3);margin-top:2px}
+.theme-check{
+  width:20px;height:20px;border-radius:50%;border:2px solid var(--olv);
+  margin:8px auto 0;transition:all .2s;
+}
+.theme-card.selected .theme-check{background:var(--pri);border-color:var(--pri)}
+
+/* ── Slide 4: Currency ── */
+.currency-grid{display:flex;flex-direction:column;gap:8px;margin:20px 0;width:100%}
+.currency-opt{
+  display:flex;align-items:center;gap:14px;padding:14px 16px;
+  border-radius:var(--r-md);background:var(--s2);border:2px solid var(--olv);
+  cursor:pointer;transition:all .2s;
+}
+.currency-opt:hover{border-color:var(--ol)}
+.currency-opt.selected{border-color:var(--pri);background:rgba(126,206,198,0.06)}
+.currency-flag{font-size:22px}
+.currency-info{flex:1;text-align:left}
+.currency-name{font-size:14px;font-weight:600;color:var(--txt)}
+.currency-sym{font-size:12px;color:var(--txt3)}
+.currency-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--olv);margin-left:auto;transition:all .2s}
+.currency-opt.selected .currency-radio{background:var(--pri);border-color:var(--pri)}
+
+/* ── Slide 5: Ready ── */
+.ready-icon{font-size:60px;margin-bottom:16px}
+.stat-row{display:flex;gap:10px;margin:20px 0;width:100%}
+.stat-c{
+  flex:1;padding:14px;border-radius:var(--r-md);
+  background:var(--s2);border:1px solid var(--olv);text-align:center;
+}
+.stat-v{font-size:20px;font-weight:700;color:var(--pri);font-family:'JetBrains Mono',monospace}
+.stat-l{font-size:11px;color:var(--txt3);margin-top:2px}
+
+/* ── Navigation ── */
+.ob-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:28px;width:100%;gap:12px;
+}
+.ob-btn{
+  flex:1;padding:16px 24px;border-radius:var(--r-full);border:none;
+  font-family:'Google Sans',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;transition:all .25s;
+}
+.ob-btn-pri{
+  background:linear-gradient(135deg,var(--pri),#5FB8AE);
+  color:#003731;box-shadow:0 6px 24px rgba(126,206,198,0.25);
+}
+.ob-btn-pri:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(126,206,198,0.35)}
+.ob-btn-sec{background:var(--s2);color:var(--txt2);border:1px solid var(--olv);flex:0.5}
+.ob-btn-sec:hover{background:var(--s3)}
+
+/* ── Progress dots ── */
+.ob-dots{display:flex;gap:6px;margin-bottom:20px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--s4);transition:all .3s}
+.dot.active{width:24px;border-radius:4px;background:var(--pri)}
+.dot.done{background:rgba(126,206,198,0.4)}
+</style>
+</head>
+<body>
+<div class="ob-wrap">
+  <!-- Progress dots -->
+  <div class="ob-dots" id="ob-dots">
+    <div class="dot active" id="dot0"></div>
+    <div class="dot" id="dot1"></div>
+    <div class="dot" id="dot2"></div>
+    <div class="dot" id="dot3"></div>
+    <div class="dot" id="dot4"></div>
+  </div>
+
+  <!-- Slide 0: Welcome -->
+  <div class="slide active" id="slide0">
+    <div class="ob-logo">💰</div>
+    <div class="ob-title">Welcome to FinTrack</div>
+    <div class="ob-sub">Your personal finance companion. Track spending, manage budgets, and reach your savings goals.</div>
+    <div class="feat-grid">
+      <div class="feat-item"><div class="feat-ico">📊</div><div class="feat-l">Smart Analytics</div><div class="feat-d">Visual charts and spending insights</div></div>
+      <div class="feat-item"><div class="feat-ico">🎯</div><div class="feat-l">Goal Tracking</div><div class="feat-d">Save towards what matters most</div></div>
+      <div class="feat-item"><div class="feat-ico">🔔</div><div class="feat-l">Budget Alerts</div><div class="feat-d">Get notified before you overspend</div></div>
+      <div class="feat-item"><div class="feat-ico">🔒</div><div class="feat-l">Private & Local</div><div class="feat-d">All data stays on your device</div></div>
+    </div>
+    <div class="ob-nav">
+      <button class="ob-btn ob-btn-pri" onclick="nextSlide()">Get Started <span style="margin-left:4px">→</span></button>
+    </div>
+  </div>
+
+  <!-- Slide 1: Name -->
+  <div class="slide" id="slide1">
+    <div style="font-size:48px;margin-bottom:16px">👋</div>
+    <div class="ob-title" style="font-size:24px">What's your name?</div>
+    <div class="ob-sub">We'll use this to personalize your dashboard greetings.</div>
+    <div class="ob-name-field">
+      <input class="ob-input" id="ob-name" type="text" placeholder="Enter your name…" autocomplete="off" maxlength="30">
+    </div>
+    <div class="ob-nav">
+      <button class="ob-btn ob-btn-sec" onclick="prevSlide()">Back</button>
+      <button class="ob-btn ob-btn-pri" onclick="saveName()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Slide 2: Theme -->
+  <div class="slide" id="slide2">
+    <div style="font-size:48px;margin-bottom:16px">🎨</div>
+    <div class="ob-title" style="font-size:24px">Choose your theme</div>
+    <div class="ob-sub">Pick how FinTrack looks. You can change this anytime in Settings.</div>
+    <div class="theme-row">
+      <div class="theme-card selected" id="theme-dark" onclick="selectTheme('dark')">
+        <div class="theme-ico">🌙</div>
+        <div class="theme-l">Dark</div>
+        <div class="theme-d">Easy on the eyes</div>
+        <div class="theme-check"></div>
+      </div>
+      <div class="theme-card" id="theme-light" onclick="selectTheme('light')">
+        <div class="theme-ico">☀️</div>
+        <div class="theme-l">Light</div>
+        <div class="theme-d">Clean and bright</div>
+        <div class="theme-check"></div>
+      </div>
+      <div class="theme-card" id="theme-system" onclick="selectTheme('system')">
+        <div class="theme-ico">📱</div>
+        <div class="theme-l">System</div>
+        <div class="theme-d">Follows your device</div>
+        <div class="theme-check"></div>
+      </div>
+    </div>
+    <div class="ob-nav">
+      <button class="ob-btn ob-btn-sec" onclick="prevSlide()">Back</button>
+      <button class="ob-btn ob-btn-pri" onclick="nextSlide()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Slide 3: Currency -->
+  <div class="slide" id="slide3">
+    <div style="font-size:48px;margin-bottom:16px">💵</div>
+    <div class="ob-title" style="font-size:24px">Select currency</div>
+    <div class="ob-sub">Choose your primary currency for all transactions and reports.</div>
+    <div class="currency-grid">
+      <div class="currency-opt selected" id="cur-INR" onclick="selectCurrency('INR')">
+        <span class="currency-flag">🇮🇳</span>
+        <div class="currency-info"><div class="currency-name">Indian Rupee</div><div class="currency-sym">INR — ₹</div></div>
+        <div class="currency-radio"></div>
+      </div>
+      <div class="currency-opt" id="cur-USD" onclick="selectCurrency('USD')">
+        <span class="currency-flag">🇺🇸</span>
+        <div class="currency-info"><div class="currency-name">US Dollar</div><div class="currency-sym">USD — $</div></div>
+        <div class="currency-radio"></div>
+      </div>
+      <div class="currency-opt" id="cur-EUR" onclick="selectCurrency('EUR')">
+        <span class="currency-flag">🇪🇺</span>
+        <div class="currency-info"><div class="currency-name">Euro</div><div class="currency-sym">EUR — €</div></div>
+        <div class="currency-radio"></div>
+      </div>
+      <div class="currency-opt" id="cur-GBP" onclick="selectCurrency('GBP')">
+        <span class="currency-flag">🇬🇧</span>
+        <div class="currency-info"><div class="currency-name">British Pound</div><div class="currency-sym">GBP — £</div></div>
+        <div class="currency-radio"></div>
+      </div>
+    </div>
+    <div class="ob-nav">
+      <button class="ob-btn ob-btn-sec" onclick="prevSlide()">Back</button>
+      <button class="ob-btn ob-btn-pri" onclick="nextSlide()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Slide 4: All set! -->
+  <div class="slide" id="slide4">
+    <div class="ready-icon">🎉</div>
+    <div class="ob-title" style="font-size:24px">You're all set, <span id="ob-name-display">Darko</span>!</div>
+    <div class="ob-sub">FinTrack is ready with sample data to explore. Add your real transactions anytime.</div>
+    <div class="stat-row">
+      <div class="stat-c"><div class="stat-v" id="stat-tx">20</div><div class="stat-l">Transactions</div></div>
+      <div class="stat-c"><div class="stat-v" id="stat-acc">5</div><div class="stat-l">Accounts</div></div>
+      <div class="stat-c"><div class="stat-v" id="stat-goals">4</div><div class="stat-l">Goals</div></div>
+    </div>
+    <div class="ob-nav">
+      <button class="ob-btn ob-btn-pri" onclick="finishOnboarding()">Start Tracking 🚀</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentSlide = 0;
+let selectedTheme = 'dark';
+let selectedCurrency = 'INR';
+const totalSlides = 5;
+
+function updateDots(){
+  for(let i=0;i<totalSlides;i++){
+    const d=document.getElementById('dot'+i);
+    if(!d)continue;
+    d.className='dot'+(i===currentSlide?' active':(i<currentSlide?' done':''));
+  }
+}
+
+function showSlide(n){
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  const s=document.getElementById('slide'+n);
+  if(s){s.classList.add('active');}
+  currentSlide=n;
+  updateDots();
+}
+
+function nextSlide(){showSlide(currentSlide+1);}
+function prevSlide(){if(currentSlide>0)showSlide(currentSlide-1);}
+
+function saveName(){
+  const name=document.getElementById('ob-name').value.trim();
+  if(name) FT.setSetting('userName',name);
+  document.getElementById('ob-name-display').textContent=name||'there';
+  nextSlide();
+}
+
+function selectTheme(t){
+  selectedTheme=t;
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('theme-'+t).classList.add('selected');
+  FTTheme.apply(t);
+}
+
+function selectCurrency(c){
+  selectedCurrency=c;
+  document.querySelectorAll('.currency-opt').forEach(o=>o.classList.remove('selected'));
+  document.getElementById('cur-'+c).classList.add('selected');
+}
+
+function finishOnboarding(){
+  // Save all settings
+  FT.setSetting('theme', selectedTheme);
+  FT.setSetting('currency', selectedCurrency);
+  FT.setSetting('onboardingDone', true);
+  const name=document.getElementById('ob-name').value.trim();
+  if(name) FT.setSetting('userName', name);
+  FTTheme.apply(selectedTheme);
+  location.href='MainMenu.html';
+}
+
+// Pre-fill stat counts
+function loadStats(){
+  document.getElementById('stat-tx').textContent = FT.getTX().length;
+  document.getElementById('stat-acc').textContent = FT.getAccounts().length;
+  document.getElementById('stat-goals').textContent = FT.getGoals().length;
+}
+
+// Init
+FTTheme.init();
+loadStats();
+document.getElementById('ob-name').addEventListener('keydown',e=>{
+  if(e.key==='Enter')saveName();
+});
+
+// If already onboarded, go to dashboard
+if(FT.getSetting('onboardingDone')){
+  location.href='MainMenu.html';
+}
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(reg => console.log("[SW] Registered:", reg.scope))
+      .catch(err => console.warn("[SW] Registration failed:", err));
+  });
+}
+</script>
+</body>
+</html>
