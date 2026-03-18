@@ -5,7 +5,7 @@
 **Type:** Personal Finance Tracker Web App
 **Design:** Dark theme, Material Design 3 inspired
 **Currency:** ₹ Indian Rupees (en-IN locale)
-**User:** Darko (educationforbasil@gmail.com)
+**User:** Darko 
 
 ---
 
