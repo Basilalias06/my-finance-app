@@ -128,6 +128,46 @@ body{
 .currency-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--olv);margin-left:auto;transition:all .2s}
 .currency-opt.selected .currency-radio{background:var(--pri);border-color:var(--pri)}
 
+/* ── Accounts setup slide ── */
+.acc-type-tabs{display:flex;gap:6px;margin:16px 0;width:100%;overflow-x:auto;padding-bottom:4px}
+.acc-type-tab{
+  padding:8px 14px;border-radius:var(--r-full);border:1.5px solid var(--olv);
+  background:var(--s2);color:var(--txt2);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .2s;white-space:nowrap;font-family:'Google Sans',sans-serif;
+}
+.acc-type-tab.active{background:var(--pri-dim);border-color:var(--pri);color:var(--pri)}
+.acc-list{width:100%;max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin:8px 0;padding-right:4px}
+.acc-list::-webkit-scrollbar{width:3px}
+.acc-list::-webkit-scrollbar-thumb{background:var(--s4);border-radius:4px}
+.acc-item{
+  display:flex;align-items:center;gap:10px;padding:12px 14px;
+  border-radius:var(--r-md);background:var(--s2);border:1px solid var(--olv);
+  animation:fadeUp .3s ease;
+}
+.acc-item-icon{font-size:20px;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--s3)}
+.acc-item-info{flex:1;text-align:left}
+.acc-item-name{font-size:13px;font-weight:600;color:var(--txt)}
+.acc-item-detail{font-size:11px;color:var(--txt3)}
+.acc-item-del{
+  width:28px;height:28px;border-radius:50%;border:none;background:transparent;
+  color:var(--txt3);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:16px;transition:all .2s;
+}
+.acc-item-del:hover{background:rgba(232,142,142,0.15);color:var(--exp)}
+.acc-add-form{
+  width:100%;display:flex;flex-direction:column;gap:8px;margin:8px 0;
+}
+.acc-form-row{display:flex;gap:8px}
+.acc-form-row .ob-input{flex:1;padding:12px 14px;font-size:14px}
+.acc-add-btn{
+  padding:10px 16px;border-radius:var(--r-full);border:1.5px dashed var(--pri);
+  background:transparent;color:var(--pri);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .2s;font-family:'Google Sans',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:6px;width:100%;
+}
+.acc-add-btn:hover{background:var(--pri-dim)}
+.acc-skip-note{font-size:11px;color:var(--txt3);margin-top:4px}
+
 /* ── Ready slide ── */
 .ready-icon{font-size:64px;margin-bottom:20px}
 .stat-row{display:flex;gap:10px;margin:24px 0;width:100%}
@@ -167,9 +207,11 @@ body{
 .light-theme,.light-theme body{background:var(--bg)!important;color:var(--txt)}
 .light-theme .ob-input{background:var(--s1);border-color:var(--olv);color:var(--txt)}
 .light-theme .ob-input::placeholder{color:var(--txt3)}
-.light-theme .feat-item,.light-theme .theme-card,.light-theme .currency-opt,.light-theme .stat-c{
+.light-theme .feat-item,.light-theme .theme-card,.light-theme .currency-opt,.light-theme .stat-c,.light-theme .acc-item{
   background:var(--s1);border-color:var(--olv);
 }
+.light-theme .acc-type-tab{background:var(--s1);border-color:var(--olv)}
+.light-theme .acc-item-icon{background:var(--s2)}
 .light-theme .ob-btn-sec{background:var(--s1);color:var(--txt2);border-color:var(--olv)}
 .light-theme .ob-btn-pri{color:#00201E}
 .light-theme .ob-sub{color:var(--txt2)}
@@ -189,6 +231,7 @@ body{
     <div class="dot" id="dot2"></div>
     <div class="dot" id="dot3"></div>
     <div class="dot" id="dot4"></div>
+    <div class="dot" id="dot5"></div>
   </div>
 
   <!-- Slide 0: Welcome -->
@@ -285,15 +328,84 @@ body{
     </div>
   </div>
 
-  <!-- Slide 4: All set! -->
+  <!-- Slide 4: Add Accounts -->
   <div class="slide" id="slide4">
+    <div class="slide-emoji">🏦</div>
+    <div class="ob-title" style="font-size:24px">Set up your accounts</div>
+    <div class="ob-sub">Add your bank accounts, credit cards, loans or other accounts. You can always edit these later.</div>
+    <div class="acc-type-tabs">
+      <div class="acc-type-tab active" onclick="switchAccTab('account')">Bank Account</div>
+      <div class="acc-type-tab" onclick="switchAccTab('credit-card')">Credit Card</div>
+      <div class="acc-type-tab" onclick="switchAccTab('loan')">Loan</div>
+      <div class="acc-type-tab" onclick="switchAccTab('wallet')">Wallet / Other</div>
+    </div>
+    <div class="acc-add-form" id="acc-form-account">
+      <div class="acc-form-row">
+        <input class="ob-input" id="acc-name" type="text" placeholder="Account name (e.g. SBI Savings)" maxlength="40">
+      </div>
+      <div class="acc-form-row">
+        <input class="ob-input" id="acc-balance" type="number" placeholder="Current balance" inputmode="decimal">
+      </div>
+      <button class="acc-add-btn" onclick="addOnboardingAccount()">
+        <span style="font-size:16px">+</span> Add Account
+      </button>
+    </div>
+    <div class="acc-add-form" id="acc-form-credit-card" style="display:none">
+      <div class="acc-form-row">
+        <input class="ob-input" id="cc-name" type="text" placeholder="Card name (e.g. HDFC Credit Card)" maxlength="40">
+      </div>
+      <div class="acc-form-row">
+        <input class="ob-input" id="cc-limit" type="number" placeholder="Credit limit" inputmode="decimal">
+        <input class="ob-input" id="cc-used" type="number" placeholder="Amount used" inputmode="decimal">
+      </div>
+      <button class="acc-add-btn" onclick="addOnboardingCC()">
+        <span style="font-size:16px">+</span> Add Credit Card
+      </button>
+    </div>
+    <div class="acc-add-form" id="acc-form-loan" style="display:none">
+      <div class="acc-form-row">
+        <input class="ob-input" id="loan-name" type="text" placeholder="Loan name (e.g. Home Loan)" maxlength="40">
+      </div>
+      <div class="acc-form-row">
+        <input class="ob-input" id="loan-lender" type="text" placeholder="Lender (e.g. SBI)" maxlength="40">
+      </div>
+      <div class="acc-form-row">
+        <input class="ob-input" id="loan-outstanding" type="number" placeholder="Outstanding amount" inputmode="decimal">
+        <input class="ob-input" id="loan-emi" type="number" placeholder="Monthly EMI" inputmode="decimal">
+      </div>
+      <button class="acc-add-btn" onclick="addOnboardingLoan()">
+        <span style="font-size:16px">+</span> Add Loan
+      </button>
+    </div>
+    <div class="acc-add-form" id="acc-form-wallet" style="display:none">
+      <div class="acc-form-row">
+        <input class="ob-input" id="wallet-name" type="text" placeholder="Name (e.g. Paytm Wallet, Cash)" maxlength="40">
+      </div>
+      <div class="acc-form-row">
+        <input class="ob-input" id="wallet-balance" type="number" placeholder="Current balance" inputmode="decimal">
+      </div>
+      <button class="acc-add-btn" onclick="addOnboardingWallet()">
+        <span style="font-size:16px">+</span> Add Account
+      </button>
+    </div>
+    <div class="acc-list" id="ob-acc-list"></div>
+    <div class="acc-skip-note">You can skip this step and add accounts later from the Accounts page.</div>
+    <div class="ob-nav">
+      <button class="ob-btn ob-btn-sec" onclick="prevSlide()">Back</button>
+      <button class="ob-btn ob-btn-pri" onclick="nextSlide()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Slide 5: All set! -->
+  <div class="slide" id="slide5">
     <div class="ready-icon">🎉</div>
     <div class="ob-title" style="font-size:24px">You're all set, <span id="ob-name-display">there</span>!</div>
-    <div class="ob-sub">FinTrack is ready with sample data to explore. Add your real transactions anytime.</div>
+    <div class="ob-sub">FinTrack is ready to go. Start tracking your finances right away.</div>
     <div class="stat-row">
       <div class="stat-c"><div class="stat-v" id="stat-tx">20</div><div class="stat-l">Transactions</div></div>
       <div class="stat-c"><div class="stat-v" id="stat-acc">5</div><div class="stat-l">Accounts</div></div>
       <div class="stat-c"><div class="stat-v" id="stat-goals">4</div><div class="stat-l">Goals</div></div>
+      <div class="stat-c" id="stat-debts-wrap" style="display:none"><div class="stat-v" id="stat-debts">0</div><div class="stat-l">Loans</div></div>
     </div>
     <div class="ob-nav">
       <button class="ob-btn ob-btn-pri" onclick="finishOnboarding()">Start Tracking 🚀</button>
@@ -305,7 +417,19 @@ body{
 let currentSlide = 0;
 let selectedTheme = 'dark';
 let selectedCurrency = 'INR';
-const totalSlides = 5;
+const totalSlides = 6;
+
+// Onboarding account collections
+const obAccounts = [];
+const obCreditCards = [];
+const obDebts = [];
+
+const ACC_ICONS = {savings:'🏦',checking:'🏦',cash:'💰',upi:'⚡',wallet:'🔐'};
+const ACC_COLORS = ['#7ECEC6','#82B5E8','#E8B06E','#96CC98','#C293D8','#E88E8E','#A18870'];
+let accColorIdx = 0;
+function nextColor(){ return ACC_COLORS[accColorIdx++ % ACC_COLORS.length]; }
+
+let currentAccTab = 'account';
 
 function updateDots(){
   for(let i=0;i<totalSlides;i++){
@@ -321,6 +445,7 @@ function showSlide(n){
   if(s){s.classList.add('active');}
   currentSlide=n;
   updateDots();
+  if(n===5) loadStats();
 }
 
 function nextSlide(){showSlide(currentSlide+1);}
@@ -344,27 +469,148 @@ function selectCurrency(c){
   selectedCurrency=c;
   document.querySelectorAll('.currency-opt').forEach(o=>o.classList.remove('selected'));
   document.getElementById('cur-'+c).classList.add('selected');
+  FT.setSetting('currency', c);
+}
+
+// ── Account tab switching ──
+function switchAccTab(tab){
+  currentAccTab = tab;
+  document.querySelectorAll('.acc-type-tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  ['account','credit-card','loan','wallet'].forEach(f=>{
+    document.getElementById('acc-form-'+f).style.display = f===tab ? '' : 'none';
+  });
+}
+
+// ── Add account during onboarding ──
+function addOnboardingAccount(){
+  const name = document.getElementById('acc-name').value.trim();
+  const balance = parseFloat(document.getElementById('acc-balance').value) || 0;
+  if(!name) return;
+  obAccounts.push({name, icon:'🏦', type:'savings', balance, color:nextColor()});
+  document.getElementById('acc-name').value='';
+  document.getElementById('acc-balance').value='';
+  renderObAccList();
+}
+
+function addOnboardingCC(){
+  const name = document.getElementById('cc-name').value.trim();
+  const limit = parseFloat(document.getElementById('cc-limit').value) || 0;
+  const used = parseFloat(document.getElementById('cc-used').value) || 0;
+  if(!name) return;
+  obCreditCards.push({name, limit, used, billing:1, color:nextColor()});
+  document.getElementById('cc-name').value='';
+  document.getElementById('cc-limit').value='';
+  document.getElementById('cc-used').value='';
+  renderObAccList();
+}
+
+function addOnboardingLoan(){
+  const name = document.getElementById('loan-name').value.trim();
+  const lender = document.getElementById('loan-lender').value.trim();
+  const outstanding = parseFloat(document.getElementById('loan-outstanding').value) || 0;
+  const emi = parseFloat(document.getElementById('loan-emi').value) || 0;
+  if(!name) return;
+  obDebts.push({name, lender: lender||name, type:'loan', icon:'account_balance', principal:outstanding, outstanding, paid:0, interestRate:0, emi, tenure:0, startDate:new Date().toISOString().slice(0,10), interestPaid:0, nextDue:'', color:nextColor()});
+  document.getElementById('loan-name').value='';
+  document.getElementById('loan-lender').value='';
+  document.getElementById('loan-outstanding').value='';
+  document.getElementById('loan-emi').value='';
+  renderObAccList();
+}
+
+function addOnboardingWallet(){
+  const name = document.getElementById('wallet-name').value.trim();
+  const balance = parseFloat(document.getElementById('wallet-balance').value) || 0;
+  if(!name) return;
+  const isWallet = name.toLowerCase().includes('wallet') || name.toLowerCase().includes('pay');
+  obAccounts.push({name, icon: isWallet?'🔐':'💰', type: isWallet?'wallet':'cash', balance, color:nextColor()});
+  document.getElementById('wallet-name').value='';
+  document.getElementById('wallet-balance').value='';
+  renderObAccList();
+}
+
+function removeObItem(type, idx){
+  if(type==='acc') obAccounts.splice(idx,1);
+  else if(type==='cc') obCreditCards.splice(idx,1);
+  else if(type==='debt') obDebts.splice(idx,1);
+  renderObAccList();
+}
+
+function renderObAccList(){
+  const list = document.getElementById('ob-acc-list');
+  let html = '';
+  const sym = (FT_CURRENCIES[selectedCurrency]||FT_CURRENCIES.INR).symbol;
+  obAccounts.forEach((a,i)=>{
+    html += `<div class="acc-item">
+      <div class="acc-item-icon">${a.icon}</div>
+      <div class="acc-item-info"><div class="acc-item-name">${a.name}</div><div class="acc-item-detail">${a.type} · ${sym}${Number(a.balance).toLocaleString()}</div></div>
+      <button class="acc-item-del" onclick="removeObItem('acc',${i})">×</button>
+    </div>`;
+  });
+  obCreditCards.forEach((c,i)=>{
+    html += `<div class="acc-item">
+      <div class="acc-item-icon">💳</div>
+      <div class="acc-item-info"><div class="acc-item-name">${c.name}</div><div class="acc-item-detail">Credit Card · Limit ${sym}${Number(c.limit).toLocaleString()}</div></div>
+      <button class="acc-item-del" onclick="removeObItem('cc',${i})">×</button>
+    </div>`;
+  });
+  obDebts.forEach((d,i)=>{
+    html += `<div class="acc-item">
+      <div class="acc-item-icon">📋</div>
+      <div class="acc-item-info"><div class="acc-item-name">${d.name}</div><div class="acc-item-detail">Loan · ${d.lender} · ${sym}${Number(d.outstanding).toLocaleString()}</div></div>
+      <button class="acc-item-del" onclick="removeObItem('debt',${i})">×</button>
+    </div>`;
+  });
+  list.innerHTML = html;
+}
+
+// ── Save onboarding accounts to storage ──
+function saveOnboardingAccounts(){
+  if(obAccounts.length > 0){
+    const accounts = obAccounts.map((a,i)=>({...a, id:'acc'+Date.now()+i}));
+    FT.setAccounts(accounts);
+  }
+  if(obCreditCards.length > 0){
+    const cards = obCreditCards.map((c,i)=>({...c, id:'cc'+Date.now()+i}));
+    FT.setCreditCards(cards);
+  }
+  if(obDebts.length > 0){
+    const debts = obDebts.map((d,i)=>({...d, id:'d'+Date.now()+i}));
+    FT.setDebts(debts);
+  }
 }
 
 function finishOnboarding(){
   FT.setSetting('theme', selectedTheme);
   FT.setSetting('currency', selectedCurrency);
+  const sym = (FT_CURRENCIES[selectedCurrency]||FT_CURRENCIES.INR).symbol;
+  FT.setSetting('currencySymbol', sym);
   FT.setSetting('onboardingDone', true);
   const name=document.getElementById('ob-name').value.trim();
   if(name) FT.setSetting('userName', name);
+  saveOnboardingAccounts();
   FTTheme.apply(selectedTheme);
   location.href='MainMenu.html';
 }
 
 function loadStats(){
-  document.getElementById('stat-tx').textContent = FT.getTX().length;
-  document.getElementById('stat-acc').textContent = FT.getAccounts().length;
-  document.getElementById('stat-goals').textContent = FT.getGoals().length;
+  const txCount = FT.getTX().length;
+  const accCount = obAccounts.length > 0 ? obAccounts.length : FT.getAccounts().length;
+  const ccCount = obCreditCards.length;
+  const debtCount = obDebts.length;
+  const goalCount = FT.getGoals().length;
+  document.getElementById('stat-tx').textContent = txCount;
+  document.getElementById('stat-acc').textContent = accCount + ccCount;
+  document.getElementById('stat-goals').textContent = goalCount;
+  if(debtCount > 0){
+    document.getElementById('stat-debts').textContent = debtCount;
+    document.getElementById('stat-debts-wrap').style.display = '';
+  }
 }
 
 // Init — force dark theme on load (onboarding default is dark)
 FTTheme.init();
-loadStats();
 document.getElementById('ob-name').addEventListener('keydown',e=>{
   if(e.key==='Enter')saveName();
 });
