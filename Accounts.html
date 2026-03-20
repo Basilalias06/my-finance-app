@@ -986,187 +986,17 @@
     <!-- Net Worth Card -->
     <div class="net-worth-card">
       <div class="label">Total Net Worth</div>
-      <div class="amount">₹2,03,950</div>
-      <div class="change">↑ 12.5% this month</div>
+      <div class="amount" id="net-worth-amount"></div>
+      <div class="change" id="net-worth-change"></div>
     </div>
 
     <!-- Bank Accounts Section -->
     <h2 class="section-title">Bank Accounts</h2>
-    <div class="accounts-grid">
-      <div class="account-card" onclick="openAccountDetail({id: 'acc1', icon: '💵', name: 'Cash', type: 'Cash', balance: 12450, change: -5.2, transactions: [{desc: 'Withdrawal', date: 'Today', amt: -500}, {desc: 'Payment', date: 'Yesterday', amt: -1200}, {desc: 'Deposit', date: '2 days ago', amt: 1500}, {desc: 'Withdrawal', date: '3 days ago', amt: -800}, {desc: 'Payment', date: '4 days ago', amt: -300}]})">
-        <div class="account-icon">💵</div>
-        <div class="account-info">
-          <div class="account-header">
-            <div class="account-name">Cash</div>
-            <span class="account-type">Cash</span>
-          </div>
-          <div class="account-balance">₹12,450</div>
-          <div class="account-change negative">
-            <span class="change-icon">↓</span>
-            <span>5.2%</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="account-card" onclick="openAccountDetail({id: 'acc2', icon: '🏦', name: 'SBI Savings', type: 'Savings', balance: 145000, change: 8.3, transactions: [{desc: 'Salary Deposit', date: 'Today', amt: 50000}, {desc: 'EMI Payment', date: 'Yesterday', amt: -5000}, {desc: 'Transfer Out', date: '2 days ago', amt: -10000}, {desc: 'Interest Credit', date: '3 days ago', amt: 200}, {desc: 'Bill Payment', date: '4 days ago', amt: -2500}]})">
-        <div class="account-icon">🏦</div>
-        <div class="account-info">
-          <div class="account-header">
-            <div class="account-name">SBI Savings</div>
-            <span class="account-type">Savings</span>
-          </div>
-          <div class="account-balance">₹1,45,000</div>
-          <div class="account-change">
-            <span class="change-icon">↑</span>
-            <span>8.3%</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="account-card" onclick="openAccountDetail({id: 'acc3', icon: '🏧', name: 'HDFC Checking', type: 'Checking', balance: 38500, change: 2.1, transactions: [{desc: 'Freelance Income', date: 'Today', amt: 15000}, {desc: 'Utility Bill', date: 'Yesterday', amt: -2500}, {desc: 'Online Shopping', date: '2 days ago', amt: -3200}, {desc: 'Transfer In', date: '3 days ago', amt: 5000}, {desc: 'Subscription', date: '4 days ago', amt: -499}]})">
-        <div class="account-icon">🏧</div>
-        <div class="account-info">
-          <div class="account-header">
-            <div class="account-name">HDFC Checking</div>
-            <span class="account-type">Checking</span>
-          </div>
-          <div class="account-balance">₹38,500</div>
-          <div class="account-change">
-            <span class="change-icon">↑</span>
-            <span>2.1%</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="account-card" onclick="openAccountDetail({id: 'acc4', icon: '📱', name: 'UPI (GPay)', type: 'UPI', balance: 5200, change: -3.5, transactions: [{desc: 'Money Sent', date: 'Today', amt: -500}, {desc: 'Money Received', date: 'Yesterday', amt: 1000}, {desc: 'Bill Payment', date: '2 days ago', amt: -300}, {desc: 'Money Sent', date: '3 days ago', amt: -200}, {desc: 'Money Received', date: '4 days ago', amt: 800}]})">
-        <div class="account-icon">📱</div>
-        <div class="account-info">
-          <div class="account-header">
-            <div class="account-name">UPI (GPay)</div>
-            <span class="account-type">UPI</span>
-          </div>
-          <div class="account-balance">₹5,200</div>
-          <div class="account-change negative">
-            <span class="change-icon">↓</span>
-            <span>3.5%</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="account-card" onclick="openAccountDetail({id: 'acc5', icon: '👝', name: 'Paytm Wallet', type: 'Wallet', balance: 2800, change: -1.8, transactions: [{desc: 'Cashback', date: 'Today', amt: 100}, {desc: 'Mobile Recharge', date: 'Yesterday', amt: -499}, {desc: 'Movie Tickets', date: '2 days ago', amt: -550}, {desc: 'Food Order', date: '3 days ago', amt: -299}, {desc: 'Cashback', date: '4 days ago', amt: 50}]})">
-        <div class="account-icon">👝</div>
-        <div class="account-info">
-          <div class="account-header">
-            <div class="account-name">Paytm Wallet</div>
-            <span class="account-type">Wallet</span>
-          </div>
-          <div class="account-balance">₹2,800</div>
-          <div class="account-change negative">
-            <span class="change-icon">↓</span>
-            <span>1.8%</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="accounts-grid" id="accounts-grid"></div>
 
     <!-- Credit Cards Section -->
     <h2 class="section-title">Credit Cards</h2>
-    <div class="credit-cards-list">
-      <div class="credit-card" onclick="openCardDetail({id: 'card1', name: 'Axis Credit Card', billing: '17th', used: 10663, limit: 190000, available: 179337, percent: 5.6, payments: [{date: 'Mar 17, 2026', amt: 8500}, {date: 'Feb 17, 2026', amt: 12300}, {date: 'Jan 17, 2026', amt: 9800}]})">
-        <div class="card-header">
-          <div class="card-name">Axis Credit Card</div>
-          <div class="card-billing">Billing 17th</div>
-        </div>
-        <div class="card-usage">
-          <div class="card-usage-text">
-            <div>
-              <div class="card-used">₹10,663 / ₹1,90,000</div>
-              <div class="card-available">Available: ₹1,79,337</div>
-            </div>
-            <div class="card-limit">5.6%</div>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 5.6%"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="credit-card" onclick="openCardDetail({id: 'card2', name: 'ICICI Credit Card', billing: '17th', used: 5399, limit: 160000, available: 154601, percent: 3.4, payments: [{date: 'Mar 17, 2026', amt: 7200}, {date: 'Feb 17, 2026', amt: 6500}, {date: 'Jan 17, 2026', amt: 5900}]})">
-        <div class="card-header">
-          <div class="card-name">ICICI Credit Card</div>
-          <div class="card-billing">Billing 17th</div>
-        </div>
-        <div class="card-usage">
-          <div class="card-usage-text">
-            <div>
-              <div class="card-used">₹5,399 / ₹1,60,000</div>
-              <div class="card-available">Available: ₹1,54,601</div>
-            </div>
-            <div class="card-limit">3.4%</div>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 3.4%"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="credit-card" onclick="openCardDetail({id: 'card3', name: 'HDFC Credit Card', billing: '17th', used: 0, limit: 116000, available: 116000, percent: 0, payments: [{date: 'Mar 17, 2026', amt: 0}, {date: 'Feb 17, 2026', amt: 3200}, {date: 'Jan 17, 2026', amt: 0}]})">
-        <div class="card-header">
-          <div class="card-name">HDFC Credit Card</div>
-          <div class="card-billing">Billing 17th</div>
-        </div>
-        <div class="card-usage">
-          <div class="card-usage-text">
-            <div>
-              <div class="card-used">₹0 / ₹1,16,000</div>
-              <div class="card-available">Available: ₹1,16,000</div>
-            </div>
-            <div class="card-limit">0%</div>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 0%"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="credit-card" onclick="openCardDetail({id: 'card4', name: 'Federal Credit Card', billing: '17th', used: 0, limit: 70000, available: 70000, percent: 0, payments: [{date: 'Mar 17, 2026', amt: 0}, {date: 'Feb 17, 2026', amt: 0}, {date: 'Jan 17, 2026', amt: 0}]})">
-        <div class="card-header">
-          <div class="card-name">Federal Credit Card</div>
-          <div class="card-billing">Billing 17th</div>
-        </div>
-        <div class="card-usage">
-          <div class="card-usage-text">
-            <div>
-              <div class="card-used">₹0 / ₹70,000</div>
-              <div class="card-available">Available: ₹70,000</div>
-            </div>
-            <div class="card-limit">0%</div>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 0%"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="credit-card" onclick="openCardDetail({id: 'card5', name: 'SBI Credit Card', billing: '17th', used: 0, limit: 80000, available: 80000, percent: 0, payments: [{date: 'Mar 17, 2026', amt: 5000}, {date: 'Feb 17, 2026', amt: 0}, {date: 'Jan 17, 2026', amt: 4500}]})">
-        <div class="card-header">
-          <div class="card-name">SBI Credit Card</div>
-          <div class="card-billing">Billing 17th</div>
-        </div>
-        <div class="card-usage">
-          <div class="card-usage-text">
-            <div>
-              <div class="card-used">₹0 / ₹80,000</div>
-              <div class="card-available">Available: ₹80,000</div>
-            </div>
-            <div class="card-limit">0%</div>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 0%"></div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="credit-cards-list" id="credit-cards-list"></div>
   </div>
 
   <!-- Floating Action Button -->
@@ -1325,19 +1155,6 @@
     const icons = ['💵', '🏦', '🏧', '📱', '👝', '💳', '🏠', '🎓', '🚗', '🎮', '📚', '🍔'];
     const colors = ['#80CBC4', '#A5D6A7', '#FFB74D', '#EF9A9A', '#90CAF9', '#CE93D8'];
 
-    // Add subtle interaction feedback to cards
-    document.querySelectorAll('.account-card, .credit-card').forEach(card => {
-      card.addEventListener('mousedown', function() {
-        this.style.transform = 'scale(0.98)';
-      });
-      card.addEventListener('mouseup', function() {
-        this.style.transform = 'scale(1)';
-      });
-      card.addEventListener('mouseleave', function() {
-        this.style.transform = 'scale(1)';
-      });
-    });
-
     // Toast notification
     function showToast(msg){
       const t=document.getElementById('toast');
@@ -1356,6 +1173,67 @@
       }).format(value);
     }
 
+    // ── Render page from FT data layer ─────────
+    function renderPage() {
+      const accounts = FT.getAccounts();
+      const cards = FT.getCreditCards();
+      const txs = FT.getTX();
+
+      // Net worth
+      const netWorth = accounts.reduce((s, a) => s + a.balance, 0);
+      document.getElementById('net-worth-amount').textContent = formatCurrency(netWorth);
+      document.getElementById('net-worth-change').textContent = accounts.length + ' accounts';
+
+      // Accounts grid
+      const grid = document.getElementById('accounts-grid');
+      grid.innerHTML = accounts.map(a => {
+        const txCount = txs.filter(t => t.acc === a.name || t.acc === a.id).length;
+        return `<div class="account-card" onclick="openAccountDetail('${a.id}')">
+          <div class="account-icon">${a.icon}</div>
+          <div class="account-info">
+            <div class="account-header">
+              <div class="account-name">${a.name}</div>
+              <span class="account-type">${a.type}</span>
+            </div>
+            <div class="account-balance">${formatCurrency(a.balance)}</div>
+            <div class="account-change">
+              <span>${txCount} transactions</span>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      // Credit cards list
+      const ccList = document.getElementById('credit-cards-list');
+      if (!cards.length) {
+        ccList.innerHTML = '<p style="text-align:center;padding:24px;color:var(--text-tertiary)">No credit cards added</p>';
+        return;
+      }
+      ccList.innerHTML = cards.map(cc => {
+        const pct = cc.limit > 0 ? Math.min(cc.used / cc.limit * 100, 100) : 0;
+        const available = cc.limit - cc.used;
+        const fillClass = pct >= 90 ? 'danger' : pct >= 70 ? 'warning' : '';
+        return `<div class="credit-card" onclick="openCardDetail('${cc.id}')">
+          <div class="card-header">
+            <div class="card-name">${cc.name}</div>
+            <div class="card-billing">Billing ${cc.billing}th</div>
+          </div>
+          <div class="card-usage">
+            <div class="card-usage-text">
+              <div>
+                <div class="card-used">${formatCurrency(cc.used)} / ${formatCurrency(cc.limit)}</div>
+                <div class="card-available">Available: ${formatCurrency(available)}</div>
+              </div>
+              <div class="card-limit">${pct.toFixed(1)}%</div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill ${fillClass}" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
     // Close all modals
     function closeAllModals() {
       document.getElementById('overlay').classList.remove('active');
@@ -1368,31 +1246,33 @@
       currentDeleteTarget = null;
     }
 
-    // Open account detail sheet
-    function openAccountDetail(account) {
+    // Open account detail sheet — reads from FT
+    function openAccountDetail(accId) {
+      const account = FT.getAccounts().find(a => a.id === accId);
+      if (!account) return;
       currentEditingAccount = account;
       const content = document.getElementById('accountDetailContent');
 
-      const changeColor = account.change >= 0 ? 'color: var(--income)' : 'color: var(--expense)';
-      const changeArrow = account.change >= 0 ? '↑' : '↓';
-
+      // Get recent transactions for this account
+      const recentTxs = FT.getTX().filter(t => t.acc === account.name || t.acc === account.id).slice(0, 5);
       let transactionsHtml = '';
-      if (account.transactions && account.transactions.length > 0) {
+      if (recentTxs.length > 0) {
         transactionsHtml = `
           <div class="recent-transactions">
             <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">Recent Transactions</h3>
-            ${account.transactions.map(t => `
-              <div class="transaction-item">
-                <div class="transaction-icon">${t.amt > 0 ? '↓' : '↑'}</div>
+            ${recentTxs.map(t => {
+              const isIncome = t.ty === 'income';
+              const sign = isIncome ? '+' : '-';
+              return `<div class="transaction-item">
+                <div class="transaction-icon">${isIncome ? '↓' : '↑'}</div>
                 <div class="transaction-details">
-                  <div class="transaction-name">${t.desc}</div>
-                  <div class="transaction-date">${t.date}</div>
+                  <div class="transaction-name">${t.n}</div>
+                  <div class="transaction-date">${new Date(t.d).toLocaleDateString('en-IN', {day:'numeric',month:'short'})}</div>
                 </div>
-                <div class="transaction-amount ${t.amt > 0 ? '' : 'expense'}">${t.amt > 0 ? '+' : ''}${formatCurrency(t.amt)}</div>
-              </div>
-            `).join('')}
-          </div>
-        `;
+                <div class="transaction-amount ${isIncome ? '' : 'expense'}">${sign}${formatCurrency(t.a)}</div>
+              </div>`;
+            }).join('')}
+          </div>`;
       }
 
       content.innerHTML = `
@@ -1403,42 +1283,35 @@
             <p>${account.type}</p>
           </div>
         </div>
-
         <div class="account-detail-balance">
           <div class="account-detail-balance-label">Current Balance</div>
           <div class="account-detail-amount">${formatCurrency(account.balance)}</div>
-          <div class="account-detail-change ${account.change < 0 ? 'negative' : ''}">
-            ${changeArrow} ${Math.abs(account.change)}% this month
-          </div>
         </div>
-
         ${transactionsHtml}
-
         <div class="button-group col">
-          <button class="btn btn-primary" onclick="openEditAccount(${JSON.stringify(account).replace(/"/g, '&quot;')})">
-            <span class="material-symbols-rounded" style="font-size: 20px;">edit</span>
-            Edit
+          <button class="btn btn-primary" onclick="openEditAccount('${account.id}')">
+            <span class="material-symbols-rounded" style="font-size: 20px;">edit</span> Edit
           </button>
           <button class="btn btn-danger" onclick="showDeleteConfirm('${account.name}', '${account.id}', 'account')">
-            <span class="material-symbols-rounded" style="font-size: 20px;">delete</span>
-            Delete
+            <span class="material-symbols-rounded" style="font-size: 20px;">delete</span> Delete
           </button>
-        </div>
-      `;
+        </div>`;
 
       document.getElementById('overlay').classList.add('active');
       document.getElementById('accountDetailSheet').classList.add('active');
     }
 
-    // Open edit account sheet
-    function openEditAccount(account) {
+    // Open edit account sheet — reads from FT
+    function openEditAccount(accId) {
+      const account = FT.getAccounts().find(a => a.id === accId);
+      if (!account) return;
       currentEditingAccount = account;
       document.getElementById('editAccName').value = account.name;
       document.getElementById('editAccType').value = account.type;
       document.getElementById('editAccBalance').value = account.balance;
 
       renderIconPicker('editAccIconPicker', account.icon);
-      renderColorPicker('editAccColorPicker');
+      renderColorPicker('editAccColorPicker', account.color);
 
       document.getElementById('accountDetailSheet').classList.remove('active');
       document.getElementById('editAccountSheet').classList.add('active');
@@ -1451,7 +1324,6 @@
       document.getElementById('addAccBalance').value = '';
 
       renderIconPicker('addAccIconPicker', '💵');
-      renderColorPicker('addAccColorPicker');
 
       currentEditingAccount = null;
       document.getElementById('overlay').classList.add('active');
@@ -1459,105 +1331,111 @@
     }
 
     // Render icon picker
-    function renderIconPicker(containerId, selected = null) {
+    function renderIconPicker(containerId, selected) {
       const container = document.getElementById(containerId);
       container.innerHTML = icons.map(icon => `
-        <div class="icon-option ${icon === selected ? 'selected' : ''}" onclick="selectIcon('${containerId}', '${icon}')">
+        <div class="icon-option ${icon === selected ? 'selected' : ''}" onclick="selectIcon('${containerId}', this)">
           ${icon}
         </div>
       `).join('');
     }
 
     // Render color picker
-    function renderColorPicker(containerId) {
+    function renderColorPicker(containerId, selectedColor) {
       const container = document.getElementById(containerId);
       container.innerHTML = colors.map(color => `
-        <div class="color-option" style="background-color: ${color};" onclick="selectColor('${containerId}', '${color}')"></div>
+        <div class="color-option ${color === selectedColor ? 'selected' : ''}" style="background-color: ${color};" onclick="selectColorOption('${containerId}', this, '${color}')"></div>
       `).join('');
     }
 
     // Select icon
-    function selectIcon(containerId, icon) {
-      document.querySelectorAll(`#${containerId} .icon-option`).forEach(el => {
-        el.classList.remove('selected');
-      });
-      event.target.closest('.icon-option').classList.add('selected');
+    function selectIcon(containerId, el) {
+      document.querySelectorAll('#' + containerId + ' .icon-option').forEach(e => e.classList.remove('selected'));
+      el.classList.add('selected');
     }
 
     // Select color
-    function selectColor(containerId, color) {
-      document.querySelectorAll(`#${containerId} .color-option`).forEach(el => {
-        el.style.borderColor = 'transparent';
-      });
-      event.target.classList.add('selected');
+    function selectColorOption(containerId, el, color) {
+      document.querySelectorAll('#' + containerId + ' .color-option').forEach(e => e.classList.remove('selected'));
+      el.classList.add('selected');
     }
 
-    // Save edited account
+    function getSelectedIcon(containerId) {
+      const sel = document.querySelector('#' + containerId + ' .icon-option.selected');
+      return sel ? sel.textContent.trim() : '💵';
+    }
+
+    function getSelectedColor(containerId) {
+      const sel = document.querySelector('#' + containerId + ' .color-option.selected');
+      return sel ? sel.style.backgroundColor : '#80CBC4';
+    }
+
+    // Save edited account — persists to FT
     function saveEditAccount() {
       const name = document.getElementById('editAccName').value.trim();
       const type = document.getElementById('editAccType').value;
       const balance = parseFloat(document.getElementById('editAccBalance').value) || 0;
-      const icon = document.querySelector('#editAccIconPicker .icon-option.selected');
+      const icon = getSelectedIcon('editAccIconPicker');
+      const color = getSelectedColor('editAccColorPicker');
 
-      if (!name) {
-        showToast('Please enter account name');
-        return;
-      }
+      if (!name) { showToast('Please enter account name'); return; }
+      if (!currentEditingAccount) return;
 
+      FT.updateAccount(currentEditingAccount.id, { name, type, balance, icon, color });
       showToast('Account updated');
       closeAllModals();
+      renderPage();
     }
 
-    // Save new account
+    // Save new account — persists to FT
     function saveNewAccount() {
       const name = document.getElementById('addAccName').value.trim();
       const type = document.getElementById('addAccType').value;
       const balance = parseFloat(document.getElementById('addAccBalance').value) || 0;
-      const icon = document.querySelector('#addAccIconPicker .icon-option.selected');
+      const icon = getSelectedIcon('addAccIconPicker');
 
-      if (!name) {
-        showToast('Please enter account name');
-        return;
-      }
+      if (!name) { showToast('Please enter account name'); return; }
 
+      FT.addAccount({ name, type, balance, icon, color: '#80CBC4' });
       showToast('Account created');
       closeAllModals();
+      renderPage();
     }
 
     // Show delete confirmation
     function showDeleteConfirm(itemName, itemId, type) {
       currentDeleteTarget = { name: itemName, id: itemId, type: type };
-      document.getElementById('deleteConfirmTitle').textContent = `Delete ${itemName}?`;
+      document.getElementById('deleteConfirmTitle').textContent = 'Delete ' + itemName + '?';
       document.getElementById('overlay').classList.add('active');
       document.getElementById('deleteConfirmDialog').classList.add('active');
     }
 
-    // Confirm delete
+    // Confirm delete — persists to FT
     function confirmDelete() {
-      if (currentDeleteTarget) {
-        showToast(`${currentDeleteTarget.name} deleted`);
-        closeAllModals();
+      if (!currentDeleteTarget) return;
+      if (currentDeleteTarget.type === 'account') {
+        FT.deleteAccount(currentDeleteTarget.id);
       }
+      showToast(currentDeleteTarget.name + ' deleted');
+      closeAllModals();
+      renderPage();
     }
 
-    // Open card detail sheet
-    function openCardDetail(card) {
+    // Open card detail sheet — reads from FT
+    function openCardDetail(cardId) {
+      const card = FT.getCreditCards().find(c => c.id === cardId);
+      if (!card) return;
       const content = document.getElementById('cardDetailContent');
-      const paymentHistory = (card.payments || []).map(p => `
-        <div class="payment-item">
-          <div class="payment-date">${p.date}</div>
-          <div class="payment-amount">${p.amt > 0 ? '+' : ''}${formatCurrency(p.amt)}</div>
-        </div>
-      `).join('');
+      const pct = card.limit > 0 ? (card.used / card.limit * 100).toFixed(1) : 0;
+      const available = card.limit - card.used;
 
       content.innerHTML = `
         <div class="card-detail-header">
           <div class="card-detail-name">
             <h3>${card.name}</h3>
-            <p>Billing Date: ${card.billing}</p>
+            <p>Billing Date: ${card.billing}th</p>
           </div>
         </div>
-
         <div class="card-details-grid">
           <div class="card-detail-item">
             <div class="card-detail-item-label">Used</div>
@@ -1569,40 +1447,18 @@
           </div>
           <div class="card-detail-item">
             <div class="card-detail-item-label">Available</div>
-            <div class="card-detail-item-value">${formatCurrency(card.available)}</div>
+            <div class="card-detail-item-value">${formatCurrency(available)}</div>
           </div>
           <div class="card-detail-item">
             <div class="card-detail-item-label">Utilization</div>
-            <div class="card-detail-item-value">${card.percent}%</div>
+            <div class="card-detail-item-value">${pct}%</div>
           </div>
         </div>
-
         <div class="card-usage" style="margin-bottom: 24px;">
           <div class="progress-bar" style="height: 8px;">
-            <div class="progress-fill" style="width: ${card.percent}%; background-color: ${card.percent > 75 ? '#EF9A9A' : card.percent > 50 ? '#FFB74D' : '#A5D6A7'}"></div>
+            <div class="progress-fill" style="width: ${pct}%; background-color: ${pct > 75 ? '#EF9A9A' : pct > 50 ? '#FFB74D' : '#A5D6A7'}"></div>
           </div>
-        </div>
-
-        <div class="card-payment-history">
-          <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">Payment History</h3>
-          ${paymentHistory}
-        </div>
-
-        <div class="button-group col">
-          <button class="btn btn-primary" onclick="showToast('Make Payment feature coming soon')">
-            <span class="material-symbols-rounded" style="font-size: 20px;">payments</span>
-            Make Payment
-          </button>
-          <button class="btn btn-secondary" onclick="showToast('Edit Card feature coming soon')">
-            <span class="material-symbols-rounded" style="font-size: 20px;">edit</span>
-            Edit
-          </button>
-          <button class="btn btn-danger" onclick="showDeleteConfirm('${card.name}', '${card.id}', 'card')">
-            <span class="material-symbols-rounded" style="font-size: 20px;">delete</span>
-            Delete
-          </button>
-        </div>
-      `;
+        </div>`;
 
       document.getElementById('overlay').classList.add('active');
       document.getElementById('cardDetailSheet').classList.add('active');
@@ -1610,10 +1466,11 @@
 
     // Close modals when pressing Escape
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        closeAllModals();
-      }
+      if (e.key === 'Escape') closeAllModals();
     });
+
+    // Initial render
+    renderPage();
   </script>
 <script>
 if ("serviceWorker" in navigator) {

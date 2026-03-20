@@ -2,10 +2,17 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=MainMenu.html">
 <title>FinTrack</title>
+<script src="fintrack-data.js"></script>
 </head>
 <body>
-<script>window.location.href = "MainMenu.html";</script>
+<script>
+  // Respect onboarding flow — redirect to Onboarding if not completed
+  if (FT.getSetting('onboardingDone')) {
+    window.location.href = "MainMenu.html";
+  } else {
+    window.location.href = "Onboarding.html";
+  }
+</script>
 </body>
 </html>

@@ -1282,25 +1282,8 @@
     }
 
     function loadThemePreference() {
-      const savedTheme = localStorage.getItem('fintrack-theme') || 'dark';
-      const systemPrefers = window.matchMedia('(prefers-color-scheme: light)').matches;
-
-      let themeToApply = savedTheme;
-      if (savedTheme === 'system') {
-        themeToApply = systemPrefers ? 'light' : 'dark';
-      }
-
-      applyTheme(themeToApply);
+      const savedTheme = FT.getSetting('theme') || 'dark';
       updateThemeButtons(savedTheme);
-    }
-
-    function applyTheme(theme) {
-      const html = document.documentElement;
-      if (theme === 'light') {
-        html.classList.add('light-theme');
-      } else {
-        html.classList.remove('light-theme');
-      }
     }
 
     function updateThemeButtons(theme) {
@@ -1322,17 +1305,14 @@
       buttons.forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
 
-      localStorage.setItem('fintrack-theme', theme);
+      FT.setSetting('theme', theme);
+      FTTheme.apply(theme);
 
       if (theme === 'dark') {
-        applyTheme('dark');
         showToast('Theme changed to Dark');
       } else if (theme === 'light') {
-        applyTheme('light');
         showToast('Theme changed to Light');
       } else if (theme === 'system') {
-        const systemPrefers = window.matchMedia('(prefers-color-scheme: light)').matches;
-        applyTheme(systemPrefers ? 'light' : 'dark');
         showToast('Theme set to System');
       }
     }
@@ -1341,20 +1321,21 @@
       const currencyValue = select.value;
       const currencySymbol = select.options[select.selectedIndex].getAttribute('data-symbol');
 
-      localStorage.setItem('fintrack-currency', currencyValue);
-      localStorage.setItem('fintrack-currency-symbol', currencySymbol);
+      FT.setSetting('currency', currencyValue.split(' ')[1]);
+      FT.setSetting('currencySymbol', currencySymbol);
 
       document.getElementById('currency-description').textContent = currencyValue.split(' ')[1] + ' (' + currencyValue.split(' ')[0] + ')';
       showToast('Currency updated to ' + currencyValue);
     }
 
     function loadCurrencyPreference() {
-      const savedCurrency = localStorage.getItem('fintrack-currency');
-      if (savedCurrency) {
+      const savedCurrency = FT.getSetting('currency');
+      const currencyMap = { INR: '₹ INR', USD: '$ USD', EUR: '€ EUR', GBP: '£ GBP' };
+      const symbolMap = { INR: '₹', USD: '$', EUR: '€', GBP: '£' };
+      if (savedCurrency && currencyMap[savedCurrency]) {
         const select = document.getElementById('currency-select');
-        select.value = savedCurrency;
-        const currencySymbol = localStorage.getItem('fintrack-currency-symbol');
-        document.getElementById('currency-description').textContent = savedCurrency.split(' ')[1] + ' (' + currencySymbol + ')';
+        select.value = currencyMap[savedCurrency];
+        document.getElementById('currency-description').textContent = savedCurrency + ' (' + (symbolMap[savedCurrency] || savedCurrency) + ')';
       }
     }
 
@@ -1365,20 +1346,22 @@
       element.classList.add('active');
 
       document.documentElement.style.setProperty('--primary', colorValue);
-      localStorage.setItem('fintrack-accent-color', color);
-      localStorage.setItem('fintrack-accent-value', colorValue);
+      FT.setSetting('accentColor', colorValue);
+      FT.setSetting('accentName', color);
 
       showToast('Accent color changed to ' + capitalizeFirst(color));
     }
 
     function loadAccentColorPreference() {
-      const savedColor = localStorage.getItem('fintrack-accent-color');
-      const savedValue = localStorage.getItem('fintrack-accent-value');
+      const savedColor = FT.getSetting('accentName');
+      const savedValue = FT.getSetting('accentColor');
 
       if (savedColor && savedValue) {
         const colorElement = document.querySelector('.color-circle.' + savedColor);
         if (colorElement) {
-          selectColor(colorElement, savedColor, savedValue);
+          document.querySelectorAll('.color-circle').forEach(el => el.classList.remove('active'));
+          colorElement.classList.add('active');
+          document.documentElement.style.setProperty('--primary', savedValue);
         }
       }
     }
@@ -1496,23 +1479,24 @@
     // ── Budget Rollover ───────────────────────
     function toggleBudgetRollover(){
       const current = FT.getSetting('budgetRollover');
-      FT.setSetting('budgetRollover', !current);
-      showToast('Budget rollover ' + (!current ? 'enabled' : 'disabled'));
-    }
-
-    // ── Theme overrides to also persist in FT ─
-    const _origSwitchTheme = switchTheme;
-    function switchTheme(theme, event) {
-      _origSwitchTheme(theme, event);
-      FT.setSetting('theme', theme);
+      const newVal = !current;
+      FT.setSetting('budgetRollover', newVal);
+      const btn = document.getElementById('budget-rollover-toggle');
+      btn.classList.toggle('on', newVal);
+      btn.setAttribute('data-state', newVal ? 'on' : 'off');
+      showToast('Budget rollover ' + (newVal ? 'enabled' : 'disabled'));
     }
 
     // ── Init ─────────────────────────────────
     (function ftSettingsInit(){
       FTTheme.init();
-      // Sync budget rollover toggle state if element exists
+      // Sync budget rollover toggle state from FT
       const rolloverEl = document.getElementById('budget-rollover-toggle');
-      if(rolloverEl) rolloverEl.classList.toggle('on', FT.getSetting('budgetRollover'));
+      if(rolloverEl) {
+        const isOn = !!FT.getSetting('budgetRollover');
+        rolloverEl.classList.toggle('on', isOn);
+        rolloverEl.setAttribute('data-state', isOn ? 'on' : 'off');
+      }
     })();
 
     function capitalizeFirst(str) {
