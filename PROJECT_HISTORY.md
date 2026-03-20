@@ -694,3 +694,51 @@ All HTML Pages
 | File | Changes |
 |------|---------|
 | `Onboarding.html` | Complete AMOLED dark theme redesign; fixed layout centering; updated theme-color meta; fixed default name |
+
+### Session 9 — Platform Hardening, Auth, Validation, Offline, Docs
+
+Implemented a broad upgrade pass covering architecture, security, offline behavior, accessibility, documentation, and contributor readiness.
+
+**Authentication & session foundation**
+- Added `Login.html` and `Signup.html` for local account creation/sign-in
+- Added `fintrack-auth.js` for session handling, auth guards, and sign-out flow
+- Updated `index.html` to route users through auth before onboarding/dashboard
+- Added account/logout surface in `Settings.html`
+
+**Config & sync readiness**
+- Added `fintrack-config.example.js` for environment-style configuration
+- Updated `fintrack-sync.js` to read Supabase settings from `window.FTConfig`
+- Added validation for missing Supabase configuration to avoid silent sync failures
+
+**Shared modules / maintainability**
+- Added `fintrack-ui.js` for shared bootstrapping, service worker registration, focus styles, accessibility labels, and app-lock overlay
+- Added `fintrack-validation.js` for reusable validation across entities and imports
+- Included shared modules across app pages
+
+**Data validation & safer imports**
+- Added validation hooks to transaction, account, budget, goal, debt, and split creation flows in `fintrack-data.js`
+- Added schema versioning and stronger import checks
+- Included auth user export/import support for backup portability
+
+**Security & privacy**
+- Added app-lock passcode support via settings + unlock overlay
+- Added guarded export/clear-data behavior when app lock is enabled
+- Added optional protected JSON export wrapper flow
+
+**Offline/PWA improvements**
+- Added `Offline.html` fallback page
+- Rebuilt `service-worker.js` to cache new auth/shared files and use offline fallback for navigation requests
+- Updated `manifest.json` start URL and shortcuts
+
+**Accessibility & UX polish**
+- Added automatic ARIA labels for icon-only controls where possible
+- Added focus-visible styling and reduced-motion support through shared UI module
+- Added global signed-in session badge for authenticated app pages
+
+**Insights & smart finance signals**
+- Retained and surfaced the existing shared `FTInsights` engine as part of the hardening pass so dashboard insights remain a first-class feature
+
+**Testing & docs**
+- Added `README.md`
+- Added `tests/run-tests.js` for validation/auth/data smoke coverage
+- Expanded project memory so future sessions can understand the new structure quickly

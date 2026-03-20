@@ -1,8 +1,8 @@
 {
   "name": "FinTrack - Personal Finance",
   "short_name": "FinTrack",
-  "description": "Track your finances, budgets, goals and more.",
-  "start_url": "/MainMenu.html",
+  "description": "Track your finances, budgets, goals, debts, and insights with offline support.",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#0f1117",
   "theme_color": "#1a1d27",
@@ -22,7 +22,6 @@
     }
   ],
   "categories": ["finance", "productivity"],
-  "screenshots": [],
   "shortcuts": [
     {
       "name": "Add Transaction",
@@ -32,9 +31,16 @@
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "View Reports",
+      "name": "Insights",
+      "short_name": "Insights",
+      "description": "Open your dashboard insights",
+      "url": "/MainMenu.html#insights",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Reports",
       "short_name": "Reports",
-      "description": "View your financial reports",
+      "description": "Review trends and reports",
       "url": "/Reports.html",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     }

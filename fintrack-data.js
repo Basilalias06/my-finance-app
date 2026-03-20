@@ -108,7 +108,11 @@ const DEFAULT_SETTINGS = {
   },
   budgetRollover: false,
   onboardingDone: false,
-  dashboardWidgets: ["overview","accounts","creditcards","categories","incomevexpense","networth","daily","quickaccess"],
+  schemaVersion: 2,
+  appLockEnabled: false,
+  appLockPasscode: "",
+  userEmail: "",
+  dashboardWidgets: ["overview","accounts","creditcards","categories","incomevexpense","networth","daily","quickaccess","insights"],
 };
 
 // ─────────────────────────────────────────────
@@ -136,7 +140,7 @@ const FT = {
   // ── Transactions ──────────────────────────
   getTX()        { return this._get("transactions", DEFAULT_TRANSACTIONS); },
   setTX(arr)     { this._set("transactions", arr); },
-  addTX(tx)      { const a=this.getTX(); tx.id="t"+Date.now(); a.unshift(tx); this.setTX(a); this._sync("onAddTx", tx); return tx; },
+  addTX(tx)      { if(typeof FTValidate!=="undefined"){ const c=FTValidate.transaction(tx); if(!c.valid) throw new Error(c.errors.join(" ") ); } const a=this.getTX(); tx.id="t"+Date.now(); a.unshift(tx); this.setTX(a); this._sync("onAddTx", tx); return tx; },
   updateTX(id,d) { const a=this.getTX().map(t=>t.id===id?{...t,...d}:t); this.setTX(a); const updated=a.find(t=>t.id===id); this._sync("onUpdateTx", id, updated); },
   deleteTX(id)   { this.setTX(this.getTX().filter(t=>t.id!==id)); this._sync("onDeleteTx", id); },
   bulkDeleteTX(ids){ this.setTX(this.getTX().filter(t=>!ids.includes(t.id))); this._sync("onBulkDeleteTx", ids); },
@@ -144,7 +148,7 @@ const FT = {
   // ── Accounts ──────────────────────────────
   getAccounts()    { return this._get("accounts", DEFAULT_ACCOUNTS); },
   setAccounts(arr) { this._set("accounts", arr); },
-  addAccount(acc)  { const a=this.getAccounts(); acc.id="acc"+Date.now(); a.push(acc); this.setAccounts(a); this._sync("onAddAcc", acc); return acc; },
+  addAccount(acc)  { if(typeof FTValidate!=="undefined"){ const c=FTValidate.account(acc); if(!c.valid) throw new Error(c.errors.join(" ") ); } const a=this.getAccounts(); acc.id="acc"+Date.now(); a.push(acc); this.setAccounts(a); this._sync("onAddAcc", acc); return acc; },
   updateAccount(id,d){ const a=this.getAccounts().map(x=>x.id===id?{...x,...d}:x); this.setAccounts(a); const updated=a.find(x=>x.id===id); this._sync("onUpdateAcc", id, updated); },
   deleteAccount(id){ this.setAccounts(this.getAccounts().filter(x=>x.id!==id)); this._sync("onDeleteAcc", id); },
 
@@ -155,28 +159,28 @@ const FT = {
   // ── Budgets ───────────────────────────────
   getBudgets()      { return this._get("budgets", DEFAULT_BUDGETS); },
   setBudgets(arr)   { this._set("budgets", arr); },
-  addBudget(b)      { const a=this.getBudgets(); b.id="b"+Date.now(); a.push(b); this.setBudgets(a); this._sync("onAddBudget", b); return b; },
+  addBudget(b)      { if(typeof FTValidate!=="undefined"){ const c=FTValidate.budget(b); if(!c.valid) throw new Error(c.errors.join(" ") ); } const a=this.getBudgets(); b.id="b"+Date.now(); a.push(b); this.setBudgets(a); this._sync("onAddBudget", b); return b; },
   updateBudget(id,d){ const a=this.getBudgets().map(x=>x.id===id?{...x,...d}:x); this.setBudgets(a); const updated=a.find(x=>x.id===id); this._sync("onUpdateBudget", id, updated); },
   deleteBudget(id)  { this.setBudgets(this.getBudgets().filter(x=>x.id!==id)); this._sync("onDeleteBudget", id); },
 
   // ── Goals ─────────────────────────────────
   getGoals()      { return this._get("goals", DEFAULT_GOALS); },
   setGoals(arr)   { this._set("goals", arr); },
-  addGoal(g)      { const a=this.getGoals(); g.id="g"+Date.now(); a.push(g); this.setGoals(a); this._sync("onAddGoal", g); return g; },
+  addGoal(g)      { if(typeof FTValidate!=="undefined"){ const c=FTValidate.goal(g); if(!c.valid) throw new Error(c.errors.join(" ") ); } const a=this.getGoals(); g.id="g"+Date.now(); a.push(g); this.setGoals(a); this._sync("onAddGoal", g); return g; },
   updateGoal(id,d){ const a=this.getGoals().map(x=>x.id===id?{...x,...d}:x); this.setGoals(a); const updated=a.find(x=>x.id===id); this._sync("onUpdateGoal", id, updated); },
   deleteGoal(id)  { this.setGoals(this.getGoals().filter(x=>x.id!==id)); this._sync("onDeleteGoal", id); },
 
   // ── Debts ────────────────────────────────
   getDebts()      { return this._get("debts", DEFAULT_DEBTS); },
   setDebts(arr)   { this._set("debts", arr); },
-  addDebt(d)      { const a=this.getDebts(); d.id="d"+Date.now(); a.push(d); this.setDebts(a); this._sync("onAddDebt", d); return d; },
+  addDebt(d)      { if(typeof FTValidate!=="undefined"){ const c=FTValidate.debt(d); if(!c.valid) throw new Error(c.errors.join(" ") ); } const a=this.getDebts(); d.id="d"+Date.now(); a.push(d); this.setDebts(a); this._sync("onAddDebt", d); return d; },
   updateDebt(id,d){ const a=this.getDebts().map(x=>x.id===id?{...x,...d}:x); this.setDebts(a); this._sync("onUpdateDebt", id, a.find(x=>x.id===id)); },
   deleteDebt(id)  { this.setDebts(this.getDebts().filter(x=>x.id!==id)); this._sync("onDeleteDebt", id); },
 
   // ── Split Expenses ─────────────────────────
   getSplits()       { return this._get("splits", DEFAULT_SPLITS); },
   setSplits(arr)    { this._set("splits", arr); },
-  addSplit(s)       { const a=this.getSplits(); s.id="sp"+Date.now(); a.unshift(s); this.setSplits(a); this._sync("onAddSplit", s); return s; },
+  addSplit(s)       { if(typeof FTValidate!=="undefined"){ const c=FTValidate.split(s); if(!c.valid) throw new Error(c.errors.join(" ") ); } const a=this.getSplits(); s.id="sp"+Date.now(); a.unshift(s); this.setSplits(a); this._sync("onAddSplit", s); return s; },
   updateSplit(id,d) { const a=this.getSplits().map(x=>x.id===id?{...x,...d}:x); this.setSplits(a); this._sync("onUpdateSplit", id, a.find(x=>x.id===id)); },
   deleteSplit(id)   { this.setSplits(this.getSplits().filter(x=>x.id!==id)); this._sync("onDeleteSplit", id); },
 
@@ -241,20 +245,27 @@ const FT = {
       splits: this.getSplits(),
       splitFriends: this.getSplitFriends(),
       settings: this.getSettings(),
+      authUsers: (()=>{ try { return JSON.parse(localStorage.getItem("ft_auth_users")||"[]"); } catch(e){ return []; } })(),
+      schemaVersion: 2,
       exportedAt: new Date().toISOString()
     }, null, 2);
   },
   importJSON(str) {
     try {
       const data = JSON.parse(str);
-      if(data.transactions)  this.setTX(data.transactions);
-      if(data.accounts)      this.setAccounts(data.accounts);
-      if(data.budgets)       this.setBudgets(data.budgets);
-      if(data.goals)         this.setGoals(data.goals);
-      if(data.debts)         this.setDebts(data.debts);
-      if(data.splits)        this.setSplits(data.splits);
-      if(data.splitFriends)  this.setSplitFriends(data.splitFriends);
+      if(typeof FTValidate!=="undefined"){
+        const shape = FTValidate.importShape(data);
+        if(!shape.valid) return false;
+      }
+      if(data.transactions && Array.isArray(data.transactions))  this.setTX(data.transactions);
+      if(data.accounts && Array.isArray(data.accounts))      this.setAccounts(data.accounts);
+      if(data.budgets && Array.isArray(data.budgets))       this.setBudgets(data.budgets);
+      if(data.goals && Array.isArray(data.goals))         this.setGoals(data.goals);
+      if(data.debts && Array.isArray(data.debts))         this.setDebts(data.debts);
+      if(data.splits && Array.isArray(data.splits))        this.setSplits(data.splits);
+      if(data.splitFriends && Array.isArray(data.splitFriends))  this.setSplitFriends(data.splitFriends);
       if(data.settings)      this._set("settings", {...this.getSettings(), ...data.settings});
+      if(data.authUsers && !localStorage.getItem("ft_auth_users")) localStorage.setItem("ft_auth_users", JSON.stringify(data.authUsers));
       // Push everything to Supabase after import
       if(typeof FTSync !== "undefined") setTimeout(() => FTSync.pushAll().catch(()=>{}), 500);
       return true;

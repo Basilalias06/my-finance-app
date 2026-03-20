@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinTrack — Sign Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Text:wght@400;500&display=swap" rel="stylesheet">
+<script src="fintrack-data.js"></script>
+<script src="fintrack-validation.js"></script>
+<script src="fintrack-auth.js"></script>
+<script src="fintrack-ui.js"></script>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#000;color:#EAEAEA;font-family:'Google Sans Text',system-ui} .card{width:min(92vw,440px);background:#111;border:1px solid #222;border-radius:24px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.35)} h1{font:700 28px 'Google Sans',system-ui;margin:0 0 8px;color:#80CBC4} p{color:#B8B8B8;margin:0 0 20px} .field{display:grid;gap:8px;margin-bottom:14px}.field input{padding:14px 16px;border-radius:14px;border:1px solid #333;background:#1a1a1a;color:#fff}.btn{width:100%;padding:14px;border:none;border-radius:999px;background:#80CBC4;color:#00201E;font-weight:700;cursor:pointer}.alt{margin-top:14px;text-align:center;color:#B8B8B8}.alt a{color:#80CBC4}.err{min-height:18px;color:#EF9A9A;font-size:12px}</style>
+</head>
+<body>
+<form class="card" id="signup-form">
+  <h1>Create account</h1>
+  <p>Set up a FinTrack account before entering the app.</p>
+  <label class="field">Full name<input type="text" id="name" required placeholder="Your name"></label>
+  <label class="field">Email<input type="email" id="email" required placeholder="you@example.com"></label>
+  <label class="field">Password<input type="password" id="password" required minlength="6" placeholder="At least 6 characters"></label>
+  <button class="btn" type="submit">Create account</button>
+  <div class="err" id="error"></div>
+  <div class="alt">Already have an account? <a href="Login.html">Sign in</a></div>
+</form>
+<script>
+document.getElementById('signup-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const error = document.getElementById('error');
+  try {
+    FTAuth.signUp({ name: name.value, email: email.value, password: password.value });
+    FTTheme.init();
+    location.href = 'Onboarding.html';
+  } catch (err) {
+    error.textContent = err.message;
+  }
+});
+</script>
+</body>
+</html>

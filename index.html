@@ -4,11 +4,14 @@
 <meta charset="UTF-8">
 <title>FinTrack</title>
 <script src="fintrack-data.js"></script>
+<script src="fintrack-auth.js"></script>
 </head>
 <body>
 <script>
-  // Respect onboarding flow — redirect to Onboarding if not completed
-  if (FT.getSetting('onboardingDone')) {
+  const userReady = FTAuth.isAuthenticated();
+  if (!userReady) {
+    window.location.href = "Login.html";
+  } else if (FT.getSetting('onboardingDone')) {
     window.location.href = "MainMenu.html";
   } else {
     window.location.href = "Onboarding.html";
