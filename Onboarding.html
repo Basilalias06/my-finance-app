@@ -27,7 +27,6 @@ body{
   background:var(--bg);color:var(--txt);min-height:100vh;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   -webkit-font-smoothing:antialiased;padding:20px;
-  background:radial-gradient(ellipse at 50% 0%,rgba(126,206,198,0.06) 0%,transparent 60%);
 }
 .ob-wrap{width:100%;max-width:420px}
 
@@ -140,6 +139,28 @@ body{
 .dot{width:8px;height:8px;border-radius:50%;background:var(--s4);transition:all .3s}
 .dot.active{width:24px;border-radius:4px;background:var(--pri)}
 .dot.done{background:rgba(126,206,198,0.4)}
+
+/* ── Light theme ── */
+.light-theme{
+  --bg:#F5F5F5;--s1:#FFFFFF;--s2:#F0F0F0;--s3:#E8E8E8;--s4:#E0E0E0;
+  --ol:#DDDDDD;--olv:#E8E8E8;
+  --txt:#1A1A1A;--txt2:#444;--txt3:#888;
+}
+.light-theme body,.light-theme{
+  background:var(--bg);color:var(--txt);
+}
+.light-theme .ob-input{background:var(--s2);border-color:var(--olv);color:var(--txt)}
+.light-theme .ob-input::placeholder{color:var(--txt3)}
+.light-theme .feat-item,.light-theme .theme-card,.light-theme .currency-opt,.light-theme .stat-c{
+  background:var(--s2);border-color:var(--olv);
+}
+.light-theme .ob-btn-sec{background:var(--s2);color:var(--txt2);border-color:var(--olv)}
+.light-theme .ob-sub{color:var(--txt2)}
+.light-theme .feat-l,.light-theme .theme-l,.light-theme .currency-name{color:var(--txt)}
+.light-theme .feat-d,.light-theme .theme-d,.light-theme .currency-sym,.light-theme .stat-l{color:var(--txt3)}
+.light-theme .dot{background:var(--s4)}
+.light-theme .theme-check{border-color:var(--olv)}
+.light-theme .currency-radio{border-color:var(--olv)}
 </style>
 </head>
 <body>

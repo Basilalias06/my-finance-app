@@ -652,3 +652,26 @@ All HTML Pages
 | `index.html` | Added onboarding check before redirect |
 | `DebtTracker.html` | Replaced hardcoded debt cards with dynamic rendering; add/payment forms persist to FT |
 | `SplitExpense.html` | Replaced hardcoded friends/splits/groups with dynamic rendering; add split/settle/add person persist to FT |
+
+---
+
+### Session 11 — Onboarding Theme Fix & Username Persistence
+
+#### Bug Fixes
+
+**Bug 1 — Onboarding.html: Missing light theme CSS**
+- Onboarding page only had dark theme CSS variables in `:root`. When user selected "Light" theme during onboarding, `FTTheme.apply('light')` added the `.light-theme` class but there were no corresponding CSS rules to override the dark colors.
+- The page stayed visually dark or broke with mixed colors when light theme was selected.
+- **Fix:** Added `.light-theme` CSS block with proper light color variables (`--bg:#F5F5F5`, `--s1:#FFFFFF`, etc.) and overrides for all interactive elements (inputs, cards, buttons, dots, radio indicators). Removed hardcoded dark radial gradient from body background so it respects the CSS variable `--bg`.
+
+**Bug 2 — MainMenu.html: Username hardcoded as "Darko"**
+- The dashboard greeting (`Good morning, Darko`) had the name hardcoded in the string literal instead of reading from `FT.getSetting('userName')`.
+- Even though Onboarding correctly saved the user's name via `FT.setSetting('userName', name)`, MainMenu never read it back.
+- **Fix:** Greeting now reads `FT.getSetting('userName')` and falls back to "there" if no name is set.
+
+#### Files Modified in Session 11
+
+| File | Changes |
+|------|---------|
+| `Onboarding.html` | Added `.light-theme` CSS variables and element overrides; removed hardcoded dark radial gradient from body |
+| `MainMenu.html` | Changed greeting from hardcoded "Darko" to dynamic `FT.getSetting('userName')` with fallback |

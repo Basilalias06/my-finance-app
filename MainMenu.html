@@ -518,7 +518,8 @@ function init(){
   CCS  = FT.getCreditCards();
 
   const h=new Date().getHours();
-  $("greet").textContent=h<12?"Good morning, Darko":h<17?"Good afternoon, Darko":"Good evening, Darko";
+  const uName=FT.getSetting("userName")||"there";
+  $("greet").textContent=h<12?"Good morning, "+uName:h<17?"Good afternoon, "+uName:"Good evening, "+uName;
 
   // Onboarding check
   if(!FT.getSetting("onboardingDone")){
