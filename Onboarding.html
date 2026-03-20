@@ -168,6 +168,25 @@ body{
 .acc-add-btn:hover{background:var(--pri-dim)}
 .acc-skip-note{font-size:11px;color:var(--txt3);margin-top:4px}
 
+/* ── Developer mode toggle ── */
+.dev-toggle{
+  margin-top:16px;display:flex;align-items:center;gap:10px;
+  padding:10px 16px;border-radius:var(--r-md);background:var(--s2);
+  border:1.5px solid var(--olv);cursor:pointer;transition:all .2s;width:100%;
+}
+.dev-toggle:hover{border-color:var(--ol)}
+.dev-toggle.active{border-color:#AB47BC;background:rgba(171,71,188,0.08)}
+.dev-toggle-icon{font-size:20px}
+.dev-toggle-info{flex:1;text-align:left}
+.dev-toggle-label{font-size:13px;font-weight:600;color:var(--txt)}
+.dev-toggle-desc{font-size:11px;color:var(--txt3);line-height:1.3}
+.dev-toggle-check{
+  width:18px;height:18px;border-radius:4px;border:2px solid var(--olv);
+  transition:all .2s;display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:transparent;
+}
+.dev-toggle.active .dev-toggle-check{background:#AB47BC;border-color:#AB47BC;color:#fff}
+
 /* ── Ready slide ── */
 .ready-icon{font-size:64px;margin-bottom:20px}
 .stat-row{display:flex;gap:10px;margin:24px 0;width:100%}
@@ -212,6 +231,7 @@ body{
 }
 .light-theme .acc-type-tab{background:var(--s1);border-color:var(--olv)}
 .light-theme .acc-item-icon{background:var(--s2)}
+.light-theme .dev-toggle{background:var(--s1);border-color:var(--olv)}
 .light-theme .ob-btn-sec{background:var(--s1);color:var(--txt2);border-color:var(--olv)}
 .light-theme .ob-btn-pri{color:#00201E}
 .light-theme .ob-sub{color:var(--txt2)}
@@ -244,6 +264,14 @@ body{
       <div class="feat-item"><div class="feat-ico">🎯</div><div class="feat-l">Goal Tracking</div><div class="feat-d">Save towards what matters most</div></div>
       <div class="feat-item"><div class="feat-ico">🔔</div><div class="feat-l">Budget Alerts</div><div class="feat-d">Get notified before you overspend</div></div>
       <div class="feat-item"><div class="feat-ico">🔒</div><div class="feat-l">Private & Local</div><div class="feat-d">All data stays on your device</div></div>
+    </div>
+    <div class="dev-toggle" id="dev-toggle" onclick="toggleDevMode()">
+      <div class="dev-toggle-icon">🛠️</div>
+      <div class="dev-toggle-info">
+        <div class="dev-toggle-label">Developer / Demo Mode</div>
+        <div class="dev-toggle-desc">Load sample data with accounts, investments, crypto, loans & transactions</div>
+      </div>
+      <div class="dev-toggle-check" id="dev-check">✓</div>
     </div>
     <div class="ob-nav">
       <button class="ob-btn ob-btn-pri" onclick="nextSlide()">Get Started <span style="margin-left:4px">→</span></button>
@@ -336,7 +364,9 @@ body{
     <div class="acc-type-tabs">
       <div class="acc-type-tab active" onclick="switchAccTab('account')">Bank Account</div>
       <div class="acc-type-tab" onclick="switchAccTab('credit-card')">Credit Card</div>
-      <div class="acc-type-tab" onclick="switchAccTab('loan')">Loan</div>
+      <div class="acc-type-tab" onclick="switchAccTab('loan')">Loan / EMI</div>
+      <div class="acc-type-tab" onclick="switchAccTab('investment')">Investment</div>
+      <div class="acc-type-tab" onclick="switchAccTab('crypto')">Crypto</div>
       <div class="acc-type-tab" onclick="switchAccTab('wallet')">Wallet / Other</div>
     </div>
     <div class="acc-add-form" id="acc-form-account">
@@ -375,6 +405,41 @@ body{
       </div>
       <button class="acc-add-btn" onclick="addOnboardingLoan()">
         <span style="font-size:16px">+</span> Add Loan
+      </button>
+    </div>
+    <div class="acc-add-form" id="acc-form-investment" style="display:none">
+      <div class="acc-form-row">
+        <select class="ob-input" id="inv-type" style="padding:12px 14px;font-size:14px">
+          <option value="mutual-fund">Mutual Fund</option>
+          <option value="stocks">Stocks</option>
+          <option value="fixed-deposit">Fixed Deposit</option>
+          <option value="ppf">PPF / EPF</option>
+          <option value="nps">NPS</option>
+          <option value="gold">Gold</option>
+          <option value="other-investment">Other Investment</option>
+        </select>
+      </div>
+      <div class="acc-form-row">
+        <input class="ob-input" id="inv-name" type="text" placeholder="Name (e.g. Nifty 50 Index Fund)" maxlength="40">
+      </div>
+      <div class="acc-form-row">
+        <input class="ob-input" id="inv-value" type="number" placeholder="Current value" inputmode="decimal">
+        <input class="ob-input" id="inv-invested" type="number" placeholder="Amount invested" inputmode="decimal">
+      </div>
+      <button class="acc-add-btn" onclick="addOnboardingInvestment()">
+        <span style="font-size:16px">+</span> Add Investment
+      </button>
+    </div>
+    <div class="acc-add-form" id="acc-form-crypto" style="display:none">
+      <div class="acc-form-row">
+        <input class="ob-input" id="crypto-name" type="text" placeholder="Name (e.g. Bitcoin, Ethereum)" maxlength="40">
+      </div>
+      <div class="acc-form-row">
+        <input class="ob-input" id="crypto-value" type="number" placeholder="Current value" inputmode="decimal">
+        <input class="ob-input" id="crypto-invested" type="number" placeholder="Amount invested" inputmode="decimal">
+      </div>
+      <button class="acc-add-btn" onclick="addOnboardingCrypto()">
+        <span style="font-size:16px">+</span> Add Crypto
       </button>
     </div>
     <div class="acc-add-form" id="acc-form-wallet" style="display:none">
@@ -418,18 +483,121 @@ let currentSlide = 0;
 let selectedTheme = 'dark';
 let selectedCurrency = 'INR';
 const totalSlides = 6;
+let devMode = false;
 
 // Onboarding account collections
 const obAccounts = [];
 const obCreditCards = [];
 const obDebts = [];
 
-const ACC_ICONS = {savings:'🏦',checking:'🏦',cash:'💰',upi:'⚡',wallet:'🔐'};
-const ACC_COLORS = ['#7ECEC6','#82B5E8','#E8B06E','#96CC98','#C293D8','#E88E8E','#A18870'];
+const ACC_COLORS = ['#7ECEC6','#82B5E8','#E8B06E','#96CC98','#C293D8','#E88E8E','#A18870','#42A5F5','#FF7043','#AB47BC'];
 let accColorIdx = 0;
 function nextColor(){ return ACC_COLORS[accColorIdx++ % ACC_COLORS.length]; }
 
 let currentAccTab = 'account';
+
+// ── Developer mode toggle ──
+function toggleDevMode(){
+  devMode = !devMode;
+  document.getElementById('dev-toggle').classList.toggle('active', devMode);
+}
+
+// ── Developer dummy data ──
+function loadDevData(){
+  // Clear user-added items
+  obAccounts.length = 0;
+  obCreditCards.length = 0;
+  obDebts.length = 0;
+
+  // Bank Accounts
+  obAccounts.push(
+    {name:'SBI Savings',icon:'🏦',type:'savings',balance:245000,color:'#7ECEC6'},
+    {name:'HDFC Checking',icon:'🏦',type:'checking',balance:68500,color:'#82B5E8'},
+    {name:'ICICI Salary',icon:'🏦',type:'savings',balance:125000,color:'#96CC98'},
+    {name:'Cash',icon:'💰',type:'cash',balance:8500,color:'#E8B06E'},
+    {name:'UPI / GPay',icon:'⚡',type:'upi',balance:12200,color:'#A18870'},
+    {name:'Paytm Wallet',icon:'🔐',type:'wallet',balance:3400,color:'#C293D8'},
+    // Investments - Mutual Funds
+    {name:'Nifty 50 Index Fund',icon:'📈',type:'mutual-fund',balance:350000,invested:280000,color:'#42A5F5'},
+    {name:'HDFC Mid-Cap Fund',icon:'📈',type:'mutual-fund',balance:180000,invested:150000,color:'#26A69A'},
+    {name:'Axis Small Cap Fund',icon:'📈',type:'mutual-fund',balance:95000,invested:85000,color:'#FF7043'},
+    {name:'Parag Parikh Flexi Cap',icon:'📈',type:'mutual-fund',balance:220000,invested:175000,color:'#AB47BC'},
+    // Stocks
+    {name:'Reliance Industries',icon:'📊',type:'stocks',balance:125000,invested:90000,color:'#29B6F6'},
+    {name:'TCS',icon:'📊',type:'stocks',balance:85000,invested:70000,color:'#66BB6A'},
+    {name:'Infosys',icon:'📊',type:'stocks',balance:62000,invested:55000,color:'#FFA726'},
+    {name:'HDFC Bank',icon:'📊',type:'stocks',balance:48000,invested:42000,color:'#EF5350'},
+    // Fixed Deposits
+    {name:'SBI FD - 1 Year',icon:'🏛️',type:'fixed-deposit',balance:200000,invested:200000,color:'#8D6E63'},
+    {name:'HDFC FD - 2 Year',icon:'🏛️',type:'fixed-deposit',balance:500000,invested:500000,color:'#78909C'},
+    // PPF / EPF
+    {name:'PPF Account',icon:'🏛️',type:'ppf',balance:680000,invested:600000,color:'#5C6BC0'},
+    {name:'EPF Balance',icon:'🏛️',type:'ppf',balance:420000,invested:350000,color:'#26C6DA'},
+    // NPS
+    {name:'NPS Tier 1',icon:'🏛️',type:'nps',balance:185000,invested:150000,color:'#9CCC65'},
+    // Crypto
+    {name:'Bitcoin (BTC)',icon:'₿',type:'crypto',balance:180000,invested:120000,color:'#F7931A'},
+    {name:'Ethereum (ETH)',icon:'⟠',type:'crypto',balance:95000,invested:75000,color:'#627EEA'},
+    {name:'Solana (SOL)',icon:'◎',type:'crypto',balance:35000,invested:25000,color:'#9945FF'},
+    // Gold
+    {name:'Digital Gold',icon:'🥇',type:'gold',balance:75000,invested:60000,color:'#FFD54F'},
+    {name:'Sovereign Gold Bond',icon:'🥇',type:'gold',balance:150000,invested:120000,color:'#FFB300'},
+  );
+
+  // Credit Cards
+  obCreditCards.push(
+    {name:'Axis Atlas Credit Card',limit:300000,used:18500,billing:17,color:'#E88E8E'},
+    {name:'HDFC Regalia',limit:200000,used:12350,billing:5,color:'#82B5E8'},
+    {name:'ICICI Amazon Pay',limit:150000,used:5400,billing:12,color:'#96CC98'},
+    {name:'SBI Simply Click',limit:100000,used:3200,billing:20,color:'#C293D8'},
+  );
+
+  // Loans / EMIs
+  obDebts.push(
+    {name:'Home Loan',lender:'State Bank of India',type:'loan',icon:'home',principal:3500000,outstanding:2800000,paid:700000,interestRate:8.5,emi:32000,tenure:120,startDate:'2023-04-01',interestPaid:245000,nextDue:'2026-04-01',color:'#E88E8E'},
+    {name:'Car Loan',lender:'HDFC Bank',type:'loan',icon:'directions_car',principal:800000,outstanding:520000,paid:280000,interestRate:9.2,emi:18500,tenure:36,startDate:'2024-06-01',interestPaid:48000,nextDue:'2026-04-05',color:'#82B5E8'},
+    {name:'Personal Loan',lender:'ICICI Bank',type:'loan',icon:'account_balance',principal:300000,outstanding:180000,paid:120000,interestRate:12,emi:9500,tenure:24,startDate:'2025-01-01',interestPaid:18500,nextDue:'2026-04-10',color:'#96CC98'},
+    {name:'iPhone 16 EMI',lender:'Bajaj Finserv',type:'loan',icon:'smartphone',principal:89900,outstanding:52000,paid:37900,interestRate:0,emi:7492,tenure:6,startDate:'2025-10-01',interestPaid:0,nextDue:'2026-04-01',color:'#E8B06E'},
+    {name:'Education Loan',lender:'Bank of Baroda',type:'loan',icon:'school',principal:500000,outstanding:380000,paid:120000,interestRate:7.5,emi:12000,tenure:48,startDate:'2024-08-01',interestPaid:32000,nextDue:'2026-04-15',color:'#C293D8'},
+  );
+
+  // Developer transactions
+  const devTX = [
+    {id:"dt1",n:"Salary March",ty:"income",a:125000,cat:"Salary",acc:"ICICI Salary",d:"2026-03-17T09:00",note:"Monthly salary",tags:[]},
+    {id:"dt2",n:"Rent Payment",ty:"expense",a:25000,cat:"Housing",acc:"HDFC Checking",d:"2026-03-01T10:00",note:"March rent",tags:["bill"]},
+    {id:"dt3",n:"SIP - Nifty 50",ty:"expense",a:10000,cat:"Investments",acc:"SBI Savings",d:"2026-03-05T09:00",note:"Monthly SIP",tags:["investment"]},
+    {id:"dt4",n:"SIP - Mid Cap",ty:"expense",a:5000,cat:"Investments",acc:"SBI Savings",d:"2026-03-05T09:05",note:"Monthly SIP",tags:["investment"]},
+    {id:"dt5",n:"Home Loan EMI",ty:"expense",a:32000,cat:"Bills",acc:"SBI Savings",d:"2026-03-01T08:00",note:"Home loan EMI",tags:["emi","bill"]},
+    {id:"dt6",n:"Car Loan EMI",ty:"expense",a:18500,cat:"Bills",acc:"HDFC Checking",d:"2026-03-05T08:00",note:"Car loan EMI",tags:["emi","bill"]},
+    {id:"dt7",n:"iPhone EMI",ty:"expense",a:7492,cat:"Bills",acc:"HDFC Checking",d:"2026-03-01T10:30",note:"iPhone 16 EMI",tags:["emi"]},
+    {id:"dt8",n:"Netflix",ty:"expense",a:649,cat:"Entertainment",acc:"ICICI Amazon Pay",d:"2026-03-16T14:20",note:"Subscription",tags:["subscription"]},
+    {id:"dt9",n:"Spotify",ty:"expense",a:119,cat:"Entertainment",acc:"ICICI Amazon Pay",d:"2026-03-15T10:00",note:"Subscription",tags:["subscription"]},
+    {id:"dt10",n:"Grocery - BigBasket",ty:"expense",a:3200,cat:"Food & Dining",acc:"UPI / GPay",d:"2026-03-17T10:30",note:"Weekly grocery",tags:[]},
+    {id:"dt11",n:"Swiggy Dinner",ty:"expense",a:850,cat:"Food & Dining",acc:"HDFC Regalia",d:"2026-03-16T20:30",note:"",tags:[]},
+    {id:"dt12",n:"Petrol",ty:"expense",a:3500,cat:"Transport",acc:"Axis Atlas Credit Card",d:"2026-03-14T18:00",note:"",tags:[]},
+    {id:"dt13",n:"Electricity Bill",ty:"expense",a:2800,cat:"Bills",acc:"UPI / GPay",d:"2026-03-12T18:10",note:"MSEB",tags:["bill"]},
+    {id:"dt14",n:"Internet Bill",ty:"expense",a:999,cat:"Bills",acc:"UPI / GPay",d:"2026-03-10T09:00",note:"Jio Fiber",tags:["bill"]},
+    {id:"dt15",n:"Gym Membership",ty:"expense",a:2500,cat:"Health",acc:"HDFC Regalia",d:"2026-03-08T07:00",note:"Cult.fit monthly",tags:["subscription"]},
+    {id:"dt16",n:"Bought BTC",ty:"expense",a:15000,cat:"Investments",acc:"SBI Savings",d:"2026-03-07T11:00",note:"Bitcoin DCA",tags:["crypto"]},
+    {id:"dt17",n:"Bought ETH",ty:"expense",a:8000,cat:"Investments",acc:"SBI Savings",d:"2026-03-07T11:05",note:"Ethereum DCA",tags:["crypto"]},
+    {id:"dt18",n:"Freelance Payment",ty:"income",a:35000,cat:"Freelance",acc:"HDFC Checking",d:"2026-03-15T16:45",note:"Web dev project",tags:[]},
+    {id:"dt19",n:"Stock Dividend - TCS",ty:"income",a:4200,cat:"Investments",acc:"HDFC Checking",d:"2026-03-10T09:15",note:"Quarterly dividend",tags:["dividend"]},
+    {id:"dt20",n:"MF Redemption",ty:"income",a:25000,cat:"Investments",acc:"SBI Savings",d:"2026-03-09T14:00",note:"Partial redemption",tags:["investment"]},
+    {id:"dt21",n:"Amazon Shopping",ty:"expense",a:4500,cat:"Shopping",acc:"ICICI Amazon Pay",d:"2026-03-06T16:00",note:"Electronics",tags:[]},
+    {id:"dt22",n:"PPF Contribution",ty:"expense",a:12500,cat:"Investments",acc:"SBI Savings",d:"2026-03-05T10:00",note:"Monthly PPF",tags:["investment"]},
+    {id:"dt23",n:"NPS Contribution",ty:"expense",a:5000,cat:"Investments",acc:"SBI Savings",d:"2026-03-05T10:05",note:"Monthly NPS",tags:["investment"]},
+    {id:"dt24",n:"Health Insurance",ty:"expense",a:1500,cat:"Insurance",acc:"HDFC Checking",d:"2026-03-04T10:00",note:"Star Health monthly",tags:["insurance","bill"]},
+    {id:"dt25",n:"Coffee - Starbucks",ty:"expense",a:520,cat:"Food & Dining",acc:"Cash",d:"2026-03-12T11:00",note:"",tags:[]},
+    {id:"dt26",n:"Uber Ride",ty:"expense",a:380,cat:"Transport",acc:"UPI / GPay",d:"2026-03-11T08:30",note:"",tags:[]},
+    {id:"dt27",n:"Books - Kindle",ty:"expense",a:350,cat:"Education",acc:"ICICI Amazon Pay",d:"2026-03-03T15:00",note:"",tags:[]},
+    {id:"dt28",n:"Salary February",ty:"income",a:125000,cat:"Salary",acc:"ICICI Salary",d:"2026-02-17T09:00",note:"Monthly salary",tags:[]},
+    {id:"dt29",n:"Sold SOL Profit",ty:"income",a:8000,cat:"Investments",acc:"HDFC Checking",d:"2026-02-20T14:00",note:"Solana partial exit",tags:["crypto"]},
+    {id:"dt30",n:"Education Loan EMI",ty:"expense",a:12000,cat:"Bills",acc:"SBI Savings",d:"2026-03-15T08:00",note:"Education loan EMI",tags:["emi","bill"]},
+  ];
+  FT.setTX(devTX);
+
+  renderObAccList();
+}
 
 function updateDots(){
   for(let i=0;i<totalSlides;i++){
@@ -445,6 +613,8 @@ function showSlide(n){
   if(s){s.classList.add('active');}
   currentSlide=n;
   updateDots();
+  // Load dev data when entering accounts slide with dev mode on
+  if(n===4 && devMode && obAccounts.length===0) loadDevData();
   if(n===5) loadStats();
 }
 
@@ -477,7 +647,7 @@ function switchAccTab(tab){
   currentAccTab = tab;
   document.querySelectorAll('.acc-type-tab').forEach(t=>t.classList.remove('active'));
   event.target.classList.add('active');
-  ['account','credit-card','loan','wallet'].forEach(f=>{
+  ['account','credit-card','loan','investment','crypto','wallet'].forEach(f=>{
     document.getElementById('acc-form-'+f).style.display = f===tab ? '' : 'none';
   });
 }
@@ -530,6 +700,34 @@ function addOnboardingWallet(){
   renderObAccList();
 }
 
+function addOnboardingInvestment(){
+  const name = document.getElementById('inv-name').value.trim();
+  const type = document.getElementById('inv-type').value;
+  const value = parseFloat(document.getElementById('inv-value').value) || 0;
+  const invested = parseFloat(document.getElementById('inv-invested').value) || 0;
+  if(!name) return;
+  const icons = {'mutual-fund':'📈','stocks':'📊','fixed-deposit':'🏛️','ppf':'🏛️','nps':'🏛️','gold':'🥇','other-investment':'💼'};
+  obAccounts.push({name, icon:icons[type]||'📈', type, balance:value, invested:invested||value, color:nextColor()});
+  document.getElementById('inv-name').value='';
+  document.getElementById('inv-value').value='';
+  document.getElementById('inv-invested').value='';
+  renderObAccList();
+}
+
+function addOnboardingCrypto(){
+  const name = document.getElementById('crypto-name').value.trim();
+  const value = parseFloat(document.getElementById('crypto-value').value) || 0;
+  const invested = parseFloat(document.getElementById('crypto-invested').value) || 0;
+  if(!name) return;
+  const icon = name.toLowerCase().includes('bitcoin')||name.toLowerCase().includes('btc')?'₿':
+               name.toLowerCase().includes('ethereum')||name.toLowerCase().includes('eth')?'⟠':'🪙';
+  obAccounts.push({name, icon, type:'crypto', balance:value, invested:invested||value, color:nextColor()});
+  document.getElementById('crypto-name').value='';
+  document.getElementById('crypto-value').value='';
+  document.getElementById('crypto-invested').value='';
+  renderObAccList();
+}
+
 function removeObItem(type, idx){
   if(type==='acc') obAccounts.splice(idx,1);
   else if(type==='cc') obCreditCards.splice(idx,1);
@@ -541,10 +739,20 @@ function renderObAccList(){
   const list = document.getElementById('ob-acc-list');
   let html = '';
   const sym = (FT_CURRENCIES[selectedCurrency]||FT_CURRENCIES.INR).symbol;
+  const invTypes = ['mutual-fund','stocks','fixed-deposit','ppf','nps','gold','crypto','other-investment'];
   obAccounts.forEach((a,i)=>{
+    const isInv = invTypes.includes(a.type);
+    const typeLabel = a.type.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+    let detail = `${typeLabel} · ${sym}${Number(a.balance).toLocaleString()}`;
+    if(isInv && a.invested){
+      const gain = a.balance - a.invested;
+      const pct = a.invested > 0 ? ((gain/a.invested)*100).toFixed(1) : '0';
+      const sign = gain >= 0 ? '+' : '';
+      detail = `${typeLabel} · ${sym}${Number(a.balance).toLocaleString()} (${sign}${pct}%)`;
+    }
     html += `<div class="acc-item">
       <div class="acc-item-icon">${a.icon}</div>
-      <div class="acc-item-info"><div class="acc-item-name">${a.name}</div><div class="acc-item-detail">${a.type} · ${sym}${Number(a.balance).toLocaleString()}</div></div>
+      <div class="acc-item-info"><div class="acc-item-name">${a.name}</div><div class="acc-item-detail">${detail}</div></div>
       <button class="acc-item-del" onclick="removeObItem('acc',${i})">×</button>
     </div>`;
   });
@@ -558,7 +766,7 @@ function renderObAccList(){
   obDebts.forEach((d,i)=>{
     html += `<div class="acc-item">
       <div class="acc-item-icon">📋</div>
-      <div class="acc-item-info"><div class="acc-item-name">${d.name}</div><div class="acc-item-detail">Loan · ${d.lender} · ${sym}${Number(d.outstanding).toLocaleString()}</div></div>
+      <div class="acc-item-info"><div class="acc-item-name">${d.name}</div><div class="acc-item-detail">Loan · ${d.lender} · EMI ${sym}${Number(d.emi).toLocaleString()}</div></div>
       <button class="acc-item-del" onclick="removeObItem('debt',${i})">×</button>
     </div>`;
   });
@@ -587,6 +795,7 @@ function finishOnboarding(){
   const sym = (FT_CURRENCIES[selectedCurrency]||FT_CURRENCIES.INR).symbol;
   FT.setSetting('currencySymbol', sym);
   FT.setSetting('onboardingDone', true);
+  FT.setSetting('devMode', devMode);
   const name=document.getElementById('ob-name').value.trim();
   if(name) FT.setSetting('userName', name);
   saveOnboardingAccounts();
