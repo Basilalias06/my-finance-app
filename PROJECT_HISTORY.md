@@ -574,9 +574,8 @@ All HTML Pages
 ## Known Issues & Limitations
 1. Recurring transaction auto-creation not yet implemented (UI exists in Recurring.html)
 2. Calendar.html transactions filtered by date only (no category filter)
-3. DebtTracker and SplitExpense data is hardcoded in HTML (not yet migrated to FT storage)
-4. Supabase sync requires manual key setup in `fintrack-sync.js` — not plug-and-play without configuration
-5. No email/login auth — data is device-scoped; cross-device sync requires JSON export/import
+3. Supabase sync requires manual key setup in `fintrack-sync.js` — not plug-and-play without configuration
+4. No email/login auth — data is device-scoped; cross-device sync requires JSON export/import
 
 ---
 
@@ -585,7 +584,71 @@ All HTML Pages
 - Multi-currency support with auto-conversion
 - Recurring transaction auto-creation engine
 - Email / Google auth via Supabase Auth for true multi-device sync
-- Debt and split expense data persistence via fintrack-data.js
 - Widgets / home screen summary
 - AI spending analysis and recommendations
 - Export to WhatsApp / share expense summaries
+
+---
+
+### Session 10 — Bug Fixes & Data Layer Migration
+
+#### Bug Fixes
+
+**Bug 1 — Accounts.html: Hardcoded data, CRUD not persisting**
+- Account cards and credit card cards were hardcoded in HTML — not reading from `FT.getAccounts()` / `FT.getCreditCards()`.
+- `saveEditAccount()`, `saveNewAccount()`, and `confirmDelete()` only showed toasts without actually saving/deleting data in localStorage.
+- **Fix:** Replaced hardcoded HTML with dynamic `renderPage()` that reads from FT data layer. All CRUD operations now call `FT.addAccount()`, `FT.updateAccount()`, `FT.deleteAccount()` and re-render the page.
+
+**Bug 2 — Settings.html: Theme storage conflict**
+- Theme was saved via `localStorage.setItem('fintrack-theme', theme)` but `FTTheme.init()` reads from `FT.getSetting('theme')` (stored under `ft_settings` key). Theme changes in Settings didn't propagate to other pages.
+- **Fix:** `switchTheme()` now uses `FT.setSetting('theme', theme)` and `FTTheme.apply(theme)` directly. Removed duplicate `_origSwitchTheme` wrapper.
+
+**Bug 3 — Settings.html: Budget rollover toggle visual state**
+- `toggleBudgetRollover()` updated the FT setting but didn't toggle the button's `on` CSS class or `data-state` attribute, so the toggle appeared stuck visually.
+- **Fix:** Added `classList.toggle('on', newVal)` and `setAttribute('data-state', ...)` to keep visual state in sync.
+
+**Bug 4 — Settings.html: Currency and accent color stored in separate localStorage keys**
+- Currency was stored as `fintrack-currency` / `fintrack-currency-symbol` and accent color as `fintrack-accent-color` / `fintrack-accent-value` — all outside the FT settings system.
+- **Fix:** Migrated to `FT.setSetting('currency')`, `FT.setSetting('currencySymbol')`, `FT.setSetting('accentColor')`, `FT.setSetting('accentName')`.
+
+**Bug 5 — index.html: Onboarding bypass**
+- `index.html` unconditionally redirected to `MainMenu.html` via `<meta http-equiv="refresh">` and `window.location.href`, bypassing the onboarding check that `MainMenu.html` performs.
+- **Fix:** Now loads `fintrack-data.js` and checks `FT.getSetting('onboardingDone')` to route to either `Onboarding.html` or `MainMenu.html`.
+
+#### Data Layer Migration — DebtTracker & SplitExpense
+
+**fintrack-data.js — New CRUD Methods & Seed Data:**
+- Added `DEFAULT_DEBTS` (4 entries: Home Loan, Personal Loan, Axis CC, ICICI CC) with fields: name, lender, type, icon, principal, outstanding, paid, interestRate, emi, tenure, startDate, interestPaid, nextDue.
+- Added `DEFAULT_SPLITS` (4 entries: Dinner, Grocery, Movie, Uber) with fields: desc, total, paidBy, date, splitType, members, shares.
+- Added `DEFAULT_SPLIT_FRIENDS` (5 entries: Rahul, Priya, Amit, Sneha, Vikram) with fields: name, phone, email, color.
+- Added full CRUD: `getDebts/setDebts/addDebt/updateDebt/deleteDebt`, `getSplits/setSplits/addSplit/updateSplit/deleteSplit`, `getSplitFriends/setSplitFriends/addSplitFriend/deleteSplitFriend`.
+- Updated `exportJSON()` / `importJSON()` / `clearAll()` to include debts, splits, and splitFriends.
+
+**DebtTracker.html — Dynamic Rendering:**
+- Replaced all 4 hardcoded debt cards with dynamic `renderDebts()` function reading from `FT.getDebts()`.
+- Overview card (total debt, paid, remaining, monthly EMI, progress ring) computed dynamically.
+- Strategy toggle (Snowball/Avalanche) re-sorts debt cards by outstanding amount or interest rate.
+- Payoff timeline computed from outstanding/emi for each debt.
+- "Add Debt" form now persists via `FT.addDebt()`.
+- "Make Payment" deducts from debt outstanding via `FT.updateDebt()` and from selected account via `FT.updateAccount()`.
+- Payment account dropdown populated dynamically from `FT.getAccounts()`.
+
+**SplitExpense.html — Dynamic Rendering:**
+- Replaced hardcoded friends (5), splits (4), and groups (2) with dynamic rendering from `FT.getSplitFriends()` and `FT.getSplits()`.
+- Balance card (owed/owes/net) computed from split shares using `computeBalances()`.
+- Friend cards show dynamic balance, recent split activity, and history.
+- "Add Split" form: paid-by radio group and split-between checkboxes populated dynamically from friends list. Equal split shares computed automatically. Persists via `FT.addSplit()`.
+- "Settle Up" creates a settlement split that zeroes out the balance with the selected friend.
+- "Add Person" persists via `FT.addSplitFriend()` with auto-assigned color.
+- Removed hardcoded Groups section (groups feature not yet backed by data layer).
+
+#### Files Modified in Session 10
+
+| File | Changes |
+|------|---------|
+| `fintrack-data.js` | Added DEFAULT_DEBTS, DEFAULT_SPLITS, DEFAULT_SPLIT_FRIENDS seed data; added debt/split/splitFriend CRUD methods; updated export/import/clearAll |
+| `Accounts.html` | Replaced hardcoded account/credit card HTML with dynamic renderPage(); CRUD operations now persist via FT |
+| `Settings.html` | Fixed theme storage to use FT.setSetting; fixed budget rollover toggle visual; migrated currency/accent to FT settings |
+| `index.html` | Added onboarding check before redirect |
+| `DebtTracker.html` | Replaced hardcoded debt cards with dynamic rendering; add/payment forms persist to FT |
+| `SplitExpense.html` | Replaced hardcoded friends/splits/groups with dynamic rendering; add split/settle/add person persist to FT |

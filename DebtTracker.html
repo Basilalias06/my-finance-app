@@ -826,41 +826,7 @@
     <!-- Main Content -->
     <div class="container">
         <!-- Overview Card -->
-        <div class="overview-card">
-            <div class="overview-left">
-                <div class="overview-stat">
-                    <span class="stat-label">Total Debt</span>
-                    <span class="stat-value highlight">₹8,50,000</span>
-                </div>
-                <div class="overview-stat">
-                    <span class="stat-label">Total Paid</span>
-                    <span class="stat-value">₹2,40,000</span>
-                </div>
-                <div class="overview-stat">
-                    <span class="stat-label">Remaining</span>
-                    <span class="stat-value">₹6,10,000</span>
-                </div>
-                <div class="overview-stat">
-                    <span class="stat-label">Monthly EMI</span>
-                    <span class="stat-value">₹28,500</span>
-                </div>
-            </div>
-            <div class="overview-right">
-                <div class="progress-ring-container">
-                    <svg class="progress-ring" viewBox="0 0 120 120">
-                        <circle class="progress-ring__circle" cx="60" cy="60" r="54" stroke-width="8" stroke-dasharray="339.29" stroke-dashoffset="339.29"/>
-                        <circle class="progress-ring__circle progress" cx="60" cy="60" r="54" stroke-width="8" stroke-dasharray="339.29" stroke-dashoffset="96.9" id="progressCircle"/>
-                    </svg>
-                    <div class="progress-text">
-                        <div class="progress-text-value" id="percentPaid">28%</div>
-                        <div class="progress-text-label">Paid Off</div>
-                    </div>
-                </div>
-                <div class="overview-meta">
-                    Debt-free by<br><strong>April 2028</strong>
-                </div>
-            </div>
-        </div>
+        <div class="overview-card" id="overviewCard"></div>
 
         <!-- Strategy Toggle -->
         <div class="strategy-section">
@@ -883,229 +849,13 @@
         <!-- Debts List -->
         <div class="debts-section">
             <h3 class="section-title">Your Debts</h3>
-
-            <!-- Home Loan -->
-            <div class="debt-card" onclick="openPaymentSheet(1)">
-                <div class="debt-card-header">
-                    <div class="debt-card-title">
-                        <div class="debt-icon">
-                            <span class="material-symbols-rounded">home</span>
-                        </div>
-                        <div>
-                            <div>Home Loan</div>
-                            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 400;">State Bank of India</div>
-                        </div>
-                    </div>
-                    <div class="debt-priority">Priority 1</div>
-                </div>
-                <div class="debt-card-body">
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Outstanding</span>
-                        <span class="debt-detail-value primary">₹4,20,000</span>
-                    </div>
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Interest Rate</span>
-                        <span class="debt-detail-value">8.5% p.a.</span>
-                    </div>
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">EMI</span>
-                        <span class="debt-detail-value">₹22,000/month</span>
-                    </div>
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Remaining Tenure</span>
-                        <span class="debt-detail-value">24 months</span>
-                    </div>
-                </div>
-                <div class="debt-card-progress">
-                    <div class="progress-label">
-                        <span>Progress</span>
-                        <span>45.7%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 45.7%"></div>
-                    </div>
-                </div>
-                <div class="debt-card-footer">
-                    <span>Interest paid: ₹34,500</span>
-                    <span>Next: April 1, 2026</span>
-                </div>
-            </div>
-
-            <!-- Personal Loan -->
-            <div class="debt-card" onclick="openPaymentSheet(2)">
-                <div class="debt-card-header">
-                    <div class="debt-card-title">
-                        <div class="debt-icon">
-                            <span class="material-symbols-rounded">account_balance</span>
-                        </div>
-                        <div>
-                            <div>Personal Loan</div>
-                            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 400;">HDFC Bank</div>
-                        </div>
-                    </div>
-                    <div class="debt-priority">Priority 2</div>
-                </div>
-                <div class="debt-card-body">
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Outstanding</span>
-                        <span class="debt-detail-value primary">₹1,50,000</span>
-                    </div>
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Interest Rate</span>
-                        <span class="debt-detail-value">12% p.a.</span>
-                    </div>
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">EMI</span>
-                        <span class="debt-detail-value">₹6,500/month</span>
-                    </div>
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Remaining Tenure</span>
-                        <span class="debt-detail-value">23 months</span>
-                    </div>
-                </div>
-                <div class="debt-card-progress">
-                    <div class="progress-label">
-                        <span>Progress</span>
-                        <span>25.0%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 25.0%"></div>
-                    </div>
-                </div>
-                <div class="debt-card-footer">
-                    <span>Interest paid: ₹8,200</span>
-                    <span>Next: April 5, 2026</span>
-                </div>
-            </div>
-
-            <!-- Credit Card - Axis -->
-            <div class="debt-card" onclick="openPaymentSheet(3)">
-                <div class="debt-card-header">
-                    <div class="debt-card-title">
-                        <div class="debt-icon">
-                            <span class="material-symbols-rounded">credit_card</span>
-                        </div>
-                        <div>
-                            <div>Credit Card</div>
-                            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 400;">Axis Bank</div>
-                        </div>
-                    </div>
-                    <div class="debt-priority">Priority 3</div>
-                </div>
-                <div class="debt-card-body">
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Outstanding</span>
-                        <span class="debt-detail-value primary">₹10,663</span>
-                    </div>
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Interest Rate</span>
-                        <span class="debt-detail-value">42% p.a.</span>
-                    </div>
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Min Payment</span>
-                        <span class="debt-detail-value">₹534</span>
-                    </div>
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Due Date</span>
-                        <span class="debt-detail-value">Mar 17, 2026</span>
-                    </div>
-                </div>
-                <div class="debt-card-progress">
-                    <div class="progress-label">
-                        <span>Status</span>
-                        <span><span class="badge-warning">DUE TODAY</span></span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 0%; background: var(--color-warning);"></div>
-                    </div>
-                </div>
-                <div class="debt-card-footer">
-                    <span>Recommended: Full payment</span>
-                    <span>Save ₹420+ interest/month</span>
-                </div>
-            </div>
-
-            <!-- Credit Card - ICICI -->
-            <div class="debt-card" onclick="openPaymentSheet(4)">
-                <div class="debt-card-header">
-                    <div class="debt-card-title">
-                        <div class="debt-icon">
-                            <span class="material-symbols-rounded">credit_card</span>
-                        </div>
-                        <div>
-                            <div>Credit Card</div>
-                            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 400;">ICICI Bank</div>
-                        </div>
-                    </div>
-                    <div class="debt-priority">Priority 4</div>
-                </div>
-                <div class="debt-card-body">
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Outstanding</span>
-                        <span class="debt-detail-value primary">₹5,399</span>
-                    </div>
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Interest Rate</span>
-                        <span class="debt-detail-value">39.6% p.a.</span>
-                    </div>
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Min Payment</span>
-                        <span class="debt-detail-value">₹270</span>
-                    </div>
-                    <div class="debt-detail">
-                        <span class="debt-detail-label">Due Date</span>
-                        <span class="debt-detail-value">Mar 17, 2026</span>
-                    </div>
-                </div>
-                <div class="debt-card-progress">
-                    <div class="progress-label">
-                        <span>Status</span>
-                        <span><span class="badge-warning">DUE TODAY</span></span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 0%; background: var(--color-warning);"></div>
-                    </div>
-                </div>
-                <div class="debt-card-footer">
-                    <span>Interest paid: ₹1,200</span>
-                    <span>Pay in full ASAP</span>
-                </div>
-            </div>
+            <div id="debtsListContainer"></div>
         </div>
 
         <!-- Payoff Timeline -->
         <div class="timeline-section">
             <h3 class="section-title">Payoff Timeline</h3>
-            <div class="timeline-container">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-name">Credit Card (Axis) - Paid Off</div>
-                        <div class="timeline-date">April 2026 (2 weeks)</div>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-name">Credit Card (ICICI) - Paid Off</div>
-                        <div class="timeline-date">May 2026</div>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-name">Personal Loan - Paid Off</div>
-                        <div class="timeline-date">February 2028</div>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-name">Home Loan - Paid Off</div>
-                        <div class="timeline-date">April 2028</div>
-                    </div>
-                </div>
-            </div>
+            <div class="timeline-container" id="timelineContainer"></div>
         </div>
     </div>
 
@@ -1240,31 +990,160 @@
     <script src="fintrack-data.js"></script>
 <script src="fintrack-sync.js"></script>
 <script>
-        // Navigation
-        function goBack() {
-            window.location.href = 'MainMenu.html';
+        // ── Navigation ──────────────────────
+        function goBack() { window.location.href = 'MainMenu.html'; }
+        function navigateTo(page) { window.location.href = page; }
+
+        // ── Toast ───────────────────────────
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('active');
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => toast.classList.remove('active'), 3000);
         }
 
-        function navigateTo(page) {
-            window.location.href = page;
+        // ── Format helpers ──────────────────
+        function fmt(n) {
+            return new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', minimumFractionDigits:0, maximumFractionDigits:0 }).format(n);
+        }
+        function fmtDate(d) {
+            return new Date(d).toLocaleDateString('en-IN', { month:'short', day:'numeric', year:'numeric' });
         }
 
-        // Strategy Toggle
+        // ── Render overview card ────────────
+        function renderOverview(debts) {
+            const totalDebt = debts.reduce((s,d) => s + d.principal, 0);
+            const totalPaid = debts.reduce((s,d) => s + d.paid, 0);
+            const remaining = debts.reduce((s,d) => s + d.outstanding, 0);
+            const monthlyEMI = debts.reduce((s,d) => s + d.emi, 0);
+            const paidPct = totalDebt > 0 ? Math.round((totalPaid / totalDebt) * 100) : 0;
+            const circumference = 2 * Math.PI * 54; // r=54
+            const offset = circumference - (paidPct / 100) * circumference;
+
+            document.getElementById('overviewCard').innerHTML = `
+                <div class="overview-left">
+                    <div class="overview-stat"><span class="stat-label">Total Debt</span><span class="stat-value highlight">${fmt(totalDebt)}</span></div>
+                    <div class="overview-stat"><span class="stat-label">Total Paid</span><span class="stat-value">${fmt(totalPaid)}</span></div>
+                    <div class="overview-stat"><span class="stat-label">Remaining</span><span class="stat-value">${fmt(remaining)}</span></div>
+                    <div class="overview-stat"><span class="stat-label">Monthly EMI</span><span class="stat-value">${fmt(monthlyEMI)}</span></div>
+                </div>
+                <div class="overview-right">
+                    <div class="progress-ring-container">
+                        <svg class="progress-ring" viewBox="0 0 120 120">
+                            <circle class="progress-ring__circle" cx="60" cy="60" r="54" stroke-width="8" stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}"/>
+                            <circle class="progress-ring__circle progress" cx="60" cy="60" r="54" stroke-width="8" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"/>
+                        </svg>
+                        <div class="progress-text">
+                            <div class="progress-text-value">${paidPct}%</div>
+                            <div class="progress-text-label">Paid Off</div>
+                        </div>
+                    </div>
+                    <div class="overview-meta">${debts.length} active debt${debts.length !== 1 ? 's' : ''}</div>
+                </div>`;
+        }
+
+        // ── Render debt cards ───────────────
+        let currentStrategy = 'snowball';
+
+        function renderDebts() {
+            const debts = FT.getDebts();
+            // Sort by strategy
+            const sorted = [...debts].sort((a,b) => {
+                if (currentStrategy === 'snowball') return a.outstanding - b.outstanding;
+                return b.interestRate - a.interestRate;
+            });
+
+            renderOverview(debts);
+
+            const container = document.getElementById('debtsListContainer');
+            if (!sorted.length) {
+                container.innerHTML = '<p style="text-align:center;padding:24px;color:var(--text-secondary)">No debts tracked yet</p>';
+                document.getElementById('timelineContainer').innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = sorted.map((d, i) => {
+                const progress = d.principal > 0 ? ((d.paid / d.principal) * 100).toFixed(1) : 0;
+                const isOverdue = new Date(d.nextDue) <= new Date();
+                const emiLabel = d.type === 'credit-card' ? 'Min Payment' : 'EMI';
+                const tenureLabel = d.type === 'credit-card' ? 'Due Date' : 'Remaining Tenure';
+                const tenureValue = d.type === 'credit-card' ? fmtDate(d.nextDue) : d.tenure + ' months';
+
+                return `<div class="debt-card" onclick="openPaymentSheet('${d.id}')">
+                    <div class="debt-card-header">
+                        <div class="debt-card-title">
+                            <div class="debt-icon"><span class="material-symbols-rounded">${d.icon}</span></div>
+                            <div>
+                                <div>${d.name}</div>
+                                <div style="font-size:11px;color:var(--text-secondary);font-weight:400">${d.lender}</div>
+                            </div>
+                        </div>
+                        <div class="debt-priority">Priority ${i+1}</div>
+                    </div>
+                    <div class="debt-card-body">
+                        <div class="debt-detail"><span class="debt-detail-label">Outstanding</span><span class="debt-detail-value primary">${fmt(d.outstanding)}</span></div>
+                        <div class="debt-detail"><span class="debt-detail-label">Interest Rate</span><span class="debt-detail-value">${d.interestRate}% p.a.</span></div>
+                        <div class="debt-detail"><span class="debt-detail-label">${emiLabel}</span><span class="debt-detail-value">${fmt(d.emi)}/month</span></div>
+                        <div class="debt-detail"><span class="debt-detail-label">${tenureLabel}</span><span class="debt-detail-value">${tenureValue}</span></div>
+                    </div>
+                    <div class="debt-card-progress">
+                        <div class="progress-label">
+                            <span>Progress</span>
+                            <span>${isOverdue && d.type === 'credit-card' ? '<span class="badge-warning">OVERDUE</span>' : progress + '%'}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:${progress}%;${isOverdue ? 'background:var(--color-warning)' : ''}"></div>
+                        </div>
+                    </div>
+                    <div class="debt-card-footer">
+                        <span>Interest paid: ${fmt(d.interestPaid)}</span>
+                        <span>Next: ${fmtDate(d.nextDue)}</span>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Timeline: sort by estimated payoff (outstanding / emi)
+            const timeline = sorted.filter(d => d.outstanding > 0 && d.emi > 0).map(d => {
+                const monthsLeft = Math.ceil(d.outstanding / d.emi);
+                const payoffDate = new Date();
+                payoffDate.setMonth(payoffDate.getMonth() + monthsLeft);
+                return { name: d.name + ' (' + d.lender + ')', date: payoffDate, months: monthsLeft };
+            }).sort((a,b) => a.date - b.date);
+
+            document.getElementById('timelineContainer').innerHTML = timeline.map(t =>
+                `<div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-name">${t.name} - Paid Off</div>
+                        <div class="timeline-date">${t.date.toLocaleDateString('en-IN', {month:'long',year:'numeric'})} (${t.months} months)</div>
+                    </div>
+                </div>`
+            ).join('');
+        }
+
+        // ── Strategy Toggle ─────────────────
         function switchStrategy(strategy) {
+            currentStrategy = strategy;
             const buttons = document.querySelectorAll('.strategy-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             event.target.closest('.strategy-btn').classList.add('active');
 
-            const descElement = document.getElementById('strategyDesc');
-            if (strategy === 'snowball') {
-                descElement.textContent = 'Pay off smallest debts first to gain momentum and psychological wins. Great for motivation!';
-            } else {
-                descElement.textContent = 'Pay off highest interest debts first to minimize total interest paid. Mathematically optimal!';
-            }
+            document.getElementById('strategyDesc').textContent = strategy === 'snowball'
+                ? 'Pay off smallest debts first to gain momentum and psychological wins. Great for motivation!'
+                : 'Pay off highest interest debts first to minimize total interest paid. Mathematically optimal!';
+            renderDebts();
         }
 
-        // Add Debt Sheet
+        // ── Add Debt ────────────────────────
         function openAddDebtSheet() {
+            document.getElementById('debtType').value = '';
+            document.getElementById('debtName').value = '';
+            document.getElementById('debtPrincipal').value = '';
+            document.getElementById('debtRate').value = '';
+            document.getElementById('debtEMI').value = '';
+            document.getElementById('debtStartDate').value = '';
+            document.getElementById('debtTenure').value = '';
             document.getElementById('addDebtSheet').classList.add('active');
             document.getElementById('addDebtBackdrop').classList.add('active');
         }
@@ -1275,36 +1154,44 @@
         }
 
         function addDebt() {
-            const debtType = document.getElementById('debtType').value;
-            const debtName = document.getElementById('debtName').value;
+            const type = document.getElementById('debtType').value;
+            const name = document.getElementById('debtName').value.trim();
+            const principal = parseFloat(document.getElementById('debtPrincipal').value) || 0;
+            const rate = parseFloat(document.getElementById('debtRate').value) || 0;
+            const emi = parseFloat(document.getElementById('debtEMI').value) || 0;
+            const startDate = document.getElementById('debtStartDate').value || new Date().toISOString().slice(0,10);
+            const tenure = parseInt(document.getElementById('debtTenure').value) || 0;
 
-            if (!debtType || !debtName) {
-                showToast('Please fill in all required fields');
-                return;
-            }
+            if (!type || !name) { showToast('Please fill in required fields'); return; }
 
-            showToast(`${debtName} added successfully!`);
+            const icon = type === 'credit-card' ? 'credit_card' : type === 'loan' ? 'account_balance' : 'money';
+            FT.addDebt({
+                name, lender: '', type, icon, principal, outstanding: principal, paid: 0,
+                interestRate: rate, emi, tenure, startDate, interestPaid: 0,
+                nextDue: new Date(new Date().setMonth(new Date().getMonth()+1)).toISOString().slice(0,10)
+            });
+            showToast(name + ' added successfully!');
             closeAddDebtSheet();
-
-            // Reset form
-            document.getElementById('addDebtSheet').querySelector('form')?.reset();
+            renderDebts();
         }
 
-        // Payment Sheet
-        let currentDebtId = null;
-        const debtData = {
-            1: { name: 'Home Loan', balance: '₹4,20,000', emi: '22000' },
-            2: { name: 'Personal Loan', balance: '₹1,50,000', emi: '6500' },
-            3: { name: 'Credit Card (Axis)', balance: '₹10,663', emi: '534' },
-            4: { name: 'Credit Card (ICICI)', balance: '₹5,399', emi: '270' }
-        };
+        // ── Make Payment ────────────────────
+        let currentPayDebtId = null;
 
         function openPaymentSheet(debtId) {
-            currentDebtId = debtId;
-            const debt = debtData[debtId];
-            document.getElementById('paymentSheet').querySelector('.sheet-title').textContent = `Pay ${debt.name}`;
-            document.getElementById('paymentBalance').textContent = debt.balance;
+            const debt = FT.getDebts().find(d => d.id === debtId);
+            if (!debt) return;
+            currentPayDebtId = debtId;
+            document.getElementById('paymentSheet').querySelector('.sheet-title').textContent = 'Pay ' + debt.name;
+            document.getElementById('paymentBalance').textContent = fmt(debt.outstanding);
             document.getElementById('paymentAmount').value = debt.emi;
+
+            // Populate account dropdown from FT
+            const accounts = FT.getAccounts();
+            const sel = document.getElementById('paymentAccount');
+            sel.innerHTML = '<option value="">Select account</option>' +
+                accounts.map(a => '<option value="' + a.id + '">' + a.name + '</option>').join('');
+
             document.getElementById('paymentSheet').classList.add('active');
             document.getElementById('paymentBackdrop').classList.add('active');
         }
@@ -1314,55 +1201,32 @@
             document.getElementById('paymentBackdrop').classList.remove('active');
         }
 
-        function toggleExtraPayment() {
-            const extraPaymentCheckbox = document.getElementById('extraPayment');
-            // Can add extra UI changes here if needed
-        }
+        function toggleExtraPayment() {}
 
         function makePayment() {
-            const amount = document.getElementById('paymentAmount').value;
+            const amount = parseFloat(document.getElementById('paymentAmount').value) || 0;
             const account = document.getElementById('paymentAccount').value;
+            if (!amount || !account) { showToast('Please fill in all fields'); return; }
 
-            if (!amount || !account) {
-                showToast('Please fill in all fields');
-                return;
-            }
+            const debt = FT.getDebts().find(d => d.id === currentPayDebtId);
+            if (!debt) return;
 
-            const debt = debtData[currentDebtId];
-            showToast(`Payment of ₹${amount} scheduled for ${debt.name}`);
+            const newOutstanding = Math.max(0, debt.outstanding - amount);
+            const newPaid = debt.paid + amount;
+            FT.updateDebt(currentPayDebtId, { outstanding: newOutstanding, paid: newPaid });
+
+            // Deduct from selected account
+            const acc = FT.getAccounts().find(a => a.id === account);
+            if (acc) FT.updateAccount(account, { balance: acc.balance - amount });
+
+            showToast('Payment of ' + fmt(amount) + ' applied to ' + debt.name);
             closePaymentSheet();
+            renderDebts();
         }
 
-        // Toast Notification
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('active');
-
-            setTimeout(() => {
-                toast.classList.remove('active');
-            }, 3000);
-        }
-
-        // Initialize theme
+        // ── Init ────────────────────────────
         FTTheme.init();
-
-        // Close sheets on outside click
-        document.getElementById('addDebtBackdrop').addEventListener('click', closeAddDebtSheet);
-        document.getElementById('paymentBackdrop').addEventListener('click', closePaymentSheet);
-
-        // Prevent closing on inner sheet click
-        document.getElementById('addDebtSheet').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('addDebtSheet')) {
-                closeAddDebtSheet();
-            }
-        });
-
-        document.getElementById('paymentSheet').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('paymentSheet')) {
-                closePaymentSheet();
-            }
-        });
+        renderDebts();
     </script>
 
     <!-- Floating Nav Bar -->

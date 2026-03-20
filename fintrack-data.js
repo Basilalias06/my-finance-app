@@ -70,6 +70,28 @@ const DEFAULT_TEMPLATES = [
   {id:"tpl4",name:"Gym Membership",ty:"expense",a:1500,cat:"Health",acc:"Credit Card",note:"Monthly membership"},
 ];
 
+const DEFAULT_DEBTS = [
+  {id:"d1",name:"Home Loan",lender:"State Bank of India",type:"loan",icon:"home",principal:770000,outstanding:420000,paid:240000,interestRate:8.5,emi:22000,tenure:24,startDate:"2024-04-01",interestPaid:34500,nextDue:"2026-04-01"},
+  {id:"d2",name:"Personal Loan",lender:"HDFC Bank",type:"loan",icon:"account_balance",principal:200000,outstanding:150000,paid:50000,interestRate:12,emi:6500,tenure:23,startDate:"2024-05-01",interestPaid:8200,nextDue:"2026-04-05"},
+  {id:"d3",name:"Credit Card",lender:"Axis Bank",type:"credit-card",icon:"credit_card",principal:10663,outstanding:10663,paid:0,interestRate:42,emi:534,tenure:0,startDate:"2026-03-01",interestPaid:0,nextDue:"2026-03-17"},
+  {id:"d4",name:"Credit Card",lender:"ICICI Bank",type:"credit-card",icon:"credit_card",principal:5399,outstanding:5399,paid:0,interestRate:39.6,emi:270,tenure:0,startDate:"2026-03-01",interestPaid:1200,nextDue:"2026-03-17"},
+];
+
+const DEFAULT_SPLITS = [
+  {id:"sp1",desc:"Dinner at Barbeque Nation",total:4800,paidBy:"you",date:"2026-03-15",splitType:"equal",members:["you","Rahul","Priya","Amit"],shares:{you:1200,Rahul:1200,Priya:1200,Amit:1200}},
+  {id:"sp2",desc:"Grocery Run",total:2400,paidBy:"Amit",date:"2026-03-12",splitType:"equal",members:["you","Amit"],shares:{you:1200,Amit:1200}},
+  {id:"sp3",desc:"Movie Night",total:1500,paidBy:"you",date:"2026-03-10",splitType:"equal",members:["you","Priya"],shares:{you:750,Priya:750}},
+  {id:"sp4",desc:"Uber Pool",total:1200,paidBy:"Sneha",date:"2026-03-08",splitType:"equal",members:["you","Sneha"],shares:{you:600,Sneha:600}},
+];
+
+const DEFAULT_SPLIT_FRIENDS = [
+  {id:"sf1",name:"Rahul",phone:"",email:"",color:"#42A5F5"},
+  {id:"sf2",name:"Priya",phone:"",email:"",color:"#AB47BC"},
+  {id:"sf3",name:"Amit",phone:"",email:"",color:"#FF7043"},
+  {id:"sf4",name:"Sneha",phone:"",email:"",color:"#EC407A"},
+  {id:"sf5",name:"Vikram",phone:"",email:"",color:"#26A69A"},
+];
+
 const DEFAULT_SETTINGS = {
   theme: "dark",          // dark | light | system
   accentColor: "#80CBC4",
@@ -144,6 +166,25 @@ const FT = {
   updateGoal(id,d){ const a=this.getGoals().map(x=>x.id===id?{...x,...d}:x); this.setGoals(a); const updated=a.find(x=>x.id===id); this._sync("onUpdateGoal", id, updated); },
   deleteGoal(id)  { this.setGoals(this.getGoals().filter(x=>x.id!==id)); this._sync("onDeleteGoal", id); },
 
+  // ── Debts ────────────────────────────────
+  getDebts()      { return this._get("debts", DEFAULT_DEBTS); },
+  setDebts(arr)   { this._set("debts", arr); },
+  addDebt(d)      { const a=this.getDebts(); d.id="d"+Date.now(); a.push(d); this.setDebts(a); this._sync("onAddDebt", d); return d; },
+  updateDebt(id,d){ const a=this.getDebts().map(x=>x.id===id?{...x,...d}:x); this.setDebts(a); this._sync("onUpdateDebt", id, a.find(x=>x.id===id)); },
+  deleteDebt(id)  { this.setDebts(this.getDebts().filter(x=>x.id!==id)); this._sync("onDeleteDebt", id); },
+
+  // ── Split Expenses ─────────────────────────
+  getSplits()       { return this._get("splits", DEFAULT_SPLITS); },
+  setSplits(arr)    { this._set("splits", arr); },
+  addSplit(s)       { const a=this.getSplits(); s.id="sp"+Date.now(); a.unshift(s); this.setSplits(a); this._sync("onAddSplit", s); return s; },
+  updateSplit(id,d) { const a=this.getSplits().map(x=>x.id===id?{...x,...d}:x); this.setSplits(a); this._sync("onUpdateSplit", id, a.find(x=>x.id===id)); },
+  deleteSplit(id)   { this.setSplits(this.getSplits().filter(x=>x.id!==id)); this._sync("onDeleteSplit", id); },
+
+  getSplitFriends()       { return this._get("splitFriends", DEFAULT_SPLIT_FRIENDS); },
+  setSplitFriends(arr)    { this._set("splitFriends", arr); },
+  addSplitFriend(f)       { const a=this.getSplitFriends(); f.id="sf"+Date.now(); a.push(f); this.setSplitFriends(a); return f; },
+  deleteSplitFriend(id)   { this.setSplitFriends(this.getSplitFriends().filter(x=>x.id!==id)); },
+
   // ── Templates ─────────────────────────────
   getTemplates()      { return this._get("templates", DEFAULT_TEMPLATES); },
   setTemplates(arr)   { this._set("templates", arr); },
@@ -196,6 +237,9 @@ const FT = {
       accounts: this.getAccounts(),
       budgets: this.getBudgets(),
       goals: this.getGoals(),
+      debts: this.getDebts(),
+      splits: this.getSplits(),
+      splitFriends: this.getSplitFriends(),
       settings: this.getSettings(),
       exportedAt: new Date().toISOString()
     }, null, 2);
@@ -203,11 +247,14 @@ const FT = {
   importJSON(str) {
     try {
       const data = JSON.parse(str);
-      if(data.transactions) this.setTX(data.transactions);
-      if(data.accounts)     this.setAccounts(data.accounts);
-      if(data.budgets)      this.setBudgets(data.budgets);
-      if(data.goals)        this.setGoals(data.goals);
-      if(data.settings)     this._set("settings", {...this.getSettings(), ...data.settings});
+      if(data.transactions)  this.setTX(data.transactions);
+      if(data.accounts)      this.setAccounts(data.accounts);
+      if(data.budgets)       this.setBudgets(data.budgets);
+      if(data.goals)         this.setGoals(data.goals);
+      if(data.debts)         this.setDebts(data.debts);
+      if(data.splits)        this.setSplits(data.splits);
+      if(data.splitFriends)  this.setSplitFriends(data.splitFriends);
+      if(data.settings)      this._set("settings", {...this.getSettings(), ...data.settings});
       // Push everything to Supabase after import
       if(typeof FTSync !== "undefined") setTimeout(() => FTSync.pushAll().catch(()=>{}), 500);
       return true;
@@ -215,7 +262,7 @@ const FT = {
   },
   clearAll() {
     ["transactions","accounts","creditCards","budgets","goals","templates",
-     "settings","nwHistory","notifications"].forEach(k=>localStorage.removeItem("ft_"+k));
+     "debts","splits","splitFriends","settings","nwHistory","notifications"].forEach(k=>localStorage.removeItem("ft_"+k));
   },
 };
 
