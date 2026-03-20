@@ -738,20 +738,7 @@
     <!-- Main Content -->
     <div class="container">
         <!-- Balance Summary Card -->
-        <div class="balance-card">
-            <div class="balance-row">
-                <span class="balance-label">You are owed</span>
-                <span class="balance-amount owed">₹3,250</span>
-            </div>
-            <div class="balance-row">
-                <span class="balance-label">You owe</span>
-                <span class="balance-amount owes">₹1,800</span>
-            </div>
-            <div class="balance-row">
-                <span class="balance-label">Net Balance</span>
-                <span class="balance-amount net">+₹1,450</span>
-            </div>
-        </div>
+        <div class="balance-card" id="balanceCard"></div>
 
         <!-- Friends Section -->
         <div class="section">
@@ -761,209 +748,13 @@
                     <span class="material-symbols-rounded">add</span>
                 </button>
             </div>
-
-            <!-- Rahul -->
-            <div class="friend-card" onclick="toggleFriendHistory(this)">
-                <div class="friend-header">
-                    <div class="friend-avatar avatar-rahul">R</div>
-                    <div class="friend-info">
-                        <div class="friend-name">Rahul</div>
-                        <div class="friend-activity">Dinner split — Mar 15</div>
-                    </div>
-                    <div class="friend-amount">
-                        <div class="friend-amount__value owed">₹2,500</div>
-                        <div class="friend-amount__label">Owes you</div>
-                    </div>
-                </div>
-                <div class="friend-history">
-                    <div class="history-item">
-                        <span class="history-desc">Dinner at Barbeque Nation</span>
-                        <span class="history-amount">₹1,200</span>
-                    </div>
-                    <div class="history-item">
-                        <span class="history-desc">Restaurant bill split</span>
-                        <span class="history-amount">₹1,300</span>
-                    </div>
-                    <div class="divider"></div>
-                    <button class="button-primary" style="width: 100%; margin-top: 12px;" onclick="openSettleUp('Rahul', '₹2,500')">Settle up</button>
-                </div>
-            </div>
-
-            <!-- Priya -->
-            <div class="friend-card" onclick="toggleFriendHistory(this)">
-                <div class="friend-header">
-                    <div class="friend-avatar avatar-priya">P</div>
-                    <div class="friend-info">
-                        <div class="friend-name">Priya</div>
-                        <div class="friend-activity">Movie tickets — Mar 10</div>
-                    </div>
-                    <div class="friend-amount">
-                        <div class="friend-amount__value owed">₹750</div>
-                        <div class="friend-amount__label">Owes you</div>
-                    </div>
-                </div>
-                <div class="friend-history">
-                    <div class="history-item">
-                        <span class="history-desc">Movie Night</span>
-                        <span class="history-amount">₹750</span>
-                    </div>
-                    <div class="divider"></div>
-                    <button class="button-primary" style="width: 100%; margin-top: 12px;" onclick="openSettleUp('Priya', '₹750')">Settle up</button>
-                </div>
-            </div>
-
-            <!-- Amit -->
-            <div class="friend-card" onclick="toggleFriendHistory(this)">
-                <div class="friend-header">
-                    <div class="friend-avatar avatar-amit">A</div>
-                    <div class="friend-info">
-                        <div class="friend-name">Amit</div>
-                        <div class="friend-activity">Groceries — Mar 12</div>
-                    </div>
-                    <div class="friend-amount">
-                        <div class="friend-amount__value owes">₹1,200</div>
-                        <div class="friend-amount__label">You owe</div>
-                    </div>
-                </div>
-                <div class="friend-history">
-                    <div class="history-item">
-                        <span class="history-desc">Grocery Run</span>
-                        <span class="history-amount">₹1,200</span>
-                    </div>
-                    <div class="divider"></div>
-                    <button class="button-primary" style="width: 100%; margin-top: 12px;" onclick="openSettleUp('Amit', '₹1,200')">Settle up</button>
-                </div>
-            </div>
-
-            <!-- Sneha -->
-            <div class="friend-card" onclick="toggleFriendHistory(this)">
-                <div class="friend-header">
-                    <div class="friend-avatar avatar-sneha">S</div>
-                    <div class="friend-info">
-                        <div class="friend-name">Sneha</div>
-                        <div class="friend-activity">Uber ride — Mar 8</div>
-                    </div>
-                    <div class="friend-amount">
-                        <div class="friend-amount__value owes">₹600</div>
-                        <div class="friend-amount__label">You owe</div>
-                    </div>
-                </div>
-                <div class="friend-history">
-                    <div class="history-item">
-                        <span class="history-desc">Uber Pool</span>
-                        <span class="history-amount">₹600</span>
-                    </div>
-                    <div class="divider"></div>
-                    <button class="button-primary" style="width: 100%; margin-top: 12px;" onclick="openSettleUp('Sneha', '₹600')">Settle up</button>
-                </div>
-            </div>
-
-            <!-- Vikram -->
-            <div class="friend-card" onclick="toggleFriendHistory(this)">
-                <div class="friend-header">
-                    <div class="friend-avatar avatar-vikram">V</div>
-                    <div class="friend-info">
-                        <div class="friend-name">Vikram</div>
-                        <div class="friend-activity">Settled — Mar 5</div>
-                    </div>
-                    <div class="friend-amount">
-                        <div class="friend-amount__value settled">✓</div>
-                        <div class="friend-amount__label">Settled up</div>
-                    </div>
-                </div>
-                <div class="friend-history">
-                    <div class="history-item">
-                        <span class="history-desc">Previous splits settled</span>
-                        <span class="history-amount">₹0</span>
-                    </div>
-                </div>
-            </div>
+            <div id="friendsContainer"></div>
         </div>
 
         <!-- Recent Splits -->
         <div class="section">
             <div class="section__title">Recent Splits</div>
-
-            <div class="split-item">
-                <div class="split-header">
-                    <div>
-                        <div class="split-date">Mar 15, 2026</div>
-                        <div class="split-title">Dinner at Barbeque Nation</div>
-                    </div>
-                </div>
-                <div class="split-details">
-                    <div>Total: <span class="split-amount">₹4,800</span></div>
-                    <div>Paid by: You</div>
-                    <div>Split: 4 ways</div>
-                    <div>Your share: <span class="split-amount">₹1,650</span></div>
-                </div>
-            </div>
-
-            <div class="split-item">
-                <div class="split-header">
-                    <div>
-                        <div class="split-date">Mar 12, 2026</div>
-                        <div class="split-title">Grocery Run</div>
-                    </div>
-                </div>
-                <div class="split-details">
-                    <div>Total: <span class="split-amount">₹2,400</span></div>
-                    <div>Paid by: Amit</div>
-                    <div>Split: 2 ways</div>
-                    <div>Your share: <span class="split-amount">₹1,200</span></div>
-                </div>
-            </div>
-
-            <div class="split-item">
-                <div class="split-header">
-                    <div>
-                        <div class="split-date">Mar 10, 2026</div>
-                        <div class="split-title">Movie Night</div>
-                    </div>
-                </div>
-                <div class="split-details">
-                    <div>Total: <span class="split-amount">₹1,500</span></div>
-                    <div>Paid by: You</div>
-                    <div>Split: 2 ways</div>
-                    <div>Your share: <span class="split-amount">₹750</span></div>
-                </div>
-            </div>
-
-            <div class="split-item">
-                <div class="split-header">
-                    <div>
-                        <div class="split-date">Mar 8, 2026</div>
-                        <div class="split-title">Uber Pool</div>
-                    </div>
-                </div>
-                <div class="split-details">
-                    <div>Total: <span class="split-amount">₹1,200</span></div>
-                    <div>Paid by: Sneha</div>
-                    <div>Split: 2 ways</div>
-                    <div>Your share: <span class="split-amount">₹600</span></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Groups Section -->
-        <div class="section">
-            <div class="section__title">Groups</div>
-
-            <div class="group-card">
-                <div class="group-info">
-                    <div class="group-name">Weekend Crew</div>
-                    <div class="group-meta">4 members · 3 unsettled</div>
-                </div>
-                <div class="group-status unsettled">₹2,100</div>
-            </div>
-
-            <div class="group-card">
-                <div class="group-info">
-                    <div class="group-name">Roommates</div>
-                    <div class="group-meta">3 members</div>
-                </div>
-                <div class="group-status settled">✓</div>
-            </div>
+            <div id="splitsContainer"></div>
         </div>
     </div>
 
@@ -980,68 +771,22 @@
         <form onsubmit="handleAddSplit(event)">
             <div class="form-group">
                 <label class="form-label">Description</label>
-                <input class="form-input" type="text" placeholder="e.g., Dinner, Movie, Groceries" required>
+                <input class="form-input" type="text" id="splitDesc" placeholder="e.g., Dinner, Movie, Groceries" required>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Total Amount</label>
-                <input class="form-input" type="number" placeholder="₹0.00" min="0" step="0.01" required>
+                <input class="form-input" type="number" id="splitTotal" placeholder="0" min="0" step="1" required>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Paid By</label>
-                <div class="radio-group">
-                    <label class="radio-item">
-                        <input type="radio" name="paidBy" value="you" checked>
-                        <span class="radio-label">You</span>
-                    </label>
-                    <label class="radio-item">
-                        <input type="radio" name="paidBy" value="rahul">
-                        <span class="radio-label">Rahul</span>
-                    </label>
-                    <label class="radio-item">
-                        <input type="radio" name="paidBy" value="priya">
-                        <span class="radio-label">Priya</span>
-                    </label>
-                    <label class="radio-item">
-                        <input type="radio" name="paidBy" value="amit">
-                        <span class="radio-label">Amit</span>
-                    </label>
-                    <label class="radio-item">
-                        <input type="radio" name="paidBy" value="sneha">
-                        <span class="radio-label">Sneha</span>
-                    </label>
-                    <label class="radio-item">
-                        <input type="radio" name="paidBy" value="vikram">
-                        <span class="radio-label">Vikram</span>
-                    </label>
-                </div>
+                <div class="radio-group" id="paidByGroup"></div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Split Between</label>
-                <div class="checkbox-group">
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="rahul" checked>
-                        <span class="checkbox-label">Rahul</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="priya" checked>
-                        <span class="checkbox-label">Priya</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="amit" checked>
-                        <span class="checkbox-label">Amit</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="sneha" checked>
-                        <span class="checkbox-label">Sneha</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="vikram">
-                        <span class="checkbox-label">Vikram</span>
-                    </label>
-                </div>
+                <div class="checkbox-group" id="splitBetweenGroup"></div>
             </div>
 
             <div class="form-group">
@@ -1059,31 +804,6 @@
                         <input type="radio" name="splitType" value="percentage">
                         <span class="radio-label">Percentage</span>
                     </label>
-                </div>
-            </div>
-
-            <div id="unequalAmounts" style="display: none;">
-                <div class="divider"></div>
-                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Enter individual amounts:</p>
-                <div class="form-group">
-                    <label class="form-label">Rahul</label>
-                    <input class="form-input" type="number" placeholder="₹0.00" min="0" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Priya</label>
-                    <input class="form-input" type="number" placeholder="₹0.00" min="0" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Amit</label>
-                    <input class="form-input" type="number" placeholder="₹0.00" min="0" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Sneha</label>
-                    <input class="form-input" type="number" placeholder="₹0.00" min="0" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Vikram</label>
-                    <input class="form-input" type="number" placeholder="₹0.00" min="0" step="0.01">
                 </div>
             </div>
 
@@ -1183,103 +903,211 @@
     <script src="fintrack-data.js"></script>
 <script src="fintrack-sync.js"></script>
 <script>
-        // Navigation
-        function navigateToMainMenu() {
-            window.location.href = 'MainMenu.html';
-        }
+        // ── Navigation ──────────────────────
+        function navigateToMainMenu() { window.location.href = 'MainMenu.html'; }
 
-        // Add Split Functions
-        function openAddSplit() {
-            document.getElementById('addSplitSheet').classList.add('active');
-        }
-
-        function closeAddSplit() {
-            document.getElementById('addSplitSheet').classList.remove('active');
-        }
-
-        function handleAddSplit(event) {
-            event.preventDefault();
-            showToast('Split added successfully');
-            closeAddSplit();
-        }
-
-        // Settle Up Functions
-        function openSettleUp(name, amount) {
-            document.getElementById('settleAmount').textContent = amount;
-            document.getElementById('settleUpSheet').classList.add('active');
-        }
-
-        function closeSettleUp() {
-            document.getElementById('settleUpSheet').classList.remove('active');
-        }
-
-        function confirmSettleUp() {
-            showToast('Expense settled successfully');
-            closeSettleUp();
-        }
-
-        // Add Person Functions
-        function openAddPerson() {
-            document.getElementById('addPersonSheet').classList.add('active');
-        }
-
-        function closeAddPerson() {
-            document.getElementById('addPersonSheet').classList.remove('active');
-        }
-
-        function handleAddPerson(event) {
-            event.preventDefault();
-            showToast('Person added successfully');
-            closeAddPerson();
-        }
-
-        // Friend History Toggle
-        function toggleFriendHistory(element) {
-            element.classList.toggle('expanded');
-        }
-
-        // Split Type Toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            FTTheme.init();
-            const splitTypeRadios = document.querySelectorAll('input[name="splitType"]');
-            splitTypeRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const unequalSection = document.getElementById('unequalAmounts');
-                    if (this.value === 'unequal' || this.value === 'percentage') {
-                        unequalSection.style.display = 'block';
-                    } else {
-                        unequalSection.style.display = 'none';
-                    }
-                });
-            });
-        });
-
-        // Toast
+        // ── Toast ───────────────────────────
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // Close bottom sheets on outside click
-        document.addEventListener('click', function(event) {
-            const bottomSheets = document.querySelectorAll('.bottom-sheet');
-            bottomSheets.forEach(sheet => {
-                if (event.target === sheet) {
-                    sheet.classList.remove('active');
+        // ── Format helper ───────────────────
+        function fmt(n) {
+            return new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', minimumFractionDigits:0, maximumFractionDigits:0 }).format(Math.abs(n));
+        }
+
+        // ── Compute balances from splits ────
+        function computeBalances() {
+            const splits = FT.getSplits();
+            const balances = {}; // positive = they owe you, negative = you owe them
+
+            splits.forEach(sp => {
+                const yourShare = sp.shares && sp.shares['you'] ? sp.shares['you'] : 0;
+                if (sp.paidBy === 'you') {
+                    // Others owe you their share
+                    Object.entries(sp.shares || {}).forEach(([person, amount]) => {
+                        if (person !== 'you') {
+                            balances[person] = (balances[person] || 0) + amount;
+                        }
+                    });
+                } else {
+                    // You owe the payer your share
+                    balances[sp.paidBy] = (balances[sp.paidBy] || 0) - yourShare;
                 }
             });
-        });
+            return balances;
+        }
 
-        // Prevent closing when clicking inside bottom sheet
-        document.querySelectorAll('.bottom-sheet').forEach(sheet => {
-            sheet.addEventListener('click', function(event) {
-                event.stopPropagation();
-            });
-        });
+        // ── Render the page ─────────────────
+        function renderPage() {
+            const friends = FT.getSplitFriends();
+            const splits = FT.getSplits();
+            const balances = computeBalances();
+
+            // Balance card
+            let owed = 0, owes = 0;
+            Object.values(balances).forEach(v => { if (v > 0) owed += v; else owes += Math.abs(v); });
+            const net = owed - owes;
+            document.getElementById('balanceCard').innerHTML = `
+                <div class="balance-row"><span class="balance-label">You are owed</span><span class="balance-amount owed">${fmt(owed)}</span></div>
+                <div class="balance-row"><span class="balance-label">You owe</span><span class="balance-amount owes">${fmt(owes)}</span></div>
+                <div class="balance-row"><span class="balance-label">Net Balance</span><span class="balance-amount net">${net >= 0 ? '+' : '-'}${fmt(net)}</span></div>`;
+
+            // Friends
+            const friendsHtml = friends.map(f => {
+                const bal = balances[f.name] || 0;
+                const initial = f.name.charAt(0);
+                const amtClass = bal > 0 ? 'owed' : bal < 0 ? 'owes' : 'settled';
+                const label = bal > 0 ? 'Owes you' : bal < 0 ? 'You owe' : 'Settled up';
+                const amtDisplay = bal === 0 ? '&#10003;' : fmt(bal);
+
+                // Recent splits involving this friend
+                const friendSplits = splits.filter(sp =>
+                    sp.paidBy === f.name || (sp.shares && sp.shares[f.name] !== undefined)
+                );
+                const lastSplit = friendSplits[0];
+                const activity = lastSplit ? lastSplit.desc + ' — ' + new Date(lastSplit.date).toLocaleDateString('en-IN', {month:'short', day:'numeric'}) : 'No activity';
+
+                const historyHtml = friendSplits.slice(0, 3).map(sp =>
+                    `<div class="history-item"><span class="history-desc">${sp.desc}</span><span class="history-amount">${fmt(sp.shares && sp.shares[f.name] ? sp.shares[f.name] : sp.total)}</span></div>`
+                ).join('');
+
+                return `<div class="friend-card" onclick="toggleFriendHistory(this)">
+                    <div class="friend-header">
+                        <div class="friend-avatar" style="background:${f.color}">${initial}</div>
+                        <div class="friend-info">
+                            <div class="friend-name">${f.name}</div>
+                            <div class="friend-activity">${activity}</div>
+                        </div>
+                        <div class="friend-amount">
+                            <div class="friend-amount__value ${amtClass}">${amtDisplay}</div>
+                            <div class="friend-amount__label">${label}</div>
+                        </div>
+                    </div>
+                    <div class="friend-history">
+                        ${historyHtml || '<div class="history-item"><span class="history-desc">No splits yet</span><span class="history-amount">-</span></div>'}
+                        ${bal !== 0 ? '<div class="divider"></div><button class="button-primary" style="width:100%;margin-top:12px" onclick="event.stopPropagation();openSettleUp(\'' + f.name + '\',' + Math.abs(bal) + ')">Settle up</button>' : ''}
+                    </div>
+                </div>`;
+            }).join('');
+            document.getElementById('friendsContainer').innerHTML = friendsHtml || '<p style="text-align:center;padding:16px;color:var(--text-secondary)">No friends added yet</p>';
+
+            // Recent splits
+            document.getElementById('splitsContainer').innerHTML = splits.length ? splits.slice(0, 10).map(sp => {
+                const ways = sp.members ? sp.members.length : Object.keys(sp.shares || {}).length;
+                const yourShare = sp.shares && sp.shares['you'] ? sp.shares['you'] : 0;
+                return `<div class="split-item">
+                    <div class="split-header"><div>
+                        <div class="split-date">${new Date(sp.date).toLocaleDateString('en-IN', {month:'short', day:'numeric', year:'numeric'})}</div>
+                        <div class="split-title">${sp.desc}</div>
+                    </div></div>
+                    <div class="split-details">
+                        <div>Total: <span class="split-amount">${fmt(sp.total)}</span></div>
+                        <div>Paid by: ${sp.paidBy === 'you' ? 'You' : sp.paidBy}</div>
+                        <div>Split: ${ways} ways</div>
+                        <div>Your share: <span class="split-amount">${fmt(yourShare)}</span></div>
+                    </div>
+                </div>`;
+            }).join('') : '<p style="text-align:center;padding:16px;color:var(--text-secondary)">No splits yet</p>';
+        }
+
+        // ── Friend History Toggle ───────────
+        function toggleFriendHistory(element) {
+            element.classList.toggle('expanded');
+        }
+
+        // ── Add Split ───────────────────────
+        function openAddSplit() {
+            document.getElementById('splitDesc').value = '';
+            document.getElementById('splitTotal').value = '';
+            // Populate dynamic friend lists
+            const friends = FT.getSplitFriends();
+            document.getElementById('paidByGroup').innerHTML =
+                '<label class="radio-item"><input type="radio" name="paidBy" value="you" checked><span class="radio-label">You</span></label>' +
+                friends.map(f => '<label class="radio-item"><input type="radio" name="paidBy" value="' + f.name + '"><span class="radio-label">' + f.name + '</span></label>').join('');
+            document.getElementById('splitBetweenGroup').innerHTML =
+                friends.map(f => '<label class="checkbox-item"><input type="checkbox" value="' + f.name + '" checked><span class="checkbox-label">' + f.name + '</span></label>').join('');
+            document.getElementById('addSplitSheet').classList.add('active');
+        }
+
+        function closeAddSplit() { document.getElementById('addSplitSheet').classList.remove('active'); }
+
+        function handleAddSplit(event) {
+            event.preventDefault();
+            const desc = document.getElementById('splitDesc').value.trim();
+            const total = parseFloat(document.getElementById('splitTotal').value) || 0;
+            const paidBy = document.querySelector('input[name="paidBy"]:checked')?.value || 'you';
+            const checkedMembers = Array.from(document.querySelectorAll('#splitBetweenGroup input:checked')).map(cb => cb.value);
+            if (!desc || !total) { showToast('Please fill description and amount'); return; }
+
+            const members = ['you', ...checkedMembers];
+            const perPerson = Math.round(total / members.length);
+            const shares = {};
+            members.forEach(m => shares[m] = perPerson);
+
+            FT.addSplit({ desc, total, paidBy, date: new Date().toISOString().slice(0,10), splitType: 'equal', members, shares });
+            showToast('Split added successfully');
+            closeAddSplit();
+            renderPage();
+        }
+
+        // ── Settle Up ──────────────────────
+        let settlingName = null;
+        let settlingAmount = 0;
+
+        function openSettleUp(name, amount) {
+            settlingName = name;
+            settlingAmount = amount;
+            document.getElementById('settleAmount').textContent = fmt(amount);
+            document.getElementById('settleUpSheet').classList.add('active');
+        }
+
+        function closeSettleUp() { document.getElementById('settleUpSheet').classList.remove('active'); }
+
+        function confirmSettleUp() {
+            if (!settlingName) return;
+            // Add a settlement split that zeroes out the balance
+            const balances = computeBalances();
+            const bal = balances[settlingName] || 0;
+
+            if (bal > 0) {
+                // They owed you — they pay you
+                FT.addSplit({ desc: 'Settlement with ' + settlingName, total: Math.abs(bal), paidBy: settlingName, date: new Date().toISOString().slice(0,10), splitType: 'equal', members: ['you', settlingName], shares: { 'you': 0, [settlingName]: Math.abs(bal) } });
+            } else if (bal < 0) {
+                // You owed them — you pay them
+                FT.addSplit({ desc: 'Settlement with ' + settlingName, total: Math.abs(bal), paidBy: 'you', date: new Date().toISOString().slice(0,10), splitType: 'equal', members: ['you', settlingName], shares: { 'you': Math.abs(bal), [settlingName]: 0 } });
+            }
+            showToast('Settled up with ' + settlingName);
+            closeSettleUp();
+            renderPage();
+        }
+
+        // ── Add Person ──────────────────────
+        function openAddPerson() { document.getElementById('addPersonSheet').classList.add('active'); }
+        function closeAddPerson() { document.getElementById('addPersonSheet').classList.remove('active'); }
+
+        function handleAddPerson(event) {
+            event.preventDefault();
+            const inputs = document.querySelectorAll('#addPersonSheet .form-input');
+            const name = inputs[0].value.trim();
+            if (!name) { showToast('Please enter a name'); return; }
+
+            const colors = ['#42A5F5','#AB47BC','#FF7043','#EC407A','#26A69A','#FFA726','#66BB6A','#78909C'];
+            const color = colors[FT.getSplitFriends().length % colors.length];
+            FT.addSplitFriend({ name, phone: inputs[1]?.value || '', email: inputs[2]?.value || '', color });
+            inputs.forEach(i => i.value = '');
+            showToast(name + ' added');
+            closeAddPerson();
+            renderPage();
+        }
+
+        // ── Init ────────────────────────────
+        FTTheme.init();
+        renderPage();
     </script>
 <nav class="nav-bar">
   <button class="nav-item" onclick="location.href='MainMenu.html'" title="Home"><span class="material-symbols-rounded">home</span></button>
