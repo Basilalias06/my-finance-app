@@ -332,7 +332,7 @@ const FTInsights = {
     const lmExp = lastMonth.filter(t=>t.ty==="expense").reduce((s,t)=>s+t.a,0);
     if(lmExp > 0) {
       const pct = Math.round(((tmExp - lmExp) / lmExp) * 100);
-      if(pct > 10) insights.push({icon:"trending_up",color:"var(--exp)",text:`Spending up ${pct}% vs last month (₹${(tmExp-lmExp).toLocaleString('en-IN')})`});
+      if(pct > 10) insights.push({icon:"trending_up",color:"var(--exp)",text:`Spending up ${pct}% vs last month (${ftFmt(tmExp-lmExp)})`});
       else if(pct < -10) insights.push({icon:"trending_down",color:"var(--inc)",text:`Great! Spending down ${Math.abs(pct)}% vs last month`});
       else insights.push({icon:"trending_flat",color:"var(--tra)",text:`Spending is stable vs last month`});
     }
@@ -341,21 +341,21 @@ const FTInsights = {
     const cats = {};
     thisMonth.filter(t=>t.ty==="expense").forEach(t=>{ cats[t.cat]=(cats[t.cat]||0)+t.a; });
     const topCat = Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
-    if(topCat) insights.push({icon:"category",color:"var(--warn)",text:`Top spend: ${topCat[0]} — ₹${topCat[1].toLocaleString('en-IN')}`});
+    if(topCat) insights.push({icon:"category",color:"var(--warn)",text:`Top spend: ${topCat[0]} — ${ftFmt(topCat[1])}`});
 
     // Savings rate
     const tmInc = thisMonth.filter(t=>t.ty==="income").reduce((s,t)=>s+t.a,0);
     if(tmInc > 0) {
       const rate = Math.round(((tmInc - tmExp) / tmInc) * 100);
       if(rate > 0) insights.push({icon:"savings",color:"var(--inc)",text:`Savings rate this month: ${rate}%`});
-      else insights.push({icon:"warning",color:"var(--exp)",text:`Overspending! Expenses exceed income by ₹${Math.abs(tmInc-tmExp).toLocaleString('en-IN')}`});
+      else insights.push({icon:"warning",color:"var(--exp)",text:`Overspending! Expenses exceed income by ${ftFmt(Math.abs(tmInc-tmExp))}`});
     }
 
     // Budget alerts
     const budgets = FT.getBudgets();
     budgets.forEach(b => {
       const pct = b.limit > 0 ? (b.spent/b.limit)*100 : 0;
-      if(pct >= 90) insights.push({icon:"error",color:"var(--exp)",text:`${b.cat} budget at ${Math.round(pct)}% — only ₹${(b.limit-b.spent).toLocaleString('en-IN')} left`});
+      if(pct >= 90) insights.push({icon:"error",color:"var(--exp)",text:`${b.cat} budget at ${Math.round(pct)}% — only ${ftFmt(b.limit-b.spent)} left`});
     });
 
     return insights.slice(0, 5);
@@ -432,16 +432,33 @@ function ftToast(msg, type="info", dur=2800) {
 }
 
 // ─────────────────────────────────────────────
+//  CURRENCY CONFIG
+// ─────────────────────────────────────────────
+const FT_CURRENCIES = {
+  INR: { symbol: "₹", locale: "en-IN", code: "INR" },
+  USD: { symbol: "$", locale: "en-US", code: "USD" },
+  EUR: { symbol: "€", locale: "de-DE", code: "EUR" },
+  GBP: { symbol: "£", locale: "en-GB", code: "GBP" },
+};
+
+function ftGetCurrency() {
+  const code = FT.getSetting("currency") || "INR";
+  return FT_CURRENCIES[code] || FT_CURRENCIES.INR;
+}
+
+// ─────────────────────────────────────────────
 //  FORMAT HELPERS
 // ─────────────────────────────────────────────
 function ftFmt(n) {
-  return "₹" + Number(n).toLocaleString("en-IN", {minimumFractionDigits:2, maximumFractionDigits:2});
+  const c = ftGetCurrency();
+  return c.symbol + Number(n).toLocaleString(c.locale, {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 function ftFmtShort(n) {
+  const c = ftGetCurrency();
   n = Number(n);
-  if(Math.abs(n) >= 1e5) return "₹" + (n/1e5).toFixed(1) + "L";
-  if(Math.abs(n) >= 1e3) return "₹" + (n/1e3).toFixed(1) + "K";
-  return "₹" + n.toFixed(0);
+  if(Math.abs(n) >= 1e5) return c.symbol + (n/1e5).toFixed(1) + "L";
+  if(Math.abs(n) >= 1e3) return c.symbol + (n/1e3).toFixed(1) + "K";
+  return c.symbol + n.toFixed(0);
 }
 function ftFmtDate(d) {
   return new Date(d).toLocaleDateString("en-IN", {day:"numeric",month:"short",year:"numeric"});
