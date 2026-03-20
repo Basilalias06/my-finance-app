@@ -18,20 +18,26 @@
 // ─────────────────────────────────────────────
 //  !! CONFIGURE YOUR PROJECT HERE !!
 // ─────────────────────────────────────────────
-const SUPABASE_URL      = "https://YOUR_PROJECT_ID.supabase.co";   // ← paste yours
-const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";                          // ← paste yours
+const SUPABASE_URL      = (window.FTConfig && window.FTConfig.supabase && window.FTConfig.supabase.url) || "https://YOUR_PROJECT_ID.supabase.co";
+const SUPABASE_ANON_KEY = (window.FTConfig && window.FTConfig.supabase && window.FTConfig.supabase.anonKey) || "YOUR_ANON_KEY"
 // ─────────────────────────────────────────────
 
 const FTSync = (() => {
 
   // ── Device identity ──────────────────────────
   function getDeviceId() {
-    let id = localStorage.getItem("ft_device_id");
+    const sessionUser = (window.FTAuth && FTAuth.currentUser && FTAuth.currentUser()) || null;
+    const key = sessionUser ? "ft_device_id_" + sessionUser.email : "ft_device_id";
+    let id = localStorage.getItem(key);
     if (!id) {
       id = "dev_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 10);
-      localStorage.setItem("ft_device_id", id);
+      localStorage.setItem(key, id);
     }
     return id;
+  }
+
+  function isConfigured() {
+    return SUPABASE_URL && SUPABASE_ANON_KEY && !SUPABASE_URL.includes("YOUR_PROJECT_ID") && SUPABASE_ANON_KEY !== "YOUR_ANON_KEY";
   }
 
   const DEVICE_ID = getDeviceId();
@@ -61,10 +67,12 @@ const FTSync = (() => {
       "apikey": SUPABASE_ANON_KEY,
       "Authorization": "Bearer " + SUPABASE_ANON_KEY,
       "x-device-id": DEVICE_ID,
+      "x-user-email": (window.FTAuth && FTAuth.currentUser() ? FTAuth.currentUser().email : "anonymous"),
       "Prefer": method === "POST" ? "return=representation" : "return=minimal",
     };
     const opts = { method, headers };
     if (body !== null) opts.body = JSON.stringify(body);
+    if (!isConfigured()) throw new Error("Supabase is not configured. Add FTConfig.supabase.url and FTConfig.supabase.anonKey.");
     const res = await fetch(SUPABASE_URL + "/rest/v1/" + path, opts);
     if (!res.ok) {
       const err = await res.text().catch(() => res.statusText);

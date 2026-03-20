@@ -57,9 +57,15 @@ You should see "Success. No rows returned" — this means all tables were create
 
 ---
 
-## Step 4 — Add your keys to fintrack-sync.js
+## Step 4 — Add your keys through `FTConfig` or directly in `fintrack-sync.js`
 
-Open `fintrack-sync.js` and replace lines 16–17 at the top:
+Preferred approach:
+
+1. Copy `fintrack-config.example.js` to `fintrack-config.js`
+2. Set `window.FTConfig.supabase.url` and `window.FTConfig.supabase.anonKey`
+3. Include that file before `fintrack-sync.js` on pages where you want environment-based config
+
+Fallback approach: open `fintrack-sync.js` and replace the placeholder values at the top:
 
 ```js
 // BEFORE:
@@ -158,3 +164,8 @@ When there's no internet:
 **CORS error in console**
 - Make sure you're using the `anon` public key (not the `service_role` secret key)
 - The anon key is safe to use in browser JavaScript
+
+
+## Authentication note
+
+This project now includes `Login.html` and `Signup.html` for local session handling inside the app. Supabase Auth can still be added later for full hosted multi-device identity, but the current upgrade already supports authenticated app entry and app-lock protection.

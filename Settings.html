@@ -13,6 +13,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
   <script src="fintrack-data.js"></script>
 <script src="fintrack-sync.js"></script>
+<script src="fintrack-validation.js"></script>
+<script src="fintrack-auth.js"></script>
+<script src="fintrack-ui.js"></script>
   <style>
     * {
       margin: 0;
@@ -1270,6 +1273,7 @@
       loadThemePreference();
       loadCurrencyPreference();
       loadAccentColorPreference();
+      mountSecurityEnhancements();
     });
 
     function showToast(message) {
@@ -1398,12 +1402,21 @@
       const biometricToggle = biometricRow.querySelector('.toggle');
 
       if (isOn) {
+        FTAuth.clearPasscode();
+        sessionStorage.removeItem('ft_unlock_ok');
         button.classList.remove('on');
         button.setAttribute('data-state', 'off');
         biometricRow.classList.add('disabled');
         biometricToggle.disabled = true;
         showToast('App lock disabled');
       } else {
+        const passcode = prompt('Set a 4-digit app passcode');
+        if (!passcode || !/^\d{4}$/.test(passcode)) {
+          showToast('Passcode must be 4 digits');
+          return;
+        }
+        FTAuth.setPasscode(passcode);
+        sessionStorage.setItem('ft_unlock_ok', '1');
         button.classList.add('on');
         button.setAttribute('data-state', 'on');
         biometricRow.classList.remove('disabled');
@@ -1427,12 +1440,18 @@
     }
 
     function exportData(format) {
+      if (FTAuth && FTAuth.appLockEnabled() && sessionStorage.getItem('ft_unlock_ok') !== '1') {
+        showToast('Unlock the app before exporting data');
+        return;
+      }
       if (format === 'csv') {
         const csv = FT.exportCSV();
         downloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), 'fintrack-export.csv');
       } else if (format === 'json') {
+        const protect = confirm('Protect this JSON export with your app passcode?');
         const json = FT.exportJSON();
-        downloadFile(new Blob([json], { type: 'application/json;charset=utf-8;' }), 'fintrack-export.json');
+        const payload = protect ? JSON.stringify({ protected: true, data: btoa(unescape(encodeURIComponent(json))) }, null, 2) : json;
+        downloadFile(new Blob([payload], { type: 'application/json;charset=utf-8;' }), 'fintrack-export.json');
       }
       showToast('Exported successfully ✓');
     }
@@ -1452,7 +1471,12 @@
         const file = e.target.files[0]; if(!file) return;
         const reader = new FileReader();
         reader.onload = ev => {
-          const ok = FT.importJSON(ev.target.result);
+          let payload = ev.target.result;
+          try {
+            const parsed = JSON.parse(payload);
+            if (parsed && parsed.protected && parsed.data) payload = decodeURIComponent(escape(atob(parsed.data)));
+          } catch(err) {}
+          const ok = FT.importJSON(payload);
           showToast(ok ? 'Data imported successfully ✓' : 'Import failed — invalid file format');
         };
         reader.readAsText(file);
@@ -1470,10 +1494,15 @@
     }
 
     function confirmClearData() {
+      if (FTAuth && FTAuth.appLockEnabled() && sessionStorage.getItem('ft_unlock_ok') !== '1') {
+        showToast('Unlock the app before clearing data');
+        return;
+      }
       FT.clearAll();
+      FTAuth && FTAuth.signOut();
       showToast('All data has been cleared');
       closeModal();
-      setTimeout(() => location.href = 'Onboarding.html', 800);
+      setTimeout(() => location.href = 'Signup.html', 800);
     }
 
     // ── Budget Rollover ───────────────────────
@@ -1497,7 +1526,30 @@
         rolloverEl.classList.toggle('on', isOn);
         rolloverEl.setAttribute('data-state', isOn ? 'on' : 'off');
       }
+      const lockToggle = document.querySelector('[onclick="toggleAppLock(this)"]');
+      if(lockToggle) {
+        const lockOn = !!FT.getSetting('appLockEnabled');
+        lockToggle.classList.toggle('on', lockOn);
+        lockToggle.setAttribute('data-state', lockOn ? 'on' : 'off');
+      }
     })();
+
+    function mountSecurityEnhancements(){
+      const container = document.querySelector('.settings-container');
+      if (!container || document.getElementById('account-security-card')) return;
+      const user = FTAuth && FTAuth.currentUser ? FTAuth.currentUser() : null;
+      const section = document.createElement('div');
+      section.className = 'settings-section';
+      section.id = 'account-security-card';
+      section.innerHTML = `<div class="section-header"><span class="material-symbols-rounded">manage_accounts</span><h2>Account</h2></div><div class="section-content"><div class="setting-row"><div class="setting-icon"><span class="material-symbols-rounded">person</span></div><div class="setting-content"><div class="setting-label">Signed in as</div><p class="setting-description">${user ? user.name + ' • ' + user.email : 'No active session'}</p></div><div class="setting-control"><button class="btn btn-secondary" onclick="logoutUser()" style="min-width: 90px;">Logout</button></div></div></div>`;
+      container.insertBefore(section, container.lastElementChild);
+    }
+
+    function logoutUser(){
+      FTAuth.signOut();
+      sessionStorage.removeItem('ft_unlock_ok');
+      location.href = 'Login.html';
+    }
 
     function capitalizeFirst(str) {
       return str.charAt(0).toUpperCase() + str.slice(1);
