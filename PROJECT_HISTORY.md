@@ -675,3 +675,22 @@ All HTML Pages
 |------|---------|
 | `Onboarding.html` | Added `.light-theme` CSS variables and element overrides; removed hardcoded dark radial gradient from body |
 | `MainMenu.html` | Changed greeting from hardcoded "Darko" to dynamic `FT.getSetting('userName')` with fallback |
+
+**Bug 3 — Onboarding.html: Layout and AMOLED theme overhaul**
+- The onboarding screen had large empty space at the top, content was not vertically centered on mobile.
+- The `theme-color` meta tag was `#1a1d27` instead of true AMOLED black `#000000`.
+- Surface colors (`--s2:#141414`) were too bright for AMOLED dark look.
+- The last slide had hardcoded "Darko" in the greeting instead of defaulting to "there".
+- **Fix:** Complete redesign of Onboarding.html:
+  - Set `theme-color` to `#000000` for AMOLED black status bar.
+  - Updated CSS variables: `--bg:#000000`, `--s2:#111111`, `--s3:#1A1A1A` for true AMOLED dark surfaces.
+  - Added `min-height:100dvh` for proper mobile viewport centering.
+  - Set `html` and `body` background to `#000000` explicitly to prevent any white flash.
+  - Improved spacing, padding, and font sizes for better mobile layout.
+  - Default name display changed from "Darko" to "there".
+  - Light theme uses `--s1:#FFFFFF` for card backgrounds (cleaner contrast).
+  - Dark theme description updated to "AMOLED black".
+
+| File | Changes |
+|------|---------|
+| `Onboarding.html` | Complete AMOLED dark theme redesign; fixed layout centering; updated theme-color meta; fixed default name |

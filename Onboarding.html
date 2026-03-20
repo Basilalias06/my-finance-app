@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1a1d27">
+<meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -16,53 +16,75 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#000;--s1:#0A0A0A;--s2:#141414;--s3:#1E1E1E;--s4:#282828;
-  --ol:#333;--olv:#222;
-  --txt:#EAEAEA;--txt2:#B8B8B8;--txt3:#6E6E6E;
-  --pri:#7ECEC6;--exp:#E88E8E;--inc:#96CC98;--warn:#E8B06E;
+  --bg:#000000;--s1:#0A0A0A;--s2:#111111;--s3:#1A1A1A;--s4:#222222;--s5:#2A2A2A;
+  --ol:#333;--olv:#1C1C1C;
+  --txt:#EAEAEA;--txt2:#B0B0B0;--txt3:#666;
+  --pri:#80CBC4;--pri-dim:rgba(128,203,196,0.08);--pri-glow:rgba(128,203,196,0.25);
+  --exp:#E88E8E;--inc:#96CC98;--warn:#E8B06E;
   --r-sm:12px;--r-md:16px;--r-lg:20px;--r-xl:24px;--r-full:100px;
 }
-body{
+html,body{
   font-family:'Google Sans Text','Google Sans',system-ui,sans-serif;
-  background:var(--bg);color:var(--txt);min-height:100vh;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  -webkit-font-smoothing:antialiased;padding:20px;
+  background:#000000;color:var(--txt);
+  min-height:100vh;min-height:100dvh;
+  margin:0;padding:0;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
 }
-.ob-wrap{width:100%;max-width:420px}
+body{
+  display:flex;align-items:center;justify-content:center;
+  padding:24px 20px;
+}
+
+.ob-wrap{
+  width:100%;max-width:400px;
+  display:flex;flex-direction:column;align-items:center;
+}
+
+/* ── Progress dots ── */
+.ob-dots{display:flex;gap:6px;margin-bottom:32px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--s4);transition:all .3s}
+.dot.active{width:24px;border-radius:4px;background:var(--pri)}
+.dot.done{background:rgba(128,203,196,0.35)}
 
 /* ── Slide container ── */
-.slide{display:none;flex-direction:column;align-items:center;text-align:center;animation:fadeUp .4s ease}
+.slide{display:none;flex-direction:column;align-items:center;text-align:center;animation:fadeUp .4s ease;width:100%}
 .slide.active{display:flex}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── Slide 1: Welcome ── */
+/* ── Logo ── */
 .ob-logo{
-  width:80px;height:80px;border-radius:var(--r-xl);
-  background:linear-gradient(135deg,var(--pri),#5FB8AE);
+  width:88px;height:88px;border-radius:var(--r-xl);
+  background:linear-gradient(135deg,#80CBC4,#4DB6AC);
   display:flex;align-items:center;justify-content:center;
-  font-size:40px;margin-bottom:24px;
-  box-shadow:0 12px 40px rgba(126,206,198,0.3);
+  font-size:44px;margin-bottom:28px;
+  box-shadow:0 16px 48px rgba(128,203,196,0.2);
 }
+
+/* ── Title ── */
 .ob-title{
   font-family:'Google Sans',sans-serif;font-size:28px;font-weight:700;
-  letter-spacing:-0.8px;margin-bottom:10px;
-  background:linear-gradient(135deg,var(--pri),#A8E6CF);
+  letter-spacing:-0.5px;margin-bottom:10px;
+  background:linear-gradient(135deg,#80CBC4,#A8E6CF);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.ob-sub{font-size:15px;color:var(--txt2);line-height:1.6;max-width:320px}
+.ob-sub{font-size:15px;color:var(--txt2);line-height:1.6;max-width:320px;margin-bottom:4px}
 
-/* ── Feature pills ── */
+/* ── Feature grid ── */
 .feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:24px 0 0;width:100%}
 .feat-item{
-  padding:14px;border-radius:var(--r-md);
+  padding:16px;border-radius:var(--r-md);
   background:var(--s2);border:1px solid var(--olv);text-align:left;
 }
-.feat-ico{font-size:22px;margin-bottom:6px}
-.feat-l{font-size:12px;font-weight:600;color:var(--txt);margin-bottom:2px}
+.feat-ico{font-size:24px;margin-bottom:8px}
+.feat-l{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:3px}
 .feat-d{font-size:11px;color:var(--txt3);line-height:1.4}
 
-/* ── Slide 2: Name ── */
-.ob-name-field{width:100%;margin:20px 0}
+/* ── Slide emoji header ── */
+.slide-emoji{font-size:52px;margin-bottom:20px}
+
+/* ── Name input ── */
+.ob-name-field{width:100%;margin:24px 0}
 .ob-input{
   width:100%;padding:16px 18px;border-radius:var(--r-md);
   background:var(--s2);border:1.5px solid var(--olv);
@@ -72,33 +94,33 @@ body{
 .ob-input:focus{border-color:var(--pri)}
 .ob-input::placeholder{color:var(--txt3)}
 
-/* ── Slide 3: Theme ── */
-.theme-row{display:flex;gap:10px;margin:20px 0;width:100%}
+/* ── Theme cards ── */
+.theme-row{display:flex;gap:10px;margin:24px 0;width:100%}
 .theme-card{
   flex:1;padding:18px 12px;border-radius:var(--r-lg);
   background:var(--s2);border:2px solid var(--olv);
   cursor:pointer;transition:all .2s;text-align:center;
 }
 .theme-card:hover{border-color:var(--ol)}
-.theme-card.selected{border-color:var(--pri);background:rgba(126,206,198,0.06)}
+.theme-card.selected{border-color:var(--pri);background:var(--pri-dim)}
 .theme-ico{font-size:28px;margin-bottom:8px}
 .theme-l{font-size:13px;font-weight:600;color:var(--txt)}
-.theme-d{font-size:11px;color:var(--txt3);margin-top:2px}
+.theme-d{font-size:11px;color:var(--txt3);margin-top:4px}
 .theme-check{
   width:20px;height:20px;border-radius:50%;border:2px solid var(--olv);
-  margin:8px auto 0;transition:all .2s;
+  margin:10px auto 0;transition:all .2s;
 }
 .theme-card.selected .theme-check{background:var(--pri);border-color:var(--pri)}
 
-/* ── Slide 4: Currency ── */
-.currency-grid{display:flex;flex-direction:column;gap:8px;margin:20px 0;width:100%}
+/* ── Currency options ── */
+.currency-grid{display:flex;flex-direction:column;gap:8px;margin:24px 0;width:100%}
 .currency-opt{
   display:flex;align-items:center;gap:14px;padding:14px 16px;
   border-radius:var(--r-md);background:var(--s2);border:2px solid var(--olv);
   cursor:pointer;transition:all .2s;
 }
 .currency-opt:hover{border-color:var(--ol)}
-.currency-opt.selected{border-color:var(--pri);background:rgba(126,206,198,0.06)}
+.currency-opt.selected{border-color:var(--pri);background:var(--pri-dim)}
 .currency-flag{font-size:22px}
 .currency-info{flex:1;text-align:left}
 .currency-name{font-size:14px;font-weight:600;color:var(--txt)}
@@ -106,20 +128,20 @@ body{
 .currency-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--olv);margin-left:auto;transition:all .2s}
 .currency-opt.selected .currency-radio{background:var(--pri);border-color:var(--pri)}
 
-/* ── Slide 5: Ready ── */
-.ready-icon{font-size:60px;margin-bottom:16px}
-.stat-row{display:flex;gap:10px;margin:20px 0;width:100%}
+/* ── Ready slide ── */
+.ready-icon{font-size:64px;margin-bottom:20px}
+.stat-row{display:flex;gap:10px;margin:24px 0;width:100%}
 .stat-c{
-  flex:1;padding:14px;border-radius:var(--r-md);
+  flex:1;padding:16px;border-radius:var(--r-md);
   background:var(--s2);border:1px solid var(--olv);text-align:center;
 }
-.stat-v{font-size:20px;font-weight:700;color:var(--pri);font-family:'JetBrains Mono',monospace}
-.stat-l{font-size:11px;color:var(--txt3);margin-top:2px}
+.stat-v{font-size:22px;font-weight:700;color:var(--pri);font-family:'JetBrains Mono',monospace}
+.stat-l{font-size:11px;color:var(--txt3);margin-top:4px}
 
-/* ── Navigation ── */
+/* ── Navigation buttons ── */
 .ob-nav{
   display:flex;align-items:center;justify-content:space-between;
-  margin-top:28px;width:100%;gap:12px;
+  margin-top:32px;width:100%;gap:12px;
 }
 .ob-btn{
   flex:1;padding:16px 24px;border-radius:var(--r-full);border:none;
@@ -127,34 +149,29 @@ body{
   cursor:pointer;transition:all .25s;
 }
 .ob-btn-pri{
-  background:linear-gradient(135deg,var(--pri),#5FB8AE);
-  color:#003731;box-shadow:0 6px 24px rgba(126,206,198,0.25);
+  background:linear-gradient(135deg,#80CBC4,#4DB6AC);
+  color:#00201E;box-shadow:0 6px 24px var(--pri-glow);
 }
-.ob-btn-pri:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(126,206,198,0.35)}
+.ob-btn-pri:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(128,203,196,0.35)}
+.ob-btn-pri:active{transform:translateY(0)}
 .ob-btn-sec{background:var(--s2);color:var(--txt2);border:1px solid var(--olv);flex:0.5}
 .ob-btn-sec:hover{background:var(--s3)}
 
-/* ── Progress dots ── */
-.ob-dots{display:flex;gap:6px;margin-bottom:20px}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--s4);transition:all .3s}
-.dot.active{width:24px;border-radius:4px;background:var(--pri)}
-.dot.done{background:rgba(126,206,198,0.4)}
-
 /* ── Light theme ── */
 .light-theme{
-  --bg:#F5F5F5;--s1:#FFFFFF;--s2:#F0F0F0;--s3:#E8E8E8;--s4:#E0E0E0;
+  --bg:#F5F5F5;--s1:#FFFFFF;--s2:#F0F0F0;--s3:#E8E8E8;--s4:#E0E0E0;--s5:#D8D8D8;
   --ol:#DDDDDD;--olv:#E8E8E8;
   --txt:#1A1A1A;--txt2:#444;--txt3:#888;
+  --pri-dim:rgba(128,203,196,0.1);
 }
-.light-theme body,.light-theme{
-  background:var(--bg);color:var(--txt);
-}
-.light-theme .ob-input{background:var(--s2);border-color:var(--olv);color:var(--txt)}
+.light-theme,.light-theme body{background:var(--bg)!important;color:var(--txt)}
+.light-theme .ob-input{background:var(--s1);border-color:var(--olv);color:var(--txt)}
 .light-theme .ob-input::placeholder{color:var(--txt3)}
 .light-theme .feat-item,.light-theme .theme-card,.light-theme .currency-opt,.light-theme .stat-c{
-  background:var(--s2);border-color:var(--olv);
+  background:var(--s1);border-color:var(--olv);
 }
-.light-theme .ob-btn-sec{background:var(--s2);color:var(--txt2);border-color:var(--olv)}
+.light-theme .ob-btn-sec{background:var(--s1);color:var(--txt2);border-color:var(--olv)}
+.light-theme .ob-btn-pri{color:#00201E}
 .light-theme .ob-sub{color:var(--txt2)}
 .light-theme .feat-l,.light-theme .theme-l,.light-theme .currency-name{color:var(--txt)}
 .light-theme .feat-d,.light-theme .theme-d,.light-theme .currency-sym,.light-theme .stat-l{color:var(--txt3)}
@@ -192,7 +209,7 @@ body{
 
   <!-- Slide 1: Name -->
   <div class="slide" id="slide1">
-    <div style="font-size:48px;margin-bottom:16px">👋</div>
+    <div class="slide-emoji">👋</div>
     <div class="ob-title" style="font-size:24px">What's your name?</div>
     <div class="ob-sub">We'll use this to personalize your dashboard greetings.</div>
     <div class="ob-name-field">
@@ -206,14 +223,14 @@ body{
 
   <!-- Slide 2: Theme -->
   <div class="slide" id="slide2">
-    <div style="font-size:48px;margin-bottom:16px">🎨</div>
+    <div class="slide-emoji">🎨</div>
     <div class="ob-title" style="font-size:24px">Choose your theme</div>
     <div class="ob-sub">Pick how FinTrack looks. You can change this anytime in Settings.</div>
     <div class="theme-row">
       <div class="theme-card selected" id="theme-dark" onclick="selectTheme('dark')">
         <div class="theme-ico">🌙</div>
         <div class="theme-l">Dark</div>
-        <div class="theme-d">Easy on the eyes</div>
+        <div class="theme-d">AMOLED black</div>
         <div class="theme-check"></div>
       </div>
       <div class="theme-card" id="theme-light" onclick="selectTheme('light')">
@@ -225,7 +242,7 @@ body{
       <div class="theme-card" id="theme-system" onclick="selectTheme('system')">
         <div class="theme-ico">📱</div>
         <div class="theme-l">System</div>
-        <div class="theme-d">Follows your device</div>
+        <div class="theme-d">Follows device</div>
         <div class="theme-check"></div>
       </div>
     </div>
@@ -237,7 +254,7 @@ body{
 
   <!-- Slide 3: Currency -->
   <div class="slide" id="slide3">
-    <div style="font-size:48px;margin-bottom:16px">💵</div>
+    <div class="slide-emoji">💵</div>
     <div class="ob-title" style="font-size:24px">Select currency</div>
     <div class="ob-sub">Choose your primary currency for all transactions and reports.</div>
     <div class="currency-grid">
@@ -271,7 +288,7 @@ body{
   <!-- Slide 4: All set! -->
   <div class="slide" id="slide4">
     <div class="ready-icon">🎉</div>
-    <div class="ob-title" style="font-size:24px">You're all set, <span id="ob-name-display">Darko</span>!</div>
+    <div class="ob-title" style="font-size:24px">You're all set, <span id="ob-name-display">there</span>!</div>
     <div class="ob-sub">FinTrack is ready with sample data to explore. Add your real transactions anytime.</div>
     <div class="stat-row">
       <div class="stat-c"><div class="stat-v" id="stat-tx">20</div><div class="stat-l">Transactions</div></div>
@@ -330,7 +347,6 @@ function selectCurrency(c){
 }
 
 function finishOnboarding(){
-  // Save all settings
   FT.setSetting('theme', selectedTheme);
   FT.setSetting('currency', selectedCurrency);
   FT.setSetting('onboardingDone', true);
@@ -340,14 +356,13 @@ function finishOnboarding(){
   location.href='MainMenu.html';
 }
 
-// Pre-fill stat counts
 function loadStats(){
   document.getElementById('stat-tx').textContent = FT.getTX().length;
   document.getElementById('stat-acc').textContent = FT.getAccounts().length;
   document.getElementById('stat-goals').textContent = FT.getGoals().length;
 }
 
-// Init
+// Init — force dark theme on load (onboarding default is dark)
 FTTheme.init();
 loadStats();
 document.getElementById('ob-name').addEventListener('keydown',e=>{
